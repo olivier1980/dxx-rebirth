@@ -1608,6 +1608,7 @@ constexpr cheat_code cheat_codes[] = {
 	{ "bruin", &game_cheats::extralife },
 	{ "porgys", &game_cheats::rapidfire },
 	{ "ahimsa", &game_cheats::robotfiringsuspended },
+	{ "crazydescent", &game_cheats::vulcansuspended },
 	{ "baldguy", &game_cheats::baldguy },
 #elif defined(DXX_BUILD_DESCENT_II)
 	{ "gabbagabbahey", &game_cheats::lamer },
@@ -1931,6 +1932,11 @@ static window_event_result FinalCheats(const d_level_shared_robot_info_state &Le
 	{
 		HUD_init_message(HM_DEFAULT, "Robot firing %s!", cheats.robotfiringsuspended?TXT_OFF:TXT_ON);
 	}
+
+    if (gotcha == &game_cheats::vulcansuspended)
+    {
+        HUD_init_message(HM_DEFAULT, "Robot Vulcan firing %s!", cheats.vulcansuspended?TXT_OFF:TXT_ON);
+    }
 
 #if defined(DXX_BUILD_DESCENT_II)
 	if (gotcha == &game_cheats::killallrobots)
