@@ -26,6 +26,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <algorithm>
 #include <cstdlib>
 #include <stdio.h>
+#include <iostream>
 #include <time.h>
 #include <optional>
 
@@ -1167,6 +1168,13 @@ static void ai_fire_laser_at_player(const d_robot_info_array &Robot_info, const 
 	vms_vector	fire_vec;
 
 	Assert(robptr.attack_type == 0);	//	We should never be coming here for the green guy, as he has no laser!
+
+    auto robot_id = static_cast<uint8_t> (get_robot_id(obj));
+
+    std::cout << unsigned(robot_id) << std::endl;
+
+    if (cheats.vulcansuspended && robot_id == 19)
+        return;
 
 	if (cheats.robotfiringsuspended)
 		return;
