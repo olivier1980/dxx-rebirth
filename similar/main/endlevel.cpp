@@ -39,6 +39,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "palette.h"
 #include "iff.h"
 #include "console.h"
+#include "texmap.h"
 #include "fvi.h"
 #include "u_mem.h"
 #include "sounds.h"

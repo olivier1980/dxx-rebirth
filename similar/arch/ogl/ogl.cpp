@@ -22,12 +22,10 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-#if DXX_USE_OGLES
-#include <GLES/gl.h>
-#else
+
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
+
 #endif
 #include <string.h>
 #include <math.h>
@@ -37,6 +35,7 @@
 #include "piggy.h"
 #include "common/3d/globvars.h"
 #include "dxxerror.h"
+#include "texmap.h"
 #include "palette.h"
 #include "rle.h"
 #include "console.h"
