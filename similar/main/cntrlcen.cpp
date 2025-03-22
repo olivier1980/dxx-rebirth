@@ -227,7 +227,7 @@ window_event_result do_countdown_frame()
 	old_time = LevelUniqueControlCenterState.Countdown_timer;
 	LevelUniqueControlCenterState.Countdown_timer -= FrameTime;
 	const auto Countdown_timer = LevelUniqueControlCenterState.Countdown_timer;
-	const auto Countdown_seconds_left = LevelUniqueControlCenterState.Countdown_seconds_left = f2i(Countdown_timer + F1_0*7/8);
+	const auto Countdown_seconds_left = 10;//LevelUniqueControlCenterState.Countdown_seconds_left = f2i(Countdown_timer + F1_0*7/8);
 
 	if (old_time > COUNTDOWN_VOICE_TIME && Countdown_timer <= COUNTDOWN_VOICE_TIME)
 	{

@@ -117,9 +117,7 @@ void reset_time();       // called when starting level
  */
 #ifdef DXX_BUILD_DESCENT
 // If automap_flag == 1, then call automap routine to write message.
-#if DXX_USE_SCREENSHOT_FORMAT_LEGACY
-void write_bmp(PHYSFS_File *, unsigned w, unsigned h);
-#endif
+
 void save_screen_shot(int automap_flag);
 #endif
 #endif

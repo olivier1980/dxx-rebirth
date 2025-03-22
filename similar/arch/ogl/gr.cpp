@@ -69,8 +69,7 @@ using std::min;
 using std::max;
 
 namespace dcx {
-
-static int ogl_brightness_r, ogl_brightness_g, ogl_brightness_b;
+    static int ogl_brightness_r, ogl_brightness_g, ogl_brightness_b;
 
 #if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
 static int sdl_video_flags;
@@ -89,20 +88,18 @@ SDL_Window *g_pRebirthSDLMainWindow;
 static int g_iRebirthWindowX, g_iRebirthWindowY;
 #endif
 #endif
-static ogl_sync sync_helper;
-static int gr_installed;
-static int gl_initialized;
-int linedotscale{1}; // scalar of glLinewidth and glPointSize - only calculated once when resolution changes
+    static ogl_sync sync_helper;
+    static int gr_installed;
+    static int gl_initialized;
+    int linedotscale{1}; // scalar of glLinewidth and glPointSize - only calculated once when resolution changes
 #ifdef RPI
 static int sdl_no_modeswitch;
 #else
-enum { sdl_no_modeswitch = 0 };
+    enum { sdl_no_modeswitch = 0 };
 #endif
-
 }
 
 namespace dsx {
-
 #if SDL_MAJOR_VERSION == 1
 void gr_set_mode_from_window_size()
 {
@@ -122,10 +119,9 @@ void gr_set_mode_from_window_size()
 	gr_set_mode_from_window_size(g_pRebirthSDLMainWindow);
 }
 #endif
-
 }
 
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1 
+#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
 static EGLDisplay eglDisplay=EGL_NO_DISPLAY;
 static EGLConfig eglConfig;
 static EGLSurface eglSurface=EGL_NO_SURFACE;
@@ -144,16 +140,14 @@ static bool TestEGLError(const char* pszLocation)
 		con_printf(CON_URGENT, "%s failed (%d).", pszLocation, iErr);
 		return 0;
 	}
-	
+
 	return 1;
 }
 #endif
 
 namespace dcx {
-
-void ogl_swap_buffers_internal(void)
-{
-	sync_helper.before_swap();
+    void ogl_swap_buffers_internal(void) {
+        sync_helper.before_swap();
 #if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
 	eglSwapBuffers(eglDisplay, eglSurface);
 #else
@@ -163,13 +157,11 @@ void ogl_swap_buffers_internal(void)
 	SDL_GL_SwapWindow(g_pRebirthSDLMainWindow);
 #endif
 #endif
-	sync_helper.after_swap();
-}
-
+        sync_helper.after_swap();
+    }
 }
 
 namespace dsx {
-
 #ifdef RPI
 
 // MH: I got the following constants for vc_dispmanx_element_change_attributes() from:
@@ -309,59 +301,7 @@ static int rpi_setup_element(int x, int y, Uint32 video_flags, int update)
 
 #endif // RPI
 
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-static void ogles_destroy()
-{
-	if( eglDisplay != EGL_NO_DISPLAY ) {
-		eglMakeCurrent(eglDisplay, NULL, NULL, EGL_NO_CONTEXT);
-	}
-
-	if (eglContext != EGL_NO_CONTEXT) {
-		con_printf(CON_DEBUG, "EGL: destroyig context");
-		eglDestroyContext(eglDisplay, eglContext);
-		eglContext = EGL_NO_CONTEXT;
-	}
-
-	if (eglSurface != EGL_NO_SURFACE) {
-		con_printf(CON_DEBUG, "EGL: destroyig surface");
-		eglDestroySurface(eglDisplay, eglSurface);
-		eglSurface = EGL_NO_SURFACE;
-	}
-
-	if (eglDisplay != EGL_NO_DISPLAY) {
-		con_printf(CON_DEBUG, "EGL: terminating");
-		eglTerminate(eglDisplay);
-		eglDisplay = EGL_NO_DISPLAY;
-	}
-}
-#endif
-
-static int ogl_init_window(int w, int h)
-{
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-	SDL_SysWMinfo info;
-	Window    x11Window = 0;
-	Display*  x11Display = 0;
-	EGLint    ver_maj, ver_min;
-	EGLint configAttribs[] =
-	{
-		EGL_RED_SIZE, 5,
-		EGL_GREEN_SIZE, 6,
-		EGL_BLUE_SIZE, 5,
-		EGL_DEPTH_SIZE, 16,
-		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-		EGL_NONE, EGL_NONE
-	};
-
-	// explicitely request an OpenGL ES 1.x context
-        EGLint contextAttribs[] = { EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE, EGL_NONE };
-	// explicitely request a doublebuffering window
-        EGLint winAttribs[] = { EGL_RENDER_BUFFER, EGL_BACK_BUFFER, EGL_NONE, EGL_NONE };
-
-	int iConfigs;
-#endif // OGLES
-
+    static int ogl_init_window(int w, int h) {
 #if SDL_MAJOR_VERSION == 1
 	if (gl_initialized)
 		ogl_smash_texture_list_internal();//if we are or were fullscreen, changing vid mode will invalidate current textures
@@ -376,7 +316,7 @@ static int ogl_init_window(int w, int h)
 	int use_flags = sdl_video_flags;
 	if (sdl_no_modeswitch) {
 		const SDL_VideoInfo *vinfo=SDL_GetVideoInfo();
-		if (vinfo) {	
+		if (vinfo) {
 			use_x=vinfo->current_w;
 			use_y=vinfo->current_h;
 			use_bpp=vinfo->vfmt->BitsPerPixel;
@@ -437,7 +377,7 @@ static int ogl_init_window(int w, int h)
 		}
 	}
 
-	
+
 #ifdef RPI
 	if (rpi_setup_element(w,h,sdl_video_flags,1)) {
 		Error("RPi: Could not set up a %dx%d element\n", w, h);
@@ -462,7 +402,7 @@ static int ogl_init_window(int w, int h)
 			con_printf(CON_DEBUG, "EGL: Created window surface");
 		}
 	}
-	
+
 	if (eglContext == EGL_NO_CONTEXT) {
 		eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, contextAttribs);
 		if ((!TestEGLError("eglCreateContext")) || eglContext == EGL_NO_CONTEXT) {
@@ -471,7 +411,7 @@ static int ogl_init_window(int w, int h)
 			con_printf(CON_DEBUG, "EGL: Created context");
 		}
 	}
-	
+
 	eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
 	if (!TestEGLError("eglMakeCurrent")) {
 		con_printf(CON_URGENT, "EGL: Error making current");
@@ -480,30 +420,26 @@ static int ogl_init_window(int w, int h)
 	}
 #endif
 
-	const auto w640 = w / 640;
-	const auto h480 = h / 480;
-	const auto min_wh = std::min(w640, h480);
-	linedotscale = min_wh < 1 ? 1 : min_wh;
+        const auto w640 = w / 640;
+        const auto h480 = h / 480;
+        const auto min_wh = std::min(w640, h480);
+        linedotscale = min_wh < 1 ? 1 : min_wh;
 
-	gl_initialized=1;
-	return 0;
-}
-
+        gl_initialized = 1;
+        return 0;
+    }
 }
 
 namespace dcx {
-
-int gr_check_fullscreen(void)
-{
+    int gr_check_fullscreen(void) {
 #if SDL_MAJOR_VERSION == 1
 	return !!(sdl_video_flags & SDL_FULLSCREEN);
 #elif SDL_MAJOR_VERSION == 2
 	return !!(SDL_GetWindowFlags(g_pRebirthSDLMainWindow) & SDL_WINDOW_FULLSCREEN);
 #endif
-}
+    }
 
-void gr_toggle_fullscreen()
-{
+    void gr_toggle_fullscreen() {
 #if SDL_MAJOR_VERSION == 1
 	const auto local_sdl_video_flags = (sdl_video_flags ^= SDL_FULLSCREEN);
 	if (gl_initialized)
@@ -563,83 +499,78 @@ void gr_toggle_fullscreen()
 	}
 	gr_set_mode_from_window_size(SDLWindow);
 #endif
-}
+    }
 
-static void ogl_init_state(void)
-{
-	/* select clearing (background) color   */
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+    static void ogl_init_state(void) {
+        /* select clearing (background) color   */
+        glClearColor(0.0, 0.0, 0.0, 0.0);
 
-	/* initialize viewing values */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+        /* initialize viewing values */
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
 #if DXX_USE_OGLES
 	glOrthof(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 #else
- 	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+        glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 #endif
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();//clear matrix
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	gr_palette_step_up(0,0,0);//in case its left over from in game
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity(); //clear matrix
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gr_palette_step_up(0, 0, 0); //in case its left over from in game
 
-	ogl_init_pixel_buffers(grd_curscreen->get_screen_width(), grd_curscreen->get_screen_height());
-}
-
+        ogl_init_pixel_buffers(grd_curscreen->get_screen_width(), grd_curscreen->get_screen_height());
+    }
 }
 
 namespace dsx {
-
-static void ogl_tune_for_current(void)
-{
+    static void ogl_tune_for_current(void) {
 #if !DXX_USE_OGLES
-	const auto gl_vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-	const auto gl_renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-	const auto gl_version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+        const auto gl_vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        const auto gl_renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        const auto gl_version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 
-	con_printf(CON_VERBOSE, "DXX-Rebirth: OpenGL: vendor: %s", gl_vendor);
-	con_printf(CON_VERBOSE, "DXX-Rebirth: OpenGL: renderer: %s", gl_renderer);
+        con_printf(CON_VERBOSE, "DXX-Rebirth: OpenGL: vendor: %s", gl_vendor);
+        con_printf(CON_VERBOSE, "DXX-Rebirth: OpenGL: renderer: %s", gl_renderer);
 
-	if (gl_renderer)
-	{
-	//add driver specific hacks here.  whee.
-	if ((d_stricmp(gl_renderer,"Mesa NVIDIA RIVA 1.0\n")==0 || d_stricmp(gl_renderer,"Mesa NVIDIA RIVA 1.2\n")==0) && d_stricmp(gl_version,"1.2 Mesa 3.0")==0)
-	{
-		con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL renderer is blacklisted for GL intensity, GL read pixel, and GL GetTexLevel");
-		CGameArg.DbgGlIntensity4Ok = false;	//ignores alpha, always black background instead of transparent.
-		CGameArg.DbgGlReadPixelsOk = false;	//either just returns all black, or kills the X server entirely
-		CGameArg.DbgGlGetTexLevelParamOk = false;	//returns random data..
-	}
-	if (d_stricmp(gl_vendor,"Matrox Graphics Inc.")==0)
-	{
-		con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL renderer is blacklisted for GL intensity");
-		//displays garbage. reported by
-		//  redomen@crcwnet.com (render="Matrox G400" version="1.1.3 5.52.015")
-		//  orulz (Matrox G200)
-		CGameArg.DbgGlIntensity4Ok = 0;
-	}
+        if (gl_renderer) {
+            //add driver specific hacks here.  whee.
+            if ((d_stricmp(gl_renderer, "Mesa NVIDIA RIVA 1.0\n") == 0 ||
+                 d_stricmp(gl_renderer, "Mesa NVIDIA RIVA 1.2\n") == 0) && d_stricmp(gl_version, "1.2 Mesa 3.0") == 0) {
+                con_puts(CON_VERBOSE,
+                         "DXX-Rebirth: OpenGL renderer is blacklisted for GL intensity, GL read pixel, and GL GetTexLevel");
+                CGameArg.DbgGlIntensity4Ok = false; //ignores alpha, always black background instead of transparent.
+                CGameArg.DbgGlReadPixelsOk = false; //either just returns all black, or kills the X server entirely
+                CGameArg.DbgGlGetTexLevelParamOk = false; //returns random data..
+            }
+            if (d_stricmp(gl_vendor, "Matrox Graphics Inc.") == 0) {
+                con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL renderer is blacklisted for GL intensity");
+                //displays garbage. reported by
+                //  redomen@crcwnet.com (render="Matrox G400" version="1.1.3 5.52.015")
+                //  orulz (Matrox G200)
+                CGameArg.DbgGlIntensity4Ok = 0;
+            }
 #ifdef macintosh
 	if (d_stricmp(gl_renderer,"3dfx Voodoo 3")==0) // strangely, includes Voodoo 2
 		CGameArg.DbgGlGetTexLevelParamOk = false;	// Always returns 0
 #endif
-	}
+        }
 
 #ifndef NDEBUG
-	con_printf(CON_VERBOSE, "DXX-Rebirth: OpenGL: gl_intensity4:%i gl_luminance4_alpha4:%i gl_rgba2:%i gl_readpixels:%i gl_gettexlevelparam:%i", CGameArg.DbgGlIntensity4Ok, CGameArg.DbgGlLuminance4Alpha4Ok, CGameArg.DbgGlRGBA2Ok, CGameArg.DbgGlReadPixelsOk, CGameArg.DbgGlGetTexLevelParamOk);
+        con_printf(CON_VERBOSE,
+                   "DXX-Rebirth: OpenGL: gl_intensity4:%i gl_luminance4_alpha4:%i gl_rgba2:%i gl_readpixels:%i gl_gettexlevelparam:%i",
+                   CGameArg.DbgGlIntensity4Ok, CGameArg.DbgGlLuminance4Alpha4Ok, CGameArg.DbgGlRGBA2Ok,
+                   CGameArg.DbgGlReadPixelsOk, CGameArg.DbgGlGetTexLevelParamOk);
 #endif
-	if (ogl_maxanisotropy < 1.0f && CGameCfg.TexAnisotropy)
-	{
-		con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL: anisotropic texture filter not supported");
-		CGameCfg.TexAnisotropy = false;
-	}
+        if (ogl_maxanisotropy < 1.0f && CGameCfg.TexAnisotropy) {
+            con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL: anisotropic texture filter not supported");
+            CGameCfg.TexAnisotropy = false;
+        }
 #endif
-}
-
+    }
 }
 
 namespace dcx {
-
 #if SDL_MAJOR_VERSION == 1
 // returns possible (fullscreen) resolutions if any.
 uint_fast32_t gr_list_modes(std::array<screen_mode, 50> &gsmodes)
@@ -680,11 +611,9 @@ uint_fast32_t gr_list_modes(std::array<screen_mode, 50> &gsmodes)
 	}
 }
 #endif
-
 }
 
 namespace dsx {
-
 #if SDL_MAJOR_VERSION == 1
 static int gr_check_mode(const screen_mode mode)
 {
@@ -697,9 +626,8 @@ static int gr_check_mode(const screen_mode mode)
 }
 #endif
 
-int gr_set_mode(screen_mode mode)
-{
-	unsigned char *gr_bm_data;
+    int gr_set_mode(screen_mode mode) {
+        unsigned char *gr_bm_data;
 #if SDL_MAJOR_VERSION == 1
 	if (!gr_check_mode(mode))
 	{
@@ -709,29 +637,31 @@ int gr_set_mode(screen_mode mode)
 		Game_screen_mode = mode;
 	}
 #endif
-	const uint_fast32_t w = SM_W(mode), h = SM_H(mode);
+        const uint_fast32_t w = SM_W(mode), h = SM_H(mode);
 
-	gr_bm_data = grd_curscreen->sc_canvas.cv_bitmap.get_bitmap_data();//since we use realloc, we want to keep this pointer around.
-	auto gr_new_bm_data = reinterpret_cast<uint8_t *>(d_realloc(gr_bm_data, w * h));
-	if (!gr_new_bm_data)
-		return 0;
-	*grd_curscreen = {};
-	grd_curscreen->set_screen_width_height(w, h);
-	grd_curscreen->sc_aspect = fixdiv(grd_curscreen->get_screen_width() * CGameCfg.AspectX, grd_curscreen->get_screen_height() * CGameCfg.AspectY);
-	gr_init_canvas(grd_curscreen->sc_canvas, gr_new_bm_data, bm_mode::ogl, w, h);
+        gr_bm_data = grd_curscreen->sc_canvas.cv_bitmap.get_bitmap_data();
+        //since we use realloc, we want to keep this pointer around.
+        auto gr_new_bm_data = reinterpret_cast<uint8_t *>(d_realloc(gr_bm_data, w * h));
+        if (!gr_new_bm_data)
+            return 0;
+        *grd_curscreen = {};
+        grd_curscreen->set_screen_width_height(w, h);
+        grd_curscreen->sc_aspect = fixdiv(grd_curscreen->get_screen_width() * CGameCfg.AspectX,
+                                          grd_curscreen->get_screen_height() * CGameCfg.AspectY);
+        gr_init_canvas(grd_curscreen->sc_canvas, gr_new_bm_data, bm_mode::ogl, w, h);
 
-	ogl_init_window(w,h);//platform specific code
-	ogl_extensions_init();
-	ogl_tune_for_current();
-	sync_helper.init(CGameArg.OglSyncMethod, CGameArg.OglSyncWait);
+        ogl_init_window(w, h); //platform specific code
+        ogl_extensions_init();
+        ogl_tune_for_current();
+        sync_helper.init(CGameArg.OglSyncMethod, CGameArg.OglSyncWait);
 
-	OGL_VIEWPORT(0,0,w,h);
-	ogl_init_state();
-	gamefont_choose_game_font(w,h);
-	gr_remap_color_fonts();
+        OGL_VIEWPORT(0, 0, w, h);
+        ogl_init_state();
+        gamefont_choose_game_font(w, h);
+        gr_remap_color_fonts();
 
-	return 0;
-}
+        return 0;
+    }
 
 #define GLstrcmptestr(a,b) if (d_stricmp(a,#b)==0 || d_stricmp(a,"GL_" #b)==0)return GL_ ## b;
 
@@ -762,33 +692,29 @@ static int ogl_init_load_library(void)
 }
 #endif
 
-void gr_set_attributes(void)
-{
+    void gr_set_attributes(void) {
 #if !DXX_USE_OGLES
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE,0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,0);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 #if SDL_MAJOR_VERSION == 1
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, CGameCfg.VSync);
 #elif SDL_MAJOR_VERSION == 2
 	SDL_GL_SetSwapInterval(CGameCfg.VSync ? 1 : 0);
 #endif
-	int buffers, samples;
-	if (CGameCfg.Multisample)
-	{
-		buffers = 1;
-		samples = 4;
-	}
-	else
-	{
-		buffers = samples = 0;
-	}
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, buffers);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
+        int buffers, samples;
+        if (CGameCfg.Multisample) {
+            buffers = 1;
+            samples = 4;
+        } else {
+            buffers = samples = 0;
+        }
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, buffers);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
 #else
 #if SDL_MAJOR_VERSION == 2
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -796,15 +722,14 @@ void gr_set_attributes(void)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
 #endif
-	ogl_smash_texture_list_internal();
-	gr_remap_color_fonts();
-}
+        ogl_smash_texture_list_internal();
+        gr_remap_color_fonts();
+    }
 
-int gr_init()
-{
-	// Only do this function once!
-	if (gr_installed==1)
-		return -1;
+    int gr_init() {
+        // Only do this function once!
+        if (gr_installed == 1)
+            return -1;
 
 #ifdef RPI
 	// Initialize the broadcom host library
@@ -826,7 +751,7 @@ int gr_init()
 	ogl_init_load_library();
 #endif
 
-	gr_set_attributes();
+        gr_set_attributes();
 
 #if SDL_MAJOR_VERSION == 1
 	if (!CGameCfg.WindowMode && !CGameArg.SysWindow)
@@ -855,340 +780,273 @@ int gr_init()
 		SDL_SetWindowIcon(SDLWindow, window_icon);
 #endif
 
-	ogl_init_texture_list_internal();
+        ogl_init_texture_list_internal();
 
-	grd_curscreen = std::make_unique<grs_screen>();
-	*grd_curscreen = {};
-	grd_curscreen->sc_canvas.cv_bitmap.bm_data = NULL;
+        grd_curscreen = std::make_unique<grs_screen>();
+        *grd_curscreen = {};
+        grd_curscreen->sc_canvas.cv_bitmap.bm_data = NULL;
 
-	// Set the mode.
-	grd_curscreen->sc_canvas.cv_fade_level = GR_FADE_OFF;
-	grd_curscreen->sc_canvas.cv_font = NULL;
-	grd_curscreen->sc_canvas.cv_font_fg_color = 0;
-	grd_curscreen->sc_canvas.cv_font_bg_color = 0;
-	gr_set_current_canvas(grd_curscreen->sc_canvas);
+        // Set the mode.
+        grd_curscreen->sc_canvas.cv_fade_level = GR_FADE_OFF;
+        grd_curscreen->sc_canvas.cv_font = NULL;
+        grd_curscreen->sc_canvas.cv_font_fg_color = 0;
+        grd_curscreen->sc_canvas.cv_font_bg_color = 0;
+        gr_set_current_canvas(grd_curscreen->sc_canvas);
 
-	ogl_init_pixel_buffers(256, 128);       // for gamefont_init
+        ogl_init_pixel_buffers(256, 128); // for gamefont_init
 
-	gr_installed = 1;
+        gr_installed = 1;
 
-	return 0;
-}
+        return 0;
+    }
 
-void gr_close()
-{
-	ogl_brightness_r = ogl_brightness_g = ogl_brightness_b = 0;
+    void gr_close() {
+        ogl_brightness_r = ogl_brightness_g = ogl_brightness_b = 0;
 
-	if (gl_initialized)
-	{
-		ogl_smash_texture_list_internal();
-		sync_helper.deinit();
-	}
+        if (gl_initialized) {
+            ogl_smash_texture_list_internal();
+            sync_helper.deinit();
+        }
 
-	if (grd_curscreen)
-	{
-		if (grd_curscreen->sc_canvas.cv_bitmap.bm_mdata)
-			d_free(grd_curscreen->sc_canvas.cv_bitmap.bm_mdata);
-		/* Resetting grd_curscreen frees the default canvas, so set
-		 * grd_curcanv to nullptr since no canvas is available after
-		 * this block ends.
-		 */
-		grd_curcanv = nullptr;
-		grd_curscreen.reset();
-	}
-	ogl_close_pixel_buffers();
+        if (grd_curscreen) {
+            if (grd_curscreen->sc_canvas.cv_bitmap.bm_mdata)
+                d_free(grd_curscreen->sc_canvas.cv_bitmap.bm_mdata);
+            /* Resetting grd_curscreen frees the default canvas, so set
+             * grd_curcanv to nullptr since no canvas is available after
+             * this block ends.
+             */
+            grd_curcanv = nullptr;
+            grd_curscreen.reset();
+        }
+        ogl_close_pixel_buffers();
 #ifdef _WIN32
 	if (ogl_rt_loaded)
 		OpenGL_LoadLibrary(false, OglLibPath);
 #endif
 
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-	ogles_destroy();
-#ifdef RPI
-	con_printf(CON_DEBUG, "RPi: cleanuing up");
-	if (dispman_display != DISPMANX_NO_HANDLE) {
-		rpi_destroy_element();
-		con_printf(CON_DEBUG, "RPi: closing display");
-		vc_dispmanx_display_close(dispman_display);
-		dispman_display = DISPMANX_NO_HANDLE;
-	}
-#endif
-#endif
-}
-
+    }
 }
 
 namespace dcx {
+    void ogl_upixelc(const grs_bitmap &cv_bitmap, unsigned x, unsigned y, const color_palette_index c) {
+        std::array<GLfloat, 2> vertices = {
+            {
+                (x + cv_bitmap.bm_x) / static_cast<float>(last_width),
+                static_cast<GLfloat>(1.0 - (y + cv_bitmap.bm_y) / static_cast<float>(last_height))
+            }
+        };
+        const auto color_r{CPAL2Tr(c)};
+        const auto color_g{CPAL2Tg(c)};
+        const auto color_b{CPAL2Tb(c)};
+        GLfloat color_array[] = {
+            color_r, color_g, color_b, 1.0,
+            color_r, color_g, color_b, 1.0,
+            color_r, color_g, color_b, 1.0,
+            color_r, color_g, color_b, 1.0,
+        };
 
-void ogl_upixelc(const grs_bitmap &cv_bitmap, unsigned x, unsigned y, const color_palette_index c)
-{
-	std::array<GLfloat, 2> vertices = {{
-		(x + cv_bitmap.bm_x) / static_cast<float>(last_width),
-		static_cast<GLfloat>(1.0 - (y + cv_bitmap.bm_y) / static_cast<float>(last_height))
-	}};
-	const auto color_r{CPAL2Tr(c)};
-	const auto color_g{CPAL2Tg(c)};
-	const auto color_b{CPAL2Tb(c)};
-	GLfloat color_array[] = {
-		color_r, color_g, color_b, 1.0,
-		color_r, color_g, color_b, 1.0,
-		color_r, color_g, color_b, 1.0,
-		color_r, color_g, color_b, 1.0,
-	};
+        OGL_DISABLE(TEXTURE_2D);
+        glPointSize(linedotscale);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+        glColorPointer(4, GL_FLOAT, 0, color_array);
+        glDrawArrays(GL_POINTS, 0, 1);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
 
-	OGL_DISABLE(TEXTURE_2D);
-	glPointSize(linedotscale);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, vertices.data());
-	glColorPointer(4, GL_FLOAT, 0, color_array);
-	glDrawArrays(GL_POINTS, 0, 1);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-}
+    color_palette_index ogl_ugpixel(const grs_bitmap &bitmap, unsigned x, unsigned y) {
+        ubyte buf[4];
 
-color_palette_index ogl_ugpixel(const grs_bitmap &bitmap, unsigned x, unsigned y)
-{
-	ubyte buf[4];
+        GLint gl_draw_buffer;
+        glGetIntegerv(GL_DRAW_BUFFER, &gl_draw_buffer);
+        glReadBuffer(gl_draw_buffer);
+        glReadPixels(bitmap.bm_x + x, SHEIGHT - bitmap.bm_y - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
-#if !DXX_USE_OGLES
-	GLint gl_draw_buffer;
-	glGetIntegerv(GL_DRAW_BUFFER, &gl_draw_buffer);
-	glReadBuffer(gl_draw_buffer);
-#endif
+        return gr_find_closest_color(buf[0] / 4, buf[1] / 4, buf[2] / 4);
+    }
 
-	glReadPixels(bitmap.bm_x + x, SHEIGHT - bitmap.bm_y - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-	
-	return gr_find_closest_color(buf[0]/4, buf[1]/4, buf[2]/4);
-}
+    void ogl_urect(grs_canvas &canvas, const int left, const int top, const int right, const int bot,
+                   const color_palette_index c) {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
 
-void ogl_urect(grs_canvas &canvas, const int left, const int top, const int right, const int bot, const color_palette_index c)
-{
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+        const GLfloat xo{(left + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width)};
+        const GLfloat xf{(right + 1 + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width)};
+        const GLfloat yo{1.0f - (top + canvas.cv_bitmap.bm_y) / static_cast<float>(last_height)};
+        const GLfloat yf{1.0f - (bot + 1 + canvas.cv_bitmap.bm_y) / static_cast<float>(last_height)};
 
-	const GLfloat xo{(left + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width)};
-	const GLfloat xf{(right + 1 + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width)};
-	const GLfloat yo{1.0f - (top + canvas.cv_bitmap.bm_y) / static_cast<float>(last_height)};
-	const GLfloat yf{1.0f - (bot + 1 + canvas.cv_bitmap.bm_y) / static_cast<float>(last_height)};
+        OGL_DISABLE(TEXTURE_2D);
 
-	OGL_DISABLE(TEXTURE_2D);
+        const auto color_r{CPAL2Tr(c)};
+        const auto color_g{CPAL2Tg(c)};
+        const auto color_b{CPAL2Tb(c)};
 
-	const auto color_r{CPAL2Tr(c)};
-	const auto color_g{CPAL2Tg(c)};
-	const auto color_b{CPAL2Tb(c)};
+        const GLfloat color_a{
+            (canvas.cv_fade_level >= GR_FADE_OFF)
+                ? 1.0f
+                : 1.0f - static_cast<float>(canvas.cv_fade_level) / (static_cast<float>(GR_FADE_LEVELS) - 1.0f)
+        };
 
-	const GLfloat color_a{
-		(canvas.cv_fade_level >= GR_FADE_OFF)
-			? 1.0f
-			: 1.0f - static_cast<float>(canvas.cv_fade_level) / (static_cast<float>(GR_FADE_LEVELS) - 1.0f)
-	};
+        std::array<GLfloat, 16> color_array;
+        color_array[0] = color_array[4] = color_array[8] = color_array[12] = color_r;
+        color_array[1] = color_array[5] = color_array[9] = color_array[13] = color_g;
+        color_array[2] = color_array[6] = color_array[10] = color_array[14] = color_b;
+        color_array[3] = color_array[7] = color_array[11] = color_array[15] = color_a;
 
-	std::array<GLfloat, 16> color_array;
-	color_array[0] = color_array[4] = color_array[8] = color_array[12] = color_r;
-	color_array[1] = color_array[5] = color_array[9] = color_array[13] = color_g;
-	color_array[2] = color_array[6] = color_array[10] = color_array[14] = color_b;
-	color_array[3] = color_array[7] = color_array[11] = color_array[15] = color_a;
+        std::array<GLfloat, 8> vertices;
+        vertices[0] = xo;
+        vertices[1] = yo;
+        vertices[2] = xo;
+        vertices[3] = yf;
+        vertices[4] = xf;
+        vertices[5] = yf;
+        vertices[6] = xf;
+        vertices[7] = yo;
+        glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+        glColorPointer(4, GL_FLOAT, 0, color_array.data());
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4); //replaced GL_QUADS
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
 
-	std::array<GLfloat, 8> vertices;
-	vertices[0] = xo;
-	vertices[1] = yo;
-	vertices[2] = xo;
-	vertices[3] = yf;
-	vertices[4] = xf;
-	vertices[5] = yf;
-	vertices[6] = xf;
-	vertices[7] = yo;
-	glVertexPointer(2, GL_FLOAT, 0, vertices.data());
-	glColorPointer(4, GL_FLOAT, 0, color_array.data());
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);//replaced GL_QUADS
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-}
+    void ogl_ulinec(grs_canvas &canvas, const int left, const int top, const int right, const int bot, const int c) {
+        GLfloat xo, yo, xf, yf;
+        GLfloat fade_alpha = (canvas.cv_fade_level >= GR_FADE_OFF)
+                                 ? 1.0
+                                 : 1.0 - static_cast<float>(canvas.cv_fade_level) / (
+                                       static_cast<float>(GR_FADE_LEVELS) - 1.0);
 
-void ogl_ulinec(grs_canvas &canvas, const int left, const int top, const int right, const int bot, const int c)
-{
-	GLfloat xo,yo,xf,yf;
-	GLfloat fade_alpha = (canvas.cv_fade_level >= GR_FADE_OFF)
-		? 1.0
-		: 1.0 - static_cast<float>(canvas.cv_fade_level) / (static_cast<float>(GR_FADE_LEVELS) - 1.0);
+        const auto color_r{CPAL2Tr(c)};
+        const auto color_g{CPAL2Tg(c)};
+        const auto color_b{CPAL2Tb(c)};
+        GLfloat color_array[] = {
+            color_r, color_g, color_b, fade_alpha,
+            color_r, color_g, color_b, fade_alpha,
+            color_r, color_g, color_b, 1.0,
+            color_r, color_g, color_b, fade_alpha
+        };
 
-	const auto color_r{CPAL2Tr(c)};
-	const auto color_g{CPAL2Tg(c)};
-	const auto color_b{CPAL2Tb(c)};
-	GLfloat color_array[] = {
-		color_r, color_g, color_b, fade_alpha,
-		color_r, color_g, color_b, fade_alpha,
-		color_r, color_g, color_b, 1.0,
-		color_r, color_g, color_b, fade_alpha
-	};
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	
-	xo = (left + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width);
-	xf = (right + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width);
-	yo = 1.0 - (top + canvas.cv_bitmap.bm_y + 0.5) / static_cast<float>(last_height);
-	yf = 1.0 - (bot + canvas.cv_bitmap.bm_y + 0.5) / static_cast<float>(last_height);
- 
-	OGL_DISABLE(TEXTURE_2D);
+        xo = (left + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width);
+        xf = (right + canvas.cv_bitmap.bm_x) / static_cast<float>(last_width);
+        yo = 1.0 - (top + canvas.cv_bitmap.bm_y + 0.5) / static_cast<float>(last_height);
+        yf = 1.0 - (bot + canvas.cv_bitmap.bm_y + 0.5) / static_cast<float>(last_height);
 
-	std::array<GLfloat, 4> vertices = {{
-		xo,
-		yo,
-		xf,
-		yf,
-	}};
+        OGL_DISABLE(TEXTURE_2D);
 
-	glVertexPointer(2, GL_FLOAT, 0, vertices.data());
-	glColorPointer(4, GL_FLOAT, 0, color_array);
-	glDrawArrays(GL_LINES, 0, 2);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-}
+        std::array<GLfloat, 4> vertices = {
+            {
+                xo,
+                yo,
+                xf,
+                yf,
+            }
+        };
 
-static GLfloat last_r, last_g, last_b;
-static int do_pal_step;
+        glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+        glColorPointer(4, GL_FLOAT, 0, color_array);
+        glDrawArrays(GL_LINES, 0, 2);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
 
-void ogl_do_palfx(void)
-{
-	OGL_DISABLE(TEXTURE_2D);
+    static GLfloat last_r, last_g, last_b;
+    static int do_pal_step;
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+    void ogl_do_palfx(void) {
+        OGL_DISABLE(TEXTURE_2D);
 
-	GLfloat alast_r = last_r;
-	GLfloat alast_g = last_g;
-	GLfloat alast_b = last_b;
-	
-	if (!do_pal_step) {
-		return;
-	}
-	else if (last_r <= 0 && last_g <= 0 && last_b <= 0) 
-	{
-		// scale negative effect by 2.5 to match D1/D2 on GL
-		// also make values positive to actually have an effect
-		alast_r = last_r * -2.5;
-		alast_g = last_g * -2.5;
-		alast_b = last_b * -2.5;
-		
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ZERO,GL_ONE_MINUS_SRC_COLOR);
-	} 
-	else
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE,GL_ONE);
-	}
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
 
-	GLfloat color_array[] = { 
-		alast_r, alast_g, alast_b, 1.0,
-		alast_r, alast_g, alast_b, 1.0,
-		alast_r, alast_g, alast_b, 1.0,
-		alast_r, alast_g, alast_b, 1.0
-	};
+        GLfloat alast_r = last_r;
+        GLfloat alast_g = last_g;
+        GLfloat alast_b = last_b;
 
-	std::array<GLfloat, 8> vertices = {{
-		0, 0, 0, 1, 1, 1, 1, 0
-	}};
-	glVertexPointer(2, GL_FLOAT, 0, vertices.data());
-	glColorPointer(4, GL_FLOAT, 0, color_array);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);//replaced GL_QUADS
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
+        if (!do_pal_step) {
+            return;
+        } else if (last_r <= 0 && last_g <= 0 && last_b <= 0) {
+            // scale negative effect by 2.5 to match D1/D2 on GL
+            // also make values positive to actually have an effect
+            alast_r = last_r * -2.5;
+            alast_g = last_g * -2.5;
+            alast_b = last_b * -2.5;
 
-static int ogl_brightness_ok;
-static int old_b_r, old_b_g, old_b_b;
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ZERO,GL_ONE_MINUS_SRC_COLOR);
+        } else {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE,GL_ONE);
+        }
 
-inline int gr_apply_gamma_clamp(int v)
-{
-	if (v >= 0)
-		return max(v + gr_palette_gamma, 0);
-	else
-		return min(v + gr_palette_gamma, 0);
-}
+        GLfloat color_array[] = {
+            alast_r, alast_g, alast_b, 1.0,
+            alast_r, alast_g, alast_b, 1.0,
+            alast_r, alast_g, alast_b, 1.0,
+            alast_r, alast_g, alast_b, 1.0
+        };
 
-void gr_palette_step_up(int r, int g, int b)
-{
-	old_b_r = ogl_brightness_r;
-	old_b_g = ogl_brightness_g;
-	old_b_b = ogl_brightness_b;
+        std::array<GLfloat, 8> vertices = {
+            {
+                0, 0, 0, 1, 1, 1, 1, 0
+            }
+        };
+        glVertexPointer(2, GL_FLOAT, 0, vertices.data());
+        glColorPointer(4, GL_FLOAT, 0, color_array);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4); //replaced GL_QUADS
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
-	ogl_brightness_r = gr_apply_gamma_clamp(r);
-	ogl_brightness_g = gr_apply_gamma_clamp(g);
-	ogl_brightness_b = gr_apply_gamma_clamp(b);
+    static int ogl_brightness_ok;
+    static int old_b_r, old_b_g, old_b_b;
 
-	if (!ogl_brightness_ok)
-	{
-		last_r = ogl_brightness_r / 63.0;
-		last_g = ogl_brightness_g / 63.0;
-		last_b = ogl_brightness_b / 63.0;
+    inline int gr_apply_gamma_clamp(int v) {
+        if (v >= 0)
+            return max(v + gr_palette_gamma, 0);
+        else
+            return min(v + gr_palette_gamma, 0);
+    }
 
-		do_pal_step = (r || g || b || gr_palette_gamma);
-	}
-	else
-	{
-		do_pal_step = 0;
-	}
-}
+    void gr_palette_step_up(int r, int g, int b) {
+        old_b_r = ogl_brightness_r;
+        old_b_g = ogl_brightness_g;
+        old_b_b = ogl_brightness_b;
 
-void gr_palette_load( palette_array_t &pal )
-{
-	copy_bound_palette(gr_current_pal, pal);
+        ogl_brightness_r = gr_apply_gamma_clamp(r);
+        ogl_brightness_g = gr_apply_gamma_clamp(g);
+        ogl_brightness_b = gr_apply_gamma_clamp(b);
 
-	gr_palette_step_up(0, 0, 0); // make ogl_setbrightness_internal get run so that menus get brightened too.
-	reset_computed_colors();
-}
+        if (!ogl_brightness_ok) {
+            last_r = ogl_brightness_r / 63.0;
+            last_g = ogl_brightness_g / 63.0;
+            last_b = ogl_brightness_b / 63.0;
 
-struct TGA_header
-{
-      unsigned char TGAheader[12];
-      unsigned char header[6];
-};
+            do_pal_step = (r || g || b || gr_palette_gamma);
+        } else {
+            do_pal_step = 0;
+        }
+    }
 
-//writes out an uncompressed RGB .tga file
-//if we got really spiffy, we could optionally link in libpng or something, and use that.
-#if DXX_USE_SCREENSHOT_FORMAT_LEGACY
-void write_bmp(PHYSFS_File *const TGAFile, const unsigned w, const unsigned h)
-{
-	TGA_header TGA;
-	GLbyte HeightH,HeightL,WidthH,WidthL;
-	const unsigned buffer_size_TGA = w * h * 3;
-	const auto buf = std::make_unique<uint8_t[]>(buffer_size_TGA);
+    void gr_palette_load(palette_array_t &pal) {
+        copy_bound_palette(gr_current_pal, pal);
 
-	glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, buf.get());
-	for (const auto pixel : xrange(w * h))
-		std::swap(buf[pixel * 3], buf[pixel * 3 + 2]);
+        gr_palette_step_up(0, 0, 0); // make ogl_setbrightness_internal get run so that menus get brightened too.
+        reset_computed_colors();
+    }
 
-	HeightH = static_cast<GLbyte>(h / 256);
-	HeightL = static_cast<GLbyte>(h % 256);
-	WidthH  = static_cast<GLbyte>(w / 256);
-	WidthL  = static_cast<GLbyte>(w % 256);
-	// Write TGA Header
-	TGA.TGAheader[0] = 0;
-	TGA.TGAheader[1] = 0;
-	TGA.TGAheader[2] = 2;
-	TGA.TGAheader[3] = 0;
-	TGA.TGAheader[4] = 0;
-	TGA.TGAheader[5] = 0;
-	TGA.TGAheader[6] = 0;
-	TGA.TGAheader[7] = 0;
-	TGA.TGAheader[8] = 0;
-	TGA.TGAheader[9] = 0;
-	TGA.TGAheader[10] = 0;
-	TGA.TGAheader[11] = 0;
-	TGA.header[0] = WidthL;
-	TGA.header[1] = WidthH;
-	TGA.header[2] = HeightL;
-	TGA.header[3] = HeightH;
-	TGA.header[4] = static_cast<GLbyte>(24);
-	TGA.header[5] = 0;
-	PHYSFSX_writeBytes(TGAFile, &TGA, sizeof(TGA_header));
-	PHYSFSX_writeBytes(TGAFile, buf, buffer_size_TGA);
-}
-#endif
+    struct TGA_header {
+        unsigned char TGAheader[12];
+        unsigned char header[6];
+    };
+
+    //writes out an uncompressed RGB .tga file
+    //if we got really spiffy, we could optionally link in libpng or something, and use that.
 
 }

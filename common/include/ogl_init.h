@@ -14,10 +14,6 @@
 
 #include "dxxsconf.h"
 
-#if !DXX_USE_OGL
-#error "This file can only be included in OpenGL enabled builds."
-#endif
-
 #ifdef _MSC_VER
 #include <windows.h>
 #include <stddef.h>

@@ -48,7 +48,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "textures.h"
 #include "slew.h"
 #include "gauges.h"
-#include "texmap.h"
 #include "3d.h"
 #include "gameseg.h"
 #include "wall.h"
@@ -1491,10 +1490,6 @@ static window_event_result HandleTestKey(const d_level_shared_robot_info_state &
 #endif
 			break;
 		case KEY_DEBUGGED + KEY_L:
-#if !DXX_USE_OGL
-			if (++Lighting_on >= 2)
-                                Lighting_on = 0;
-#endif
                         break;
 		case KEY_PAD5: slew_stop(); break;
 

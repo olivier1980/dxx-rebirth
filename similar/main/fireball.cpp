@@ -1509,10 +1509,13 @@ void do_explosion_sequence(const d_robot_info_array &Robot_info, object &obj)
 			auto &robptr{Robot_info[get_robot_id(del_obj)]};
 			if (const auto contains_count{robptr.contains.count})
 			{
-				if (((d_rand() * 16) >> 15) < robptr.contains_prob) {
+				// Multiply by large nummer to always drop item
+				if (((d_rand() * 16) >> 15) < robptr.contains_prob*1) {
 					del_obj->contains = robptr.contains;
 					del_obj->contains.count = ((d_rand() * contains_count) >> 15) + 1;
 					maybe_replace_powerup_with_energy(del_obj);
+
+					// Duplicate for more powerups
 					object_create_robot_egg(Robot_info, del_obj);
 				}
 			}

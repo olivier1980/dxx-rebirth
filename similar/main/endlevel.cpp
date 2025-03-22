@@ -28,11 +28,9 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <algorithm>
 #include <stdlib.h>
 
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h> // for isspace
-
 #include "maths.h"
 #include "vecmat.h"
 #include "gr.h"
@@ -41,7 +39,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "palette.h"
 #include "iff.h"
 #include "console.h"
-#include "texmap.h"
 #include "fvi.h"
 #include "u_mem.h"
 #include "sounds.h"
@@ -72,10 +69,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #endif
 #include "render.h"
 #include "hudmsg.h"
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
-
 #include "joy.h"
 
 #if DXX_USE_EDITOR
@@ -351,11 +345,12 @@ static void draw_mine_exit_cover(grs_canvas &canvas)
 
 static void generate_starfield(d_unique_endlevel_state::starfield_type &stars)
 {
+	std::cout << stars.size() << std::endl;
 	range_for (auto &i, stars)
 	{
-		i.x = (d_rand() - D_RAND_MAX / 2) << 14;
-		i.z = (d_rand() - D_RAND_MAX / 2) << 14;
-		i.y = (d_rand() / 2) << 14;
+		i.x = (d_rand() - D_RAND_MAX / 2) << 11;
+		i.z = (d_rand() - D_RAND_MAX / 2) << 11;
+		i.y = (d_rand() / 2) << 11;
 	}
 }
 
@@ -379,34 +374,11 @@ void draw_stars(grs_canvas &canvas, const d_unique_endlevel_state::starfield_typ
 		{
 			p.p3_flags &= ~projection_flag::projected;
 			g3_project_point(p);
-#if !DXX_USE_OGL
-			gr_pixel(canvas.cv_bitmap, f2i(p.p3_sx), f2i(p.p3_sy), color);
-#else
+
 			g3_draw_sphere(canvas, p, F1_0 * 3, color);
-#endif
+
 		}
 	}
-
-//@@	{
-//@@		vms_vector delta;
-//@@		g3s_point top_pnt;
-//@@
-//@@		g3_rotate_point(&p,&satellite_pos);
-//@@		g3_rotate_delta_vec(&delta,&satellite_upvec);
-//@@
-//@@		g3_add_delta_vec(&top_pnt,&p,&delta);
-//@@
-//@@		if (! (p.p3_codes & clipping_code::behind)) {
-//@@			int save_im = Interpolation_method;
-//@@			Interpolation_method = 0;
-//@@			//p.p3_flags &= ~projection_flag::projected;
-//@@			g3_project_point(&p);
-//@@			if (! (p.p3_flags & projection_flag::overflow))
-//@@				//gr_bitmapm(f2i(p.p3_sx)-32,f2i(p.p3_sy)-32,satellite_bitmap);
-//@@				g3_draw_rod_tmap(satellite_bitmap,&p,SATELLITE_WIDTH,&top_pnt,SATELLITE_WIDTH,f1_0);
-//@@			Interpolation_method = save_im;
-//@@		}
-//@@	}
 }
 
 static void angvec_add2_scale(vms_angvec &dest,const vms_vector &src,fix s)
@@ -636,14 +608,7 @@ static void render_external_scene(fvcobjptridx &vcobjptridx, grs_canvas &canvas,
 			gr_settransblend(canvas, GR_FADE_OFF, gr_blend::normal); // revert any transparency/blending setting back to normal
 #endif
 	}
-
-#if !DXX_USE_OGL
-	Lighting_on=0;
-#endif
 	render_object(canvas, LevelUniqueLightState, vmobjptridx(ConsoleObject));
-#if !DXX_USE_OGL
-	Lighting_on=1;
-#endif
 }
 
 }
@@ -779,10 +744,6 @@ window_event_result start_endlevel_sequence()
 
 window_event_result stop_endlevel_sequence()
 {
-#if !DXX_USE_OGL
-	Interpolation_method = 0;
-#endif
-
 	select_cockpit(PlayerCfg.CockpitMode[0]);
 
 	Endlevel_sequence = EL_OFF;

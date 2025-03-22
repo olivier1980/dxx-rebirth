@@ -651,7 +651,7 @@ void init_ai_object(const d_robot_info_array &Robot_info, const vmobjptridx_t ob
 	if (robptr.cloak_type == RI_CLOAKED_ALWAYS)
 		aip->CLOAKED = 1;
 	else
-		aip->CLOAKED = 0;
+		aip->CLOAKED = 0; //RI_CLOAKED_ALWAYS
 
 	obj.mtype.phys_info.flags |= (PF_BOUNCE | PF_TURNROLL);
 	
@@ -1181,6 +1181,10 @@ static void ai_fire_laser_at_player(const d_robot_info_array &Robot_info, const 
 
     std::cout << "Robot id: " + std::to_string(robot_id) << std::endl;
 
+	//Prevent enemies from firing altogether
+	//return;
+
+	// My custom cheat for vulcan enemies
     if (cheats.vulcansuspended && robot_id == 19)
         return;
 

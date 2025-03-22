@@ -280,7 +280,6 @@ add_executable(dxx_rebirth
 #    common/texmap/scanline.cpp
 #    common/texmap/scanline.h
 #    common/texmap/texmapl.h
-#    common/texmap/tmapflat.cpp
     common/ui/button.cpp
     common/ui/checkbox.cpp
     common/ui/dialog.cpp

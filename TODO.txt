@@ -1,0 +1,17 @@
+- make robots always drop powerup (and more too!)
+- Increase speed, rotation player
+- Start with more lives
+- Enemies always cloaked (or not)
+- No lava / collision damage
+- Collision counter demo
+- Change text using USE_BUILTIN_ENGLISH_TEXT_STRINGS
+- Prevent all enemies from firing
+- light intensity mine
+- reveal automap (just toggle cheat in code?)
+- instant destroy walls (hostage)
+- open all doors? / prevent door from closing
+- Remove all enemies
+- endlevel starfield
+- Extend countdown/disable
+- Rock ship after reactor
+- Transparent walls, load more of level

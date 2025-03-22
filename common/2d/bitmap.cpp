@@ -30,9 +30,9 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "u_mem.h"
 #include "gr.h"
 #include "dxxerror.h"
-#if DXX_USE_OGL
+#include <iostream>
 #include "ogl_init.h"
-#endif
+
 #include "bitmap.h"
 #include <memory>
 
@@ -66,9 +66,7 @@ static void report_dimension_overflow(const char dimension, const uint16_t offse
 
 void gr_set_bitmap_data(grs_bitmap &bm, const uint8_t *data)
 {
-#if DXX_USE_OGL
 	ogl_freebmtexture(bm);
-#endif
 	bm.bm_data = data;
 }
 
@@ -102,10 +100,10 @@ void gr_init_bitmap(grs_bitmap &bm, const bm_mode mode, const uint16_t x, const 
 	bm.bm_rowsize = bytesperline;
 
 	bm.bm_mdata = mdata;
-#if DXX_USE_OGL
+
 	bm.bm_parent = nullptr;
 	bm.gltexture = nullptr;
-#endif
+
 }
 
 void gr_init_main_bitmap(grs_main_bitmap &bm, const bm_mode mode, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h, const uint16_t bytesperline, RAIIdmem<uint8_t[]> data)
@@ -138,9 +136,7 @@ void gr_free_bitmap_data (grs_bitmap &bm) // TODO: virtulize
 {
 	if (auto &d = bm.bm_mdata)
 		d_free(d);
-#if DXX_USE_OGL
 	ogl_freebmtexture(bm);
-#endif
 }
 
 void gr_init_sub_bitmap(grs_bitmap &bm, grs_bitmap &bmParent, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h)	// TODO: virtualize
@@ -162,10 +158,7 @@ void gr_init_sub_bitmap(grs_bitmap &bm, grs_bitmap &bmParent, const uint16_t x, 
 	bm.set_flags(bmParent.get_flags());
 	bm.set_type(bmParent.get_type());
 	bm.bm_rowsize = bmParent.bm_rowsize;
-
-#if DXX_USE_OGL
 	bm.gltexture = bmParent.gltexture;
-#endif
 	bm.bm_parent = &bmParent;
 	bm.bm_data = &bmParent.bm_data[static_cast<uint32_t>((y*bmParent.bm_rowsize)+x)];
 }
@@ -197,6 +190,7 @@ void build_colormap_good(const palette_array_t &palette, std::array<color_palett
 
 void gr_remap_bitmap_good(grs_bitmap &bmp, palette_array_t &palette, uint_fast32_t transparent_color, uint_fast32_t super_transparent_color)
 {
+	std::cout << "remap" << std::endl;
 	std::array<color_palette_index, 256> colormap;
 	build_colormap_good(palette, colormap);
 

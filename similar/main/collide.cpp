@@ -512,6 +512,7 @@ volatile_wall_result check_volatile_wall(const vmobjptridx_t obj, const unique_s
 					damage /= 2;
 #endif
 
+				// Disable for no lava damage
 				apply_damage_to_player(obj, obj, damage, apply_damage_player::always);
 				PALETTE_FLASH_ADD(f2i(damage*4), 0, 0);	//flash red
 			}
@@ -2183,6 +2184,8 @@ void apply_damage_to_player(object &playerobj, const icobjptridx_t killer, const
 
 	if (Endlevel_sequence)
 		return;
+
+
 
 	//for the player, the 'real' shields are maintained in the Players[]
 	//array.  The shields value in the player's object are, I think, not

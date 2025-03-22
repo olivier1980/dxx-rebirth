@@ -19,9 +19,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 #include "u_mem.h"
 #include "gr.h"
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
 
 namespace dcx {
 
@@ -34,10 +32,9 @@ color_palette_index gr_ugpixel(const grs_bitmap &bitmap, int x, int y)
 		case bm_mode::ilbm:
 		case bm_mode::rgb15:
 			break;
-#if DXX_USE_OGL
 		case bm_mode::ogl:
 			return ogl_ugpixel(bitmap, x, y);
-#endif
+
 	}
 	return color_palette_index{0};
 }

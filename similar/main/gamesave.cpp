@@ -528,7 +528,7 @@ static void read_object(const vmobjptr_t obj, const NamedPHYSFS_File f, int vers
 				 * prevent checking their IDs.
 				 */
 			if (get_powerup_id(obj) == powerup_type_t::POW_VULCAN_WEAPON)
-					obj->ctype.powerup_info.count = VULCAN_WEAPON_AMMO_AMOUNT;
+					obj->ctype.powerup_info.count = VULCAN_WEAPON_AMMO_AMOUNT*1; // Multiply
 
 #if DXX_BUILD_DESCENT == 2
 			else if (get_powerup_id(obj) == powerup_type_t::POW_GAUSS_WEAPON)

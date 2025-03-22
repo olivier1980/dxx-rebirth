@@ -385,9 +385,7 @@ static void ab_load(int skip, const char * filename, std::array<bitmap_index, MA
 		snprintf(tempname.data(), tempname.size(), "%.*s#%" PRIuFAST32, DXX_ptrdiff_cast_int(path.base_end - path.base_start), path.base_start, i );
 #endif
 		gr_remap_bitmap_good(*bm[i].get(), newpal, iff_has_transparency ? iff_transparent_color : -1, SuperX);
-#if !DXX_USE_OGL
-		bm[i]->avg_color = compute_average_pixel(bm[i].get());
-#endif
+
 		bmp[i] = piggy_register_bitmap(*bm[i].get(), tempname, 0);
 	}
 }
@@ -921,6 +919,7 @@ namespace {
 static void set_lighting_flag(grs_bitmap &bmp)
 {
 	bmp.set_flag_mask(vlighting < 0, BM_FLAG_NO_LIGHTING);
+	//bmp.set_flag_mask(vlighting < 0, BM_FLAG_SUPER_TRANSPARENT);
 }
 
 }

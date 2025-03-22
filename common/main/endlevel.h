@@ -36,7 +36,7 @@ namespace dcx {
 
 struct d_unique_endlevel_state
 {
-	using starfield_type = std::array<vms_vector, 500>;
+	using starfield_type = std::array<vms_vector, 3000>;
 	starfield_type stars;
 };
 

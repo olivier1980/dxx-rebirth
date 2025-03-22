@@ -29,9 +29,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "grdef.h"
 #include "maths.h"
 #include "clip.h"
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
 
 namespace dcx {
 
@@ -278,11 +276,9 @@ void gr_uline(grs_canvas &canvas, const fix _a1, const fix _b1, const fix _a2, c
 		case bm_mode::ilbm:
 		case bm_mode::rgb15:
 			break;
-#if DXX_USE_OGL
 	case bm_mode::ogl:
 		ogl_ulinec(canvas, a1, b1, a2, b2, color);
 		return;
-#endif
 	case bm_mode::linear:
 		gr_universal_uline(canvas, a1, b1, a2, b2, color);
 		return;

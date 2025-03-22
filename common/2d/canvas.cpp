@@ -22,9 +22,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 #include "u_mem.h"
 #include "gr.h"
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
 #include <memory>
 
 namespace dcx {
@@ -113,9 +111,7 @@ void gr_clear_canvas(grs_canvas &canvas, const color_palette_index color)
 void gr_settransblend(grs_canvas &canvas, const gr_fade_level fade_level, const gr_blend blend_func)
 {
 	canvas.cv_fade_level = fade_level;
-#if DXX_USE_OGL
 	ogl_set_blending(blend_func);
-#endif
 }
 
 }

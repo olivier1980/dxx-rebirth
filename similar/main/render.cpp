@@ -37,7 +37,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "segment.h"
 #include "dxxerror.h"
 #include "bm.h"
-#include "texmap.h"
 #include "render.h"
 #include "game.h"
 #include "object.h"
@@ -83,8 +82,8 @@ using std::max;
 #if DXX_USE_OGL
 int Render_depth = MAX_RENDER_SEGS; //how many segments deep to render
 #else
-int Render_depth{20}; //how many segments deep to render
-unsigned Max_linear_depth{50}; // Deepest segment at which linear interpolation will be used.
+int Render_depth{180}; //how many segments deep to render
+unsigned Max_linear_depth{150}; // Deepest segment at which linear interpolation will be used.
 #endif
 
 //used for checking if points have been rotated
@@ -121,7 +120,15 @@ static void add_light_and_saturate(fix &l, const fix add)
 	static constexpr fix MAX_LIGHT{0x10000};	// max value
 	l = (l >= MAX_LIGHT || add >= MAX_LIGHT)
 		? MAX_LIGHT
-		: std::min(l + add, MAX_LIGHT);
+		: std::min((l + add), MAX_LIGHT);
+}
+
+	static void add_light_and_saturate2(fix &l, const fix add)
+{
+	static constexpr fix MAX_LIGHT{0x7000};	// max value
+	l = (l >= MAX_LIGHT || add >= MAX_LIGHT)
+		? MAX_LIGHT
+		: std::min((l + add)/2, MAX_LIGHT);
 }
 
 }
@@ -283,7 +290,7 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 			if (bm2->get_flag_mask(BM_FLAG_SUPER_TRANSPARENT))
 			{
 				bm2 = nullptr;
-			bm = &texmerge_get_cached_bitmap( tmap1, tmap2 );
+				bm = &texmerge_get_cached_bitmap( tmap1, tmap2 );
 			}
 		}
 	}else
@@ -309,6 +316,9 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 	const auto control_center_destroyed = LevelUniqueControlCenterState.Control_center_destroyed;
 	const auto need_flashing_lights = (control_center_destroyed | Seismic_tremor_magnitude);	//make lights flash
 	auto &Dynamic_light = LevelUniqueLightState.Dynamic_light;
+
+	gr_settransblend(canvas, GR_FADE_OFF, gr_blend::additive_c);
+
 	//set light values for each vertex & build pointlist
 	for (auto &&[dli, uvli, vpi] : zip(std::span(dyn_light).first(nv), uvl_copy, vp))
 	{
@@ -320,7 +330,7 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 		if (need_flashing_lights)	//make lights flash
 			uvli.l = fixmul(flash_scale, uvli.l);
 		//add in dynamic light (from explosions, etc.)
-		add_light_and_saturate(uvli.l, (Dlvpi.r + Dlvpi.g + Dlvpi.b) / 3);
+		add_light_and_saturate(uvli.l, (Dlvpi.r + Dlvpi.g + Dlvpi.b));
 
 		// And now the same for the ACTUAL (rgb) light we want to use
 
@@ -334,10 +344,10 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 		}
 
 		// add light color
-		add_light_and_saturate(dli.r, Dlvpi.r);
-		add_light_and_saturate(dli.g, Dlvpi.g);
-		add_light_and_saturate(dli.b, Dlvpi.b);
-		if (PlayerCfg.AlphaEffects) // due to additive blending, transparent sprites will become invivible in font of white surfaces (lamps). Fix that with a little desaturation
+		add_light_and_saturate2(dli.r, Dlvpi.r);
+		add_light_and_saturate2(dli.g, Dlvpi.g);
+		add_light_and_saturate2(dli.b, Dlvpi.b);
+		if (PlayerCfg.AlphaEffects) // due to additive blending, transparent sprites will become invisible in font of white surfaces (lamps). Fix that with a little desaturation
 		{
 			dli.r *= .93;
 			dli.g *= .93;
@@ -1379,7 +1389,8 @@ static void build_segment_list(render_state_t &rstate, const vms_vector &Viewer_
 			const auto child_begin = child_list.begin();
 			auto child_iter = child_begin;
 			for (const auto &&[c, sv] : enumerate(Side_to_verts))
-			{		//build list of sides
+			{
+				//build list of sides
 				const auto wid = WALL_IS_DOORWAY(GameBitmaps, Textures, vcwallptr, seg, c);
 				if (wid & WALL_IS_DOORWAY_FLAG::rendpast)
 				{
@@ -1510,13 +1521,8 @@ void render_mine(grs_canvas &canvas, const vms_vector &Viewer_eye, const vcsegid
 	auto &Objects = LevelUniqueObjectState.Objects;
 	auto &Vertices = LevelSharedVertexState.get_vertices();
 	auto &vmobjptridx = Objects.vmptridx;
-#if DXX_USE_OGL
 	auto &TmapInfo = LevelUniqueTmapInfoState.TmapInfo;
-#else
-	auto &vcvertptr = Vertices.vcptr;
-	auto &Walls = LevelUniqueWallSubsystemState.Walls;
-	auto &vcwallptr = Walls.vcptr;
-#endif
+
 	using std::advance;
 	render_state_t rstate;
 	#ifndef NDEBUG
@@ -1582,49 +1588,7 @@ void render_mine(grs_canvas &canvas, const vms_vector &Viewer_eye, const vcsegid
 			}
 		}
 	}
-#if !DXX_USE_OGL
-	range_for (const auto segnum, reversed_render_range)
-	{
-		// Interpolation_method = 0;
-		auto &srsm = rstate.render_seg_map[segnum];
 
-		//if (!no_render_flag[nn])
-		if (segnum!=segment_none && (_search_mode || visited[segnum]!=3)) {
-			//set global render window vars
-
-			Current_seg_depth = srsm.Seg_depth;
-			{
-				const auto &rw = srsm.render_window;
-				Window_clip_left  = rw.left;
-				Window_clip_top   = rw.top;
-				Window_clip_right = rw.right;
-				Window_clip_bot   = rw.bot;
-			}
-
-			render_segment(vcvertptr, vcwallptr, Viewer_eye, *grd_curcanv, vcsegptridx(segnum));
-			visited[segnum]=3;
-			if (srsm.objects.empty())
-				continue;
-
-			{		//reset for objects
-				Window_clip_left  = Window_clip_top = 0;
-				Window_clip_right = canvas.cv_bitmap.bm_w-1;
-				Window_clip_bot   = canvas.cv_bitmap.bm_h-1;
-			}
-
-			{
-				//int n_expl_objs=0,expl_objs[5],i;
-				const auto save_linear_depth = std::exchange(Max_linear_depth, Max_linear_depth_objects);
-				range_for (auto &v, srsm.objects)
-				{
-					do_render_object(canvas, LevelUniqueLightState, vmobjptridx(v.objnum), window);	// note link to above else
-				}
-				Max_linear_depth = save_linear_depth;
-			}
-
-		}
-	}
-#else
         // Two pass rendering. Since sprites and some level geometry can have transparency (blending), we need some fancy sorting.
         // GL_DEPTH_TEST helps to sort everything in view but we should make sure translucent sprites are rendered after geometry to prevent them to turn walls invisible (if rendered BEFORE geometry but still in FRONT of it).
         // If walls use blending, they should be rendered along with objects (in same pass) to prevent some ugly clipping.
@@ -1738,7 +1702,7 @@ void render_mine(grs_canvas &canvas, const vms_vector &Viewer_eye, const vcsegid
 			}
 		}
 	}
-#endif
+
 
 	// -- commented out by mk on 09/14/94...did i do a good thing??  object_render_targets();
 

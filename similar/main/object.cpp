@@ -33,7 +33,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "bm.h"
 #include "3d.h"
 #include "segment.h"
-#include "texmap.h"
 #include "laser.h"
 #include "key.h"
 #include "gameseg.h"

@@ -352,70 +352,6 @@ static int gr_internal_string0m(grs_canvas &canvas, const grs_font &cv_font, con
 	return gr_internal_string0_template<false>(canvas, cv_font, x, y, s);
 }
 
-#if !DXX_USE_OGL
-static void gr_internal_color_string(grs_canvas &canvas, const grs_font &cv_font, const int x, const int y, const char *const s)
-{
-//a bitmap for the character
-	grs_bitmap char_bm{};
-	char_bm.set_type(bm_mode::linear);
-	char_bm.set_flags(BM_FLAG_TRANSPARENT);
-
-	const font_character_extent INFONT{cv_font};
-	char_bm.bm_h = cv_font.ft_h;		//set height for chars of this font
-
-	auto next_row{s};
-	auto yy{y};
-
-	const auto &&fspacy1{FSPACY(1)};
-	while (next_row != nullptr)
-	{
-		auto text_ptr1{next_row};
-		next_row = nullptr;
-		auto text_ptr{text_ptr1};
-
-		auto xx{x};
-
-		if (xx==0x8000)			//centered
-			xx = get_centered_x(canvas, cv_font, text_ptr);
-
-		while (*text_ptr)
-		{
-			if (*text_ptr == '\n' )
-			{
-				next_row = &text_ptr[1];
-				yy += cv_font.ft_h + fspacy1;
-				break;
-			}
-
-			const int letter{static_cast<uint8_t>(*text_ptr) - cv_font.ft_minchar};
-			const auto [width, spacing]{get_char_width<int>(cv_font, text_ptr[0], text_ptr[1])};
-
-			if (!INFONT(letter)) {	//not in font, draw as space
-				xx += spacing;
-				text_ptr++;
-				continue;
-			}
-
-			const auto fp{(cv_font.ft_flags & FT_PROPORTIONAL)
-				? cv_font.ft_chars[letter]
-				: &cv_font.ft_data[letter * BITS_TO_BYTES(width) * cv_font.ft_h]};
-
-			/* Cast away const-ness on the font pointer.  The function
-			 * must take the parameter as non-const because some callers
-			 * provide an uninitialized pointer and fill it later.
-			 */
-			gr_init_bitmap(char_bm, bm_mode::linear, 0, 0, width, cv_font.ft_h, width, const_cast<color_palette_index *>(fp));
-			gr_bitmapm(canvas, xx, yy, char_bm);
-
-			xx += spacing;
-
-			text_ptr++;
-		}
-
-	}
-}
-
-#else //OGL
 
 static unsigned get_font_total_width(const grs_font &font)
 {
@@ -679,7 +615,7 @@ static void ogl_internal_string(grs_canvas &canvas, const grs_font &cv_font, con
 }
 
 #define gr_internal_color_string ogl_internal_string
-#endif //OGL
+
 
 static inline int PHYSFSX_readU8_ptr(PHYSFS_File *const file, uint8_t *const b)
 {
@@ -754,9 +690,9 @@ void gr_string(grs_canvas &canvas, const grs_font &cv_font, const int x, const i
 			return;
 	}
 	if (
-#if DXX_USE_OGL
+
 		canvas.cv_bitmap.get_type() == bm_mode::ogl ||
-#endif
+
 		cv_font.ft_flags & FT_COLOR)
 	{
 		gr_internal_color_string(canvas, cv_font, x, y, s);
@@ -782,14 +718,13 @@ void gr_string(grs_canvas &canvas, const grs_font &cv_font, const int x, const i
 
 void gr_ustring(grs_canvas &canvas, const grs_font &cv_font, const int x, const int y, const char *const s)
 {
-#if DXX_USE_OGL
+
 	if (canvas.cv_bitmap.get_type() == bm_mode::ogl)
 	{
 		ogl_internal_string(canvas, cv_font, x, y, s);
 		return;
 	}
-#endif
-	
+
 	if (cv_font.ft_flags & FT_COLOR)
 		gr_internal_color_string(canvas, cv_font, x, y, s);
 	else

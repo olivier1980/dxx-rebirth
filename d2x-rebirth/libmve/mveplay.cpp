@@ -27,10 +27,7 @@
 #endif // _WIN32
 
 #include <SDL.h>
-#if DXX_USE_SDLMIXER
 #include <SDL_mixer.h>
-#endif
-
 #include "config.h"
 #include "d_sdl_audio.h"
 #include "mvelib.h"
@@ -348,12 +345,10 @@ MVESTREAM::handle_result MVESTREAM::handle_mve_segment_initaudiobuffers(unsigned
 		}
 	}
 
-#if DXX_USE_SDLMIXER
 	else {
 		// MD2211: using the same old SDL audio callback as a postmixer in SDL_mixer
 		Mix_SetPostMix(s.callback, s.userdata);
 	}
-#endif
 	}
 
 	mve_audio_buffers = {};
@@ -366,10 +361,8 @@ MVESTREAM::handle_result MVESTREAM::handle_mve_segment_startstopaudio()
 	{
 		if (CGameArg.SndDisableSdlMixer)
 			SDL_PauseAudio(0);
-#if DXX_USE_SDLMIXER
 		else
 			Mix_Pause(0);
-#endif
 		mve_audio_playing = 1;
 	}
 	return MVESTREAM::handle_result::step_again;
@@ -445,7 +438,7 @@ MVESTREAM::handle_result MVESTREAM::handle_mve_segment_audioframedata(const mve_
 			}
 
 			// MD2211: the following block does on-the-fly audio conversion for SDL_mixer
-#if DXX_USE_SDLMIXER
+
 			if (!CGameArg.SndDisableSdlMixer) {
 				// build converter: in = MVE format, out = SDL_mixer output
 				int out_freq;
@@ -476,7 +469,7 @@ MVESTREAM::handle_result MVESTREAM::handle_mve_segment_audioframedata(const mve_
 					memcpy(p.get(), cvt.buf, converted_buffer_size);
 				}
 			}
-#endif
+
 			mve_audio_buffers[mve_audio_buftail] = std::move(p);
 
 			if (++mve_audio_buftail == mve_audio_buffers.size())
@@ -672,10 +665,8 @@ void MVE_rmEndMovie(std::unique_ptr<MVESTREAM> stream)
 		{
 			SDL_CloseAudio();
 		}
-#if DXX_USE_SDLMIXER
 		else
 			Mix_SetPostMix(nullptr, nullptr);
-#endif
 	}
 }
 

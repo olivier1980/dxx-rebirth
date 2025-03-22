@@ -2613,10 +2613,7 @@ namespace {
 static void draw_numerical_display(const draw_numerical_display_draw_context hudctx, const int shield, const int energy)
 {
 	auto &canvas = hudctx.canvas;
-#if !DXX_USE_OGL
-	auto &multires_gauge_graphic = hudctx.multires_gauge_graphic;
-	hud_gauge_bitblt(hudctx, NUMERICAL_GAUGE_X, NUMERICAL_GAUGE_Y, GAUGE_NUMERICAL);
-#endif
+
 	// cockpit is not 100% geometric so we need to divide shield and energy X position by 1.951 which should be most accurate
 	// gr_get_string_size is used so we can get the numbers finally in the correct position with sw and ew
 	const int xb = grd_curscreen->get_screen_width() / 1.951;
@@ -2936,10 +2933,6 @@ static void draw_static(const d_vclip_array &Vclip, const hud_draw_context_hs_mr
 	const vclip *const vc = &Vclip[vclip_index::monitor_static];
 	int framenum;
 	auto &multires_gauge_graphic = hudctx.multires_gauge_graphic;
-#if !DXX_USE_OGL
-	int x,y;
-#endif
-
 	auto &time_static_played = inset_window[win].time_static_played;
 	time_static_played += FrameTime;
 	if (time_static_played >= vc->play_time) {

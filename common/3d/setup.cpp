@@ -17,12 +17,7 @@
 
 #include "3d.h"
 #include "globvars.h"
-
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#else
-#include "texmap.h"  // for init_interface_vars_to_assembler()
-#endif
 #include "gr.h"
 
 namespace dcx {
@@ -57,11 +52,8 @@ void g3_start_frame(grs_canvas &canvas)
 	
 	Window_scale.z = f1_0;		//always 1
 
-#if DXX_USE_OGL
+
 	ogl_start_frame(canvas);
-#else
-	init_interface_vars_to_assembler();		//for the texture-mapper
-#endif
 }
 
 }

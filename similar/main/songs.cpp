@@ -461,9 +461,7 @@ static void songs_init()
 void songs_uninit()
 {
 	songs_stop_all();
-#if DXX_USE_SDLMIXER
 	jukebox_unload();
-#endif
 	BIMSecretSongs.reset();
 	BIMSongs.reset();
 }
@@ -493,9 +491,8 @@ void songs_pause(void)
 	if (CGameCfg.MusicType == music_type::Redbook)
 		RBAPause();
 #endif
-#if DXX_USE_SDLMIXER
 	mix_pause_music();
-#endif
+
 }
 
 void songs_resume(void)
@@ -507,9 +504,8 @@ void songs_resume(void)
 	if (CGameCfg.MusicType == music_type::Redbook)
 		RBAResume();
 #endif
-#if DXX_USE_SDLMIXER
 	mix_resume_music();
-#endif
+
 }
 
 void songs_pause_resume(void)
@@ -518,9 +514,8 @@ void songs_pause_resume(void)
 	if (CGameCfg.MusicType == music_type::Redbook)
 		RBAPauseResume();
 #endif
-#if DXX_USE_SDLMIXER
 	mix_pause_resume_music();
-#endif
+
 }
 
 #if DXX_BUILD_DESCENT == 1
@@ -876,7 +871,7 @@ void songs_play_level_song(int levelnum, int offset)
 			break;
 		}
 #endif
-#if DXX_USE_SDLMIXER
+
 		case music_type::Custom:
 		{
 			if (CGameCfg.CMLevelMusicPlayOrder == LevelMusicPlayOrder::Random)
@@ -915,7 +910,7 @@ void songs_play_level_song(int levelnum, int offset)
 
 			break;
 		}
-#endif
+
 		default:
 			Song_playing = song_number::None;
 			break;
