@@ -1,0 +1,15 @@
+sudo apt-get install build-essential scons libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libphysfs-dev
+
+git clone repo
+
+sudo apt install gcc-12
+sudo apt install g++-12
+
+scons d1x=gcc12,sdl2 gcc12_CXX=/usr/bin/g++-12
+
+
+sudo apt install mingw-w64
+
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+sudo update-alternatives --config python
