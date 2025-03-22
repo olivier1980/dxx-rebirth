@@ -108,6 +108,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_range.h"
 #include "d_underlying_value.h"
 #include "d_zip.h"
+#include <iostream>
 
 #if DXX_BUILD_DESCENT == 1
 #include "custom.h"
