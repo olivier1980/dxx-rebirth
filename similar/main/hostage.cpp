@@ -56,7 +56,7 @@ void hostage_rescue()
 	auto &player_info = get_local_plrobj().ctype.player_info;
 	++player_info.mission.hostages_on_board;
 
-	// Do an audio effect
+	// Do an audio effect when not in demo mode
 	if (Newdemo_state != ND_STATE_PLAYBACK)
 		digi_play_sample(sound_effect::SOUND_HOSTAGE_RESCUED, F1_0);
 

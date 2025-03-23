@@ -2152,7 +2152,7 @@ help:assume compiler supports __attribute__((unused))
 		self._check_macro(context,macro_name=macro_name,macro_value=macro_value,test="""
 dxx_compiler_attribute_unused
 static void a(){}
-""", msg='for function __attribute__((unused))', successflags={'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ('-Wunused',))})
+""", msg='for function __attribute__((unused))', successflags={'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ())})
 
 	@_custom_test
 	def check_cxx11_static_assert(self,context,_f='''
@@ -4771,13 +4771,6 @@ class DXXArchive(DXXCommon):
 'common/ui/ui.cpp',
 'common/ui/uidraw.cpp',
 'common/ui/userbox.cpp',
-))
-	# for non-ogl
-	get_objects_arch_sdl = DXXCommon.create_lazy_object_getter((
-'common/3d/clipper.cpp',
-'common/texmap/ntmap.cpp',
-'common/texmap/scanline.cpp',
-'common/texmap/tmapflat.cpp',
 ))
 	# for ogl
 	get_objects_arch_ogl = DXXCommon.create_lazy_object_getter((

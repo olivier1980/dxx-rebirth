@@ -25,9 +25,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 #include "u_mem.h"
 #include "gr.h"
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
 
 namespace dcx {
 
@@ -35,11 +33,9 @@ void gr_upixel(grs_bitmap &cv_bitmap, const unsigned x, const unsigned y, const 
 {
 	switch (cv_bitmap.get_type())
 	{
-#if DXX_USE_OGL
 	case bm_mode::ogl:
 		ogl_upixelc(cv_bitmap, x, y, color);
 		return;
-#endif
 	case bm_mode::linear:
 		cv_bitmap.get_bitmap_data()[cv_bitmap.bm_rowsize * y + x] = color;
 		return;
@@ -58,18 +54,13 @@ void gr_pixel(grs_bitmap &cv_bitmap, const unsigned x, const unsigned y, const c
 
 namespace {
 
-#if !DXX_USE_OGL
-#define gr_bm_upixel(C,B,X,Y,C2) gr_bm_upixel(B,X,Y,C2)
-#endif
 static inline void gr_bm_upixel(grs_canvas &canvas, grs_bitmap &bm, const uint_fast32_t x, const uint_fast32_t y, const color_palette_index color)
 {
 	switch (bm.get_type())
 	{
-#if DXX_USE_OGL
 	case bm_mode::ogl:
 		ogl_upixelc(canvas.cv_bitmap, bm.bm_x + x, bm.bm_y + y, color);
 		return;
-#endif
 	case bm_mode::linear:
 		bm.get_bitmap_data()[bm.bm_rowsize*y+x] = color;
 		return;

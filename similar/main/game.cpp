@@ -259,20 +259,6 @@ void init_cockpit()
 	if ( Screen_mode == SCREEN_EDITOR )
 		PlayerCfg.CockpitMode[1] = cockpit_mode_t::full_screen;
 
-#if !DXX_USE_OGL
-	if (PlayerCfg.CockpitMode[1] != cockpit_mode_t::letterbox)
-	{
-#if DXX_BUILD_DESCENT == 2
-		int HiresGFXAvailable = !GameArg.GfxSkipHiresGFX;
-#endif
-		const auto full_screen_mode = HiresGFXAvailable
-			? screen_mode /* large_game_screen_mode */{640, 480}
-			: screen_mode /* small_game_screen_mode */{320, 200};
-		if (Game_screen_mode != full_screen_mode) {
-			PlayerCfg.CockpitMode[1] = cockpit_mode_t::full_screen;
-		}
-	}
-#endif
 
 	gr_set_default_canvas();
 	auto &canvas = *grd_curcanv;
@@ -1019,15 +1005,10 @@ void save_screen_shot(int automap_flag)
 		HUD_init_message(HM_DEFAULT, "%s '%s'", TXT_DUMPING_SCREEN, &savename[sizeof(SCRNS_DIR) - 1]);
 
 #if DXX_USE_OGL
-#if !DXX_USE_OGLES
 	glReadBuffer(GL_FRONT);
-#endif
+
 #if DXX_USE_SCREENSHOT_FORMAT_PNG
 	auto write_error = write_screenshot_png(file, tm, grd_curscreen->sc_canvas.cv_bitmap, void /* unused */);
-#elif DXX_USE_SCREENSHOT_FORMAT_LEGACY
-	write_bmp(file, grd_curscreen->get_screen_width(), grd_curscreen->get_screen_height());
-	/* write_bmp never fails */
-	std::false_type write_error;
 #endif
 #else
 	grs_canvas &screen_canv = grd_curscreen->sc_canvas;
@@ -1046,8 +1027,6 @@ void save_screen_shot(int automap_flag)
 	}
 #if DXX_USE_SCREENSHOT_FORMAT_PNG
 	auto write_error = write_screenshot_png(file, tm, grd_curscreen->sc_canvas.cv_bitmap, pal);
-#elif DXX_USE_SCREENSHOT_FORMAT_LEGACY
-	auto write_error = pcx_write_bitmap(file, &temp_canv->cv_bitmap, pal);
 #endif
 #endif
 	if (write_error)
@@ -1386,11 +1365,7 @@ void full_palette_save(void)
 
 namespace {
 
-#if DXX_USE_SDLMIXER
 #define EXT_MUSIC_TEXT "Jukebox/Audio CD"
-#else
-#define EXT_MUSIC_TEXT "Audio CD"
-#endif
 
 #if (defined(__APPLE__) || defined(macintosh))
 #define _DXX_HELP_MENU_SAVE_LOAD(VERB)	\

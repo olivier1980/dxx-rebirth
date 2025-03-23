@@ -26,7 +26,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <algorithm>
 #include <cstdlib>
 #include <stdio.h>
-
 #include "inferno.h"
 #include "game.h"
 #include "gr.h"
@@ -409,6 +408,8 @@ static void draw_cloaked_object(grs_canvas &canvas, const object_base &obj, cons
 //draw an object which renders as a polygon model
 static void draw_polygon_object(grs_canvas &canvas, const d_level_unique_light_state &LevelUniqueLightState, const vcobjptridx_t obj)
 {
+    //std::cout << unsigned(robot_id) << std::endl;
+
 	auto &BossUniqueState = LevelUniqueObjectState.BossState;
 	auto &Robot_info = LevelSharedRobotInfoState.Robot_info;
 	g3s_lrgb light;

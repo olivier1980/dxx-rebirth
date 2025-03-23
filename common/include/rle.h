@@ -57,9 +57,7 @@ static inline rle_position_t rle_end(const auto &src, auto &dst)
 namespace dcx {
 uint8_t *gr_rle_decode(const uint8_t *sb, uint8_t *db, rle_position_t e);
 void gr_bitmap_rle_compress(grs_bitmap &bmp);
-#if !DXX_USE_OGL
-void gr_rle_expand_scanline_masked(uint8_t *dest, const uint8_t *src, uint_fast32_t x1, uint_fast32_t x2);
-#endif
+
 void gr_rle_expand_scanline(uint8_t *dest, const uint8_t *src, uint_fast32_t x1, uint_fast32_t x2);
 grs_bitmap *_rle_expand_texture(const grs_bitmap &bmp);
 
@@ -75,10 +73,6 @@ void rle_cache_close();
 void rle_cache_flush();
 void rle_swap_0_255(grs_bitmap &bmp);
 void rle_remap(grs_bitmap &bmp, std::array<color_palette_index, 256> &colormap);
-#if !DXX_USE_OGL
-#define gr_rle_expand_scanline_generic(C,D,DX,DY,S,X1,X2) gr_rle_expand_scanline_generic(D,DX,DY,S,X1,X2)
-void gr_rle_expand_scanline_generic(grs_canvas &, grs_bitmap &dest, int dx, int dy, const ubyte *src, int x1, int x2 );
-#endif
 
 class bm_rle_expand_range
 {

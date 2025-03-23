@@ -50,9 +50,7 @@ public:
 	friend window *window_get_front();
 	friend window *window_get_first();
 	friend void window_select(window &wind);
-#if !DXX_USE_OGL
-	friend void window_update_canvases();
-#endif
+
 
 	uint8_t is_visible() const
 	{

@@ -101,66 +101,6 @@ uint8_t *gr_rle_decode(const color_palette_index *sb, color_palette_index *db, c
 	return db;
 }
 
-#if !DXX_USE_OGL
-// Given pointer to start of one scanline of rle data, uncompress it to
-// dest, from source pixels x1 to x2.
-void gr_rle_expand_scanline_masked(uint8_t *dest, const uint8_t *src, const uint_fast32_t x1, const uint_fast32_t x2)
-{
-	int i{0};
-	ubyte count;
-	uint8_t color{0};
-
-	if ( x2 < x1 ) return;
-
-	count = 0;
-	while ( i < x1 )	{
-		color = *src++;
-		if ( color == RLE_CODE ) return;
-		if ( IS_RLE_CODE(color) )	{
-			count = color & NOT_RLE_CODE;
-			color = *src++;
-		} else {
-			// unique
-			count = 1;
-		}
-		i += count;
-	}
-	count = i - x1;
-	i = x1;
-	// we know have '*count' pixels of 'color'.
-	
-	if ( x1+count > x2 )	{
-		count = x2-x1+1;
-		if ( color != TRANSPARENCY_COLOR )	rle_stosb( dest, count, color );
-		return;
-	}
-
-	if ( color != TRANSPARENCY_COLOR )	rle_stosb( dest, count, color );
-	dest += count;
-	i += count;
-
-	while( i <= x2 )
-	{
-		color = *src++;
-		if ( color == RLE_CODE ) return;
-		if ( IS_RLE_CODE(color) )	{
-			count = color & NOT_RLE_CODE;
-			color = *src++;
-		} else {
-			// unique
-			count = 1;
-		}
-		// we know have '*count' pixels of 'color'.
-		if ( i+count <= x2 )	{
-		} else {
-			count = x2-i+1;
-		}
-		if ( color != 255 )rle_stosb( dest, count, color );
-		i += count;
-		dest += count;
-	}
-}
-#endif
 
 void gr_rle_expand_scanline(uint8_t *dest, const uint8_t *src, const uint_fast32_t x1, const uint_fast32_t x2)
 {
@@ -470,64 +410,6 @@ grs_bitmap *_rle_expand_texture(const grs_bitmap &bmp)
 	return least_recently_used->expanded_bitmap.get();
 }
 
-#if !DXX_USE_OGL
-void gr_rle_expand_scanline_generic(grs_canvas &canvas, grs_bitmap &dest, int dx, const int dy, const uint8_t *src, const int x1, const int x2)
-{
-	int i{0};
-	int count;
-	uint8_t color{0};
-
-	if ( x2 < x1 ) return;
-
-	count = 0;
-	while ( i < x1 )	{
-		color = *src++;
-		if ( color == RLE_CODE ) return;
-		if ( IS_RLE_CODE(color) )	{
-			count = color & NOT_RLE_CODE;
-			color = *src++;
-		} else {
-			// unique
-			count = 1;
-		}
-		i += count;
-	}
-	count = i - x1;
-	i = x1;
-	// we know have '*count' pixels of 'color'.
-
-	if ( x1+count > x2 )	{
-		count = x2-x1+1;
-		for (int j{0}; j < count; ++j)
-			gr_bm_pixel(canvas, dest, dx++, dy, color);
-		return;
-	}
-
-	for (int j{0}; j < count; ++j)
-		gr_bm_pixel(canvas, dest, dx++, dy, color);
-	i += count;
-
-	while( i <= x2 )		{
-		color = *src++;
-		if ( color == RLE_CODE ) return;
-		if ( IS_RLE_CODE(color) )	{
-			count = color & NOT_RLE_CODE;
-			color = *src++;
-		} else {
-			// unique
-			count = 1;
-		}
-		// we know have '*count' pixels of 'color'.
-		if ( i+count <= x2 )	{
-		} else {
-			count = x2-i+1;
-		}
-		for (unsigned j{0}; j < count; ++j)
-			gr_bm_pixel(canvas, dest, dx++, dy, color);
-		i += count;
-	}
-}
-#endif
 
 /*
  * swaps entries 0 and 255 in an RLE bitmap without uncompressing it

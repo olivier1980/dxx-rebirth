@@ -1349,13 +1349,10 @@ int state_save_all_sub(const char *filename, const char *desc)
 		}
 
 		{
-#if DXX_USE_OGL
 			const auto buf = std::make_unique<uint8_t[]>(THUMBNAIL_W * THUMBNAIL_H * 4);
-#if !DXX_USE_OGLES
 		GLint gl_draw_buffer;
  		glGetIntegerv(GL_DRAW_BUFFER, &gl_draw_buffer);
  		glReadBuffer(gl_draw_buffer);
-#endif
 		glReadPixels(0, SHEIGHT - THUMBNAIL_H, THUMBNAIL_W, THUMBNAIL_H, GL_RGBA, GL_UNSIGNED_BYTE, buf.get());
 		int k;
 		k = THUMBNAIL_H;
@@ -1367,7 +1364,7 @@ int state_save_all_sub(const char *filename, const char *desc)
 			cnv->cv_bitmap.get_bitmap_data()[THUMBNAIL_W * k + j] =
 				gr_find_closest_color(buf[4*i]/4, buf[4*i+1]/4, buf[4*i+2]/4);
 		}
-#endif
+
 		}
 
 		PHYSFSX_writeBytes(fp, cnv->cv_bitmap.bm_data, THUMBNAIL_W * THUMBNAIL_H);

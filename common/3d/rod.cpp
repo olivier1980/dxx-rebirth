@@ -14,10 +14,6 @@
 #include "3d.h"
 #include "globvars.h"
 #include "maths.h"
-#if !DXX_USE_OGL
-#include "gr.h"
-#endif
-
 #include "compiler-range_for.h"
 
 namespace dcx {
@@ -125,43 +121,5 @@ void g3_draw_rod_tmap(grs_canvas &canvas, grs_bitmap &bitmap, const g3s_point &b
 	g3_draw_tmap(canvas, rod.point_list, uvl_list, lrgb_list, bitmap, tmap_drawer_ptr);
 }
 
-#if !DXX_USE_OGL
-//draws a bitmap with the specified 3d width & height 
-void g3_draw_bitmap(grs_canvas &canvas, const vms_vector &pos, fix width, fix height, grs_bitmap &bm)
-{
-	g3s_point pnt;
-	fix w,h;
-	if ((g3_rotate_point(pnt, pos) & clipping_code::behind) != clipping_code::None)
-		return;
-	g3_project_point(pnt);
-	if (pnt.p3_flags & projection_flag::overflow)
-		return;
-#ifndef __powerc
-	const auto pz = pnt.p3_vec.z;
-	if (const auto ox = checkmuldiv(width, Canv_w2, pz))
-		w = fixmul(*ox, Matrix_scale.x);
-	else
-		return;
-
-	if (const auto oy = checkmuldiv(height, Canv_h2, pz))
-		h = fixmul(*oy, Matrix_scale.y);
-	else
-		return;
-#else
-	if (pnt.p3_vec.z == 0)
-		return;
-	double fz = f2fl(pnt.p3_vec.z);
-	w = fixmul(fl2f(((f2fl(width)*fCanv_w2) / fz)), Matrix_scale.x);
-	h = fixmul(fl2f(((f2fl(height)*fCanv_h2) / fz)), Matrix_scale.y);
-#endif
-	const fix blob0y = pnt.p3_sy - h, blob1x = pnt.p3_sx + w;
-	const std::array<grs_point, 3> blob_vertices{{
-		{pnt.p3_sx - w, blob0y},
-		{blob1x, blob0y},
-		{blob1x, pnt.p3_sy + h},
-	}};
-	scale_bitmap(bm, blob_vertices, 0, canvas.cv_bitmap);
-}
-#endif
 
 }

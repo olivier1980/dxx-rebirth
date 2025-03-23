@@ -196,12 +196,6 @@ grs_subbitmap_ptr gr_create_sub_bitmap(grs_bitmap &bm, uint16_t x, uint16_t y, u
 
 // Free the bitmap's data
 
-#if !DXX_USE_OGL
-void gr_bm_ubitblt(grs_canvas &dest, unsigned w, unsigned h, int dx, int dy, int sx, int sy, const grs_bitmap &src);
-void gr_bm_ubitbltm(grs_canvas &dest, unsigned w, unsigned h, unsigned dx, unsigned dy, unsigned sx, unsigned sy, const grs_bitmap &src);
-#define gr_bm_pixel(C,B,X,Y,C2) gr_bm_pixel(B,X,Y,C2)
-#define gr_settransblend(A,B,C)	gr_settransblend(A,B)
-#endif
 void gr_bm_pixel(grs_canvas &, grs_bitmap &bm, uint_fast32_t x, uint_fast32_t y, uint8_t color);
 void gr_set_bitmap_data(grs_bitmap &bm, const uint8_t *data);
 }
@@ -249,10 +243,7 @@ void show_fullscr(grs_canvas &, grs_bitmap &bm);
 void gr_bitblt_find_transparent_area(const grs_bitmap &bm, unsigned &minx, unsigned &miny, unsigned &maxx, unsigned &maxy);
 
 // bitmap function with transparency
-#if !DXX_USE_OGL
-void gr_bitmapm(grs_canvas &, unsigned x, unsigned y, const grs_bitmap &bm);
-void gr_ubitmapm(grs_canvas &, unsigned x, unsigned y, grs_bitmap &bm);
-#endif
+
 
 // Draw a rectangle into the current canvas.
 void gr_rect(grs_canvas &, int left,int top,int right,int bot, color_palette_index color);
@@ -271,9 +262,7 @@ void gr_box(grs_canvas &, uint_fast32_t left,uint_fast32_t top,uint_fast32_t rig
 void gr_ubox(grs_canvas &, int left,int top,int right,int bot, color_palette_index color);
 
 void gr_scanline(grs_canvas &canvas, int x1, int x2, unsigned y, color_palette_index color);
-#if !DXX_USE_OGL
-void gr_uscanline(grs_canvas &canvas, unsigned x1, unsigned x2, unsigned y, color_palette_index color);
-#endif
+
 
 using grs_font_ptr = std::unique_ptr<grs_font>;
 
@@ -432,10 +421,8 @@ int gr_check_fullscreen();
  * check_fullscreen immediatly after)
  */
 void gr_toggle_fullscreen();
-
-#if DXX_USE_OGL
 void ogl_do_palfx();
 void ogl_init_pixel_buffers(unsigned w, unsigned h);
 void ogl_close_pixel_buffers();
-#endif
+
 }

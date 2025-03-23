@@ -29,24 +29,6 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <string>
 #include "dxxsconf.h"
 
-#if !DXX_USE_OGL
-namespace dcx {
-extern void c_tmap_scanline_lin();
-extern void c_tmap_scanline_lin_nolight();
-extern void c_tmap_scanline_flat();
-void c_tmap_scanline_shaded(const gr_fade_level fade);
 
-struct tmap_scanline_function_table
-{
-	using per = void ();
-	per *sl_per;
-};
-
-#define cur_tmap_scanline_per (tmap_scanline_functions.sl_per)
-
-extern tmap_scanline_function_table tmap_scanline_functions;
-void select_tmap(const std::string &type);
-}
-#endif
 
 #endif

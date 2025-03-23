@@ -571,9 +571,7 @@ properties_init_result properties_init(d_level_shared_robot_info_state &LevelSha
 			iwidth, bmh.height,
 			iwidth, Piggy_bitmap_cache_data);
 		temp_bitmap.add_flags(BM_FLAG_PAGED_OUT);
-#if !DXX_USE_OGL
-		temp_bitmap.avg_color = bmh.avg_color;
-#endif
+
 
 		if (MacPig)
 		{
@@ -880,9 +878,6 @@ void piggy_new_pigfile(const std::span<char, FILENAME_LEN> pigname)
 
 					gr_remap_bitmap_good(*bm[fnum].get(), newpal, iff_has_transparency ? iff_transparent_color : -1, SuperX);
 
-#if !DXX_USE_OGL
-					bm[fnum]->avg_color = compute_average_pixel(bm[fnum].get());
-#endif
 
 					if ( GameArg.EdiMacData )
 						swap_0_255(*bm[fnum].get());
@@ -1743,9 +1738,7 @@ void load_bitmap_replacements(const std::span<const char, FILENAME_LEN> level_na
 			width = bmh.width + (static_cast<short>(bmh.wh_extra & 0x0f) << 8);
 			gr_set_bitmap_data(*bm, NULL);	// free ogl texture
 			gr_init_bitmap(*bm, bm_mode::linear, 0, 0, width, bmh.height + (static_cast<short>(bmh.wh_extra & 0xf0) << 4), width, NULL);
-#if !DXX_USE_OGL
-			bm->avg_color = bmh.avg_color;
-#endif
+
 			bm->bm_data = reinterpret_cast<uint8_t *>(static_cast<uintptr_t>(bmh.offset));
 
 			gr_set_bitmap_flags(*bm, bmh.flags & BM_FLAGS_TO_COPY);

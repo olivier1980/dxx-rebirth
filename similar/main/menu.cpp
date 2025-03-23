@@ -60,9 +60,8 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "state.h"
 #include "mission.h"
 #include "songs.h"
-#if DXX_USE_SDLMIXER
 #include "jukebox.h" // for jukebox_exts
-#endif
+
 #include "config.h"
 #if DXX_BUILD_DESCENT == 2
 #include "movie.h"
@@ -239,7 +238,6 @@ std::optional<std::chrono::seconds> parse_human_readable_time(const char *const 
 	return std::nullopt;
 }
 
-#if DXX_USE_SDLMIXER
 enum class select_dir_flag : bool
 {
 	files_only,
@@ -257,7 +255,7 @@ static window_event_result get_absolute_path(ntstring<PATH_MAX - 1> &full_path, 
 }
 
 #define SELECT_SONG(t, s)	select_file_recursive(t, CGameCfg.CMMiscMusic[s], jukebox_exts, select_dir_flag::files_only, CGameCfg.CMMiscMusic[s])
-#endif
+
 
 }
 
@@ -2570,12 +2568,11 @@ public:
 
 struct sound_menu : sound_menu_items, newmenu
 {
-#if DXX_USE_SDLMIXER
 	ntstring<PATH_MAX - 1> &current_music = Game_wind
 		? CGameCfg.CMLevelMusicPath
 		: CGameCfg.CMMiscMusic[song_number::title];
 	ntstring<PATH_MAX - 1> old_music = current_music;
-#endif
+
 	sound_menu(grs_canvas &src) :
 		newmenu(menu_title{nullptr}, menu_subtitle{"Sound Effects & Music"}, menu_filename{nullptr}, tiny_mode_flag::normal, tab_processing_flag::ignore, adjusted_citem::create(m, 0), src)
 	{
@@ -2635,19 +2632,18 @@ window_event_result sound_menu::event_handler(const d_event &event)
 				replay = 1;
 			}
 #endif
-#if DXX_USE_SDLMIXER
+
 			else if (citem == opt_sm_mtype3)
 			{
 				CGameCfg.MusicType = music_type::Custom;
 				replay = 1;
 			}
-#endif
+
 			else if (citem == opt_sm_redbook_playorder)
 			{
 				CGameCfg.OrigTrackOrder = items[citem].value;
 				replay = static_cast<bool>(Game_wind);
 			}
-#if DXX_USE_SDLMIXER
 			else if (citem == opt_sm_mtype3_lmplayorder1)
 			{
 				CGameCfg.CMLevelMusicPlayOrder = LevelMusicPlayOrder::Continuous;
@@ -2663,7 +2659,7 @@ window_event_result sound_menu::event_handler(const d_event &event)
 				CGameCfg.CMLevelMusicPlayOrder = LevelMusicPlayOrder::Random;
 				replay = static_cast<bool>(Game_wind);
 			}
-#endif
+
 			break;
 		}
 		case event_type::newmenu_selected:
@@ -2697,7 +2693,6 @@ window_event_result sound_menu::event_handler(const d_event &event)
 			return window_event_result::handled;	// stay in menu
 		}
 		case event_type::window_close:
-#if DXX_USE_SDLMIXER
 			if (strcmp(old_music.data(), current_music.data()))
 			{
 				songs_uninit();
@@ -2706,7 +2701,6 @@ window_event_result sound_menu::event_handler(const d_event &event)
 				else
 					songs_play_song(song_number::title, 1);
 			}
-#endif
 			break;
 
 		default:

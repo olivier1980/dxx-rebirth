@@ -34,11 +34,10 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "dsx-ns.h"
 #include "pack.h"
 #include <array>
-
-#if DXX_USE_SDLIMAGE || !DXX_USE_OGL
+#include <iostream>
 #include <memory>
 #include <SDL_video.h>
-#endif
+
 
 namespace dcx {
 
@@ -107,11 +106,7 @@ public:
 	const color_palette_index *get_bitmap_data() const { return bm_data; }
 	color_palette_index *get_bitmap_data() { return bm_mdata; }
 	struct grs_bitmap  *bm_parent{};
-#if DXX_USE_OGL
 	struct ogl_texture *gltexture{};
-#else
-	uint8_t avg_color;  //  Average color of all pixels in texture map.
-#endif /* def OGL */
 };
 
 // Free the bitmap and its pixel data
@@ -125,9 +120,7 @@ public:
 		grs_bitmap{std::move(static_cast<grs_bitmap &>(r))}
 	{
 		r.bm_data = nullptr;
-#if DXX_USE_OGL
 		r.gltexture = nullptr;
-#endif
 	}
 	grs_main_bitmap &operator=(grs_main_bitmap &&r)
 	{
@@ -136,9 +129,7 @@ public:
 		reset();
 		grs_bitmap::operator=(std::move(static_cast<grs_bitmap &>(r)));
 		r.bm_data = nullptr;
-#if DXX_USE_OGL
 		r.gltexture = nullptr;
-#endif
 		return *this;
 	}
 	~grs_main_bitmap()
@@ -245,7 +236,6 @@ struct grs_subcanvas : grs_canvas, prohibit_void_ptr<grs_subcanvas>
 	using prohibit_void_ptr<grs_subcanvas>::operator &;
 };
 
-#if DXX_USE_SDLIMAGE || !DXX_USE_OGL
 struct RAII_SDL_Surface
 {
 	struct deleter
@@ -264,7 +254,6 @@ struct RAII_SDL_Surface
 	{
 	}
 };
-#endif
 
 class grs_screen : prohibit_void_ptr<grs_screen>
 {    // This is a video screen
@@ -272,20 +261,12 @@ class grs_screen : prohibit_void_ptr<grs_screen>
 public:
 	grs_screen &operator=(grs_screen &) = delete;
 	grs_screen &operator=(grs_screen &&) = default;
-#if DXX_USE_OGL
+
 	/* OpenGL builds allocate the backing data for the canvas, so use
 	 * grs_main_canvas to ensure it is freed when appropriate.
 	 */
 	grs_main_canvas  sc_canvas;  // Represents the entire screen
-#else
-	/* SDL builds borrow the backing data from the SDL_Surface, so use
-	 * grs_subcanvas for the canvas because the memory is owned by SDL and will
-	 * be freed by SDL_FreeSurface.  Store the associated SDL_Surface alongside
-	 * the canvas, so that it is freed at the same time.
-	 */
-	RAII_SDL_Surface sdl_surface;
-	grs_subcanvas sc_canvas;
-#endif
+
 	fix     sc_aspect;      //aspect ratio (w/h) for this screen
 	uint16_t get_screen_width() const
 	{
@@ -329,11 +310,11 @@ struct grs_font : public prohibit_void_ptr<grs_font>
 	const uint16_t *ft_widths = nullptr;     // Array of widths (required for prop font)
 	const uint8_t *ft_kerndata = nullptr;    // Array of kerning triplet data
 	std::unique_ptr<uint8_t[]> ft_allocdata;
-#if DXX_USE_OGL
+
 	// These fields do not participate in disk i/o!
 	std::unique_ptr<grs_bitmap[]> ft_bitmaps;
 	grs_main_bitmap ft_parent_bitmap;
-#endif /* def OGL */
+
 };
 
 }

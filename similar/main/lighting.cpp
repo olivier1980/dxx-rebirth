@@ -62,6 +62,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "partial_range.h"
 #include "d_range.h"
+#include <iostream>
 
 using std::min;
 
@@ -121,6 +122,7 @@ static void apply_light(fvmsegptridx &vmsegptridx, const g3s_lrgb obj_light_emis
 {
 	auto &LevelSharedVertexState = LevelSharedSegmentState.get_vertex_state();
 	auto &Vertices = LevelSharedVertexState.get_vertices();
+	// Disable all light effects here
 	if (((obj_light_emission.r+obj_light_emission.g+obj_light_emission.b)/3) > 0)
 	{
 		fix obji_64 = ((obj_light_emission.r+obj_light_emission.g+obj_light_emission.b)/3)*64;
@@ -487,7 +489,7 @@ static g3s_lrgb compute_light_emission(const d_robot_info_array &Robot_info, d_l
 	if (compute_color)
 	{
 		if (light_intensity < F1_0) // for every effect we want color, increase light_intensity so the effect becomes barely visible
-			light_intensity = F1_0;
+			light_intensity = F1_0; // Multiply for stronger colored light
 
 		const auto &&obj_color = build_object_color(GameBitmaps, objp);
 		const fix rgbsum = obj_color.r + obj_color.g + obj_color.b;
@@ -704,6 +706,8 @@ g3s_lrgb compute_object_light(const d_level_unique_light_state &LevelUniqueLight
 	light.r += seg_dl.r;
 	light.g += seg_dl.g;
 	light.b += seg_dl.b;
+
+
 
 	return light;
 }

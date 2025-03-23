@@ -32,7 +32,6 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "3d.h"
 #include "dxxerror.h"
 #include "gr.h"
-#include "texmap.h"
 #include "iff.h"
 #include "u_mem.h"
 #include "inferno.h"

@@ -16,10 +16,6 @@
 
 #include "dxxsconf.h"
 
-#if !DXX_USE_OGL
-#error "This file can only be included in OpenGL enabled builds."
-#endif
-
 #ifdef _WIN32
 #include <windows.h>
 #define OGLFUNCCALL	__stdcall

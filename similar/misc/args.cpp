@@ -282,13 +282,11 @@ static void ReadCmdArgs(Inilist &ini, Arglist &&Args)
 #endif
 		else if (!d_stricmp(p, "-nosdlmixer"))
 		{
-#if DXX_USE_SDLMIXER
 			CGameArg.SndDisableSdlMixer = true;
-#endif
+
 		}
 		else if (!strncmp(p, "-sdlmixer-resampler=", 20))
 		{
-#if DXX_USE_SDLMIXER
 #if DXX_FEATURE_EXTERNAL_RESAMPLER_SDL_NATIVE
 			if (!strcmp(&p[20], "sdl-native"))
 				CGameArg.SndMixerMethod = digi_mixer_method::sdl_native;
@@ -305,7 +303,6 @@ static void ReadCmdArgs(Inilist &ini, Arglist &&Args)
 					else
 #endif
 				throw unhandled_argument(std::move(*pp));
-#endif
 		}
 
 	// Graphics Options

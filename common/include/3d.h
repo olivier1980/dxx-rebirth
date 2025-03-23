@@ -34,14 +34,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "fwd-gr.h"
 #include <array>
 #include <span>
-
-#if DXX_USE_OGL
-#if defined(__APPLE__) && defined(__MACH__)
-#include <OpenGL/gl.h>
-#else
 #include <GL/gl.h>
-#endif
-#endif
 
 //Structure for storing u,v,light values.  This structure doesn't have a
 //prefix because it was defined somewhere else before it was moved here
@@ -103,11 +96,7 @@ enum class projection_flag : uint8_t
 	//flags for point structure
 	projected = 1,		//has been projected, so sx,sy valid
 	overflow = 2,		//can't project
-#if !DXX_USE_OGL
-	temp_point = 4,	//created during clip
-	uvs = 8,			//has uv values set
-	ls = 16,			//has lighting values set
-#endif
+
 };
 
 static constexpr uint8_t operator&(const projection_flag a, const projection_flag b)
@@ -158,9 +147,6 @@ protected:
  */
 struct g3s_point : g3_rotated_point
 {
-#if !DXX_USE_OGL
-	fix p3_u, p3_v, p3_l; //u,v,l coords
-#endif
 	fix p3_sx, p3_sy;    //screen x&y
 	clipping_code p3_codes;     //clipping codes
 	projection_flag p3_flags;     //projected?
@@ -184,11 +170,7 @@ struct g3s_reusable_point : g3s_point
 	g3s_reusable_point() = default;
 };
 
-#if DXX_USE_OGL
 typedef const g3s_point cg3s_point;
-#else
-typedef g3s_point cg3s_point;
-#endif
 
 //start the frame
 void g3_start_frame(grs_canvas &);
@@ -278,13 +260,6 @@ constexpr std::integral_constant<std::size_t, 64> MAX_POINTS_PER_POLY{};
 //radius, but not to the distance from the eye
 void g3_draw_sphere(grs_canvas &, cg3s_point &pnt, fix rad, uint8_t color);
 
-#if !DXX_USE_OGL
-static inline void g3_draw_sphere(grs_canvas &canvas, g3s_point &&pnt, fix rad, uint8_t color)
-{
-	g3_draw_sphere(canvas, pnt, rad, color);
-}
-#endif
-
 //@@//return ligting value for a point
 //@@fix g3_compute_lighting_value(g3s_point *rotated_point,fix normval);
 
@@ -309,34 +284,25 @@ static inline void g3_check_and_draw_poly(grs_canvas &canvas, const std::array<c
 }
 
 //draws a line. takes two points.
-#if !DXX_USE_OGL
-struct temporary_points_t;
-#endif
 
 //draws a bitmap with the specified 3d width & height
 //returns 1 if off screen, 0 if drew
 void g3_draw_bitmap(grs_canvas &, const vms_vector &pos, fix width, fix height, grs_bitmap &bm);
 
-#if DXX_USE_OGL
+
 struct g3_draw_line_colors
 {
 	const std::array<GLfloat, 8> color_array;
 	g3_draw_line_colors(color_palette_index color);
 };
-#endif
 
-class g3_draw_line_context
-#if DXX_USE_OGL
-	: public g3_draw_line_colors
-#endif
+class g3_draw_line_context: public g3_draw_line_colors
 {
 public:
 	grs_canvas &canvas;
 	const color_palette_index color;
 	g3_draw_line_context(grs_canvas &canvas, color_palette_index color) :
-#if DXX_USE_OGL
 		g3_draw_line_colors{color},
-#endif
 		canvas{canvas}, color{color}
 	{
 	}
@@ -346,7 +312,7 @@ public:
 
 //specifies 2d drawing routines to use instead of defaults.  Passing
 //NULL for either or both restores defaults
-#if DXX_USE_OGL
+
 enum class tmap_drawer_type : bool
 {
 	polygon,
@@ -357,16 +323,6 @@ enum class tmap_drawer_type : bool
 
 using tmap_drawer_type::draw_tmap_flat;
 using tmap_drawer_type::draw_tmap;
-#else
-void g3_draw_line(const g3_draw_line_context &, cg3s_point &p0, cg3s_point &p1, temporary_points_t &);
-constexpr std::integral_constant<std::size_t, 100> MAX_POINTS_IN_POLY{};
-
-using tmap_drawer_type = void (*)(grs_canvas &, const grs_bitmap &bm, std::span<const g3s_point *const> vertlist);
-
-//	This is the gr_upoly-like interface to the texture mapper which uses texture-mapper compatible
-//	(ie, avoids cracking) edge/delta computation.
-void gr_upoly_tmap(grs_canvas &, uint_fast32_t nverts, const std::array<fix, MAX_POINTS_IN_POLY * 2> &vert, uint8_t color);
-#endif
 
 //draw a bitmap object that is always facing you
 void g3_draw_rod_tmap(grs_canvas &, grs_bitmap &bitmap, const g3s_point &bot_point, fix bot_width, const g3s_point &top_point, fix top_width, g3s_lrgb light, tmap_drawer_type tmap_drawer_ptr);

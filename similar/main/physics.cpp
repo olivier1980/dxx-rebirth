@@ -174,6 +174,7 @@ static void do_physics_sim_rot(object_base &obj)
 
 	if (obj.mtype.phys_info.drag)
 	{
+		// Increase drag to slow down rotation, decrease to get dizzy
 		const fix drag{(obj.mtype.phys_info.drag * 5) / 2};
 		int count{FrameTime / FT};
 		const fix r{FrameTime % FT};
@@ -352,7 +353,8 @@ window_event_result do_physics_sim(const d_robot_info_array &Robot_info, const v
 
 		if (obj->mtype.phys_info.flags & PF_USES_THRUST) {
 
-			const auto accel{vm_vec_copy_scale(obj->mtype.phys_info.thrust,fixdiv(f1_0,obj->mtype.phys_info.mass))};
+			// Increase acc by dividing mass
+			const auto accel{vm_vec_copy_scale(obj->mtype.phys_info.thrust,fixdiv(f1_0,obj->mtype.phys_info.mass/1))};
 			const bool have_accel{accel.x || accel.y || accel.z};
 
 			while (count--) {

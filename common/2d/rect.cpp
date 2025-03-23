@@ -24,36 +24,26 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 #include "u_mem.h"
 #include "gr.h"
-
-#if DXX_USE_OGL
 #include "ogl_init.h"
-#endif
 
 namespace dcx {
 
 void gr_urect(grs_canvas &canvas, const int left, const int top, const int right, const int bot, const color_palette_index color)
 {
-#if DXX_USE_OGL
 	if (canvas.cv_bitmap.get_type() == bm_mode::ogl)
 	{
 		ogl_urect(canvas, left, top, right, bot, color);
 		return;
 	}
-#else
-	for ( int i=top; i<=bot; i++ )
-		gr_uscanline(canvas, left, right, i, color);
-#endif
 }
 
 void gr_rect(grs_canvas &canvas, const int left, const int top, const int right, const int bot, const color_palette_index color)
 {
-#if DXX_USE_OGL
 	if (canvas.cv_bitmap.get_type() == bm_mode::ogl)
 	{
 		ogl_urect(canvas, left, top, right, bot, color);
 		return;
 	}
-#endif
 	for ( int i=top; i<=bot; i++ )
 		gr_scanline(canvas, left, right, i, color);
 }

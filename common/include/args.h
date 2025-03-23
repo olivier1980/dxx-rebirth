@@ -30,7 +30,6 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "dxxsconf.h"
 #include <cstdint>
 
-#if DXX_USE_OGL
 // GL Sync methods
 enum SyncGLMethod : uint8_t {
 	SYNC_GL_NONE=0,
@@ -44,7 +43,6 @@ enum SyncGLMethod : uint8_t {
 #define OGL_SYNC_METHOD_DEFAULT		SYNC_GL_AUTO
 #define OGL_SYNC_WAIT_DEFAULT		2		/* milliseconds */
 
-#endif
 
 // Struct that keeps all variables used by FindArg
 // Prefixes are:
@@ -85,12 +83,9 @@ struct CArg : prohibit_void_ptr<CArg>
 	bool SndNoMusic;
 	bool SysNoBorders;
 	bool SysNoTitles;
-#if DXX_USE_SDLMIXER
 	bool SndDisableSdlMixer;
 	digi_mixer_method SndMixerMethod;
-#else
-	static constexpr std::true_type SndDisableSdlMixer{};
-#endif
+
 #if DXX_MAX_JOYSTICKS
 	bool CtlNoJoystick;
 #else
@@ -139,9 +134,6 @@ struct CArg : prohibit_void_ptr<CArg>
 	std::string SysRecordDemoNameTemplate;
 	std::string MplUdpHostAddr;
 	std::string DbgAltTex;
-#if !DXX_USE_OGL
-	std::string DbgTexMap;
-#endif
 };
 extern CArg CGameArg;
 }

@@ -43,20 +43,6 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 namespace dcx {
 
 constexpr std::integral_constant<unsigned, 25> MAX_TMAP_VERTS{};
-
-#if !DXX_USE_OGL
-// -------------------------------------------------------------------------------------------------------
-// This is the main texture mapper call.
-//	tmap_num references a texture map defined in Texmap_ptrs.
-//	nverts = number of vertices
-//	vertbuf is a pointer to an array of vertex pointers
-void draw_tmap(grs_canvas &, const grs_bitmap &bp, std::span<const g3s_point *const> vertbuf);
-
-//function that takes the same parms as draw_tmap, but renders as flat poly
-//we need this to do the cloaked effect
-void draw_tmap_flat(grs_canvas &, const grs_bitmap &bp, std::span<const g3s_point *const> vertbuf);
-#endif
-
 // -------------------------------------------------------------------------------------------------------
 // Texture map vertex.
 //	The fields r,g,b and l are mutually exclusive.  r,g,b are used for rgb lighting.
@@ -81,17 +67,7 @@ struct g3ds_tmap {
 
 //	Note:	Not all interpolation method and lighting combinations are supported.
 //	Set Interpolation_method to 0/1/2 for linear/linear, perspective/linear, perspective/perspective
-#if !DXX_USE_OGL
-extern	int	Interpolation_method;
-extern uint8_t Transparency_on;
 
-// Set Lighting_on to 0/1/2 for no lighting/intensity lighting/rgb lighting
-extern	int	Lighting_on;
-
-// HACK INTERFACE: how far away the current segment (& thus texture) is
-extern unsigned Current_seg_depth;
-void init_interface_vars_to_assembler();
-#endif
 class push_interpolation_method
 {
 #if DXX_USE_OGL

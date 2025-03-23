@@ -23,48 +23,5 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 namespace dcx {
 
-#if !DXX_USE_OGL
-int gr_ucircle(grs_canvas &canvas, const fix xc1, const fix yc1, const fix r1, const color_palette_index color)
-{
-	int p,x, y, xc, yc, r;
-
-	r = f2i(r1);
-	xc = f2i(xc1);
-	yc = f2i(yc1);
-	p=3-(r*2);
-	x=0;
-	y=r;
-
-	while(x<y)
-	{
-		// Draw the first octant
-		gr_upixel(canvas.cv_bitmap, xc - y, yc - x, color);
-		gr_upixel(canvas.cv_bitmap, xc + y, yc - x, color);
-		gr_upixel(canvas.cv_bitmap, xc - y, yc + x, color);
-		gr_upixel(canvas.cv_bitmap, xc + y, yc + x, color);
-
-		if (p<0)
-			p=p+(x<<2)+6;
-		else {
-			// Draw the second octant
-			gr_upixel(canvas.cv_bitmap, xc - x, yc - y, color);
-			gr_upixel(canvas.cv_bitmap, xc + x, yc - y, color);
-			gr_upixel(canvas.cv_bitmap, xc - x, yc + y, color);
-			gr_upixel(canvas.cv_bitmap, xc + x, yc + y, color);
-			p=p+((x-y)<<2)+10;
-			y--;
-		}
-		x++;
-	}
-	if(x==y) {
-		gr_upixel(canvas.cv_bitmap, xc - x, yc - y, color);
-		gr_upixel(canvas.cv_bitmap, xc + x, yc - y, color);
-		gr_upixel(canvas.cv_bitmap, xc - x, yc + y, color);
-		gr_upixel(canvas.cv_bitmap, xc + x, yc + y, color);
-	}
-	return 0;
-}
-
-#endif //!OGL
 
 }

@@ -1247,7 +1247,7 @@ bool ad_removal_predicate::operator()(active_door &d) const
 		w.flags |= wall_flag::door_opened;
 		if (wall *const w1 = Walls.imptr(d.back_wallnum[0]))
 			w1->flags |= wall_flag::door_opened;
-		if (d.time > DOOR_WAIT_TIME)
+		if (d.time > DOOR_WAIT_TIME) // prevent door from closing with false &&
 #if DXX_BUILD_DESCENT == 2
 			if (!is_door_obstructed(vcobjptridx, vcsegptr, vcsegptridx(w.segnum), w.sidenum))
 #endif

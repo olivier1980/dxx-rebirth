@@ -22,12 +22,10 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-#if DXX_USE_OGLES
-#include <GLES/gl.h>
-#else
+
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
+
 #endif
 #include <string.h>
 #include <math.h>
@@ -137,13 +135,8 @@ unsigned last_width=~0u,last_height=~0u;
 int GL_TEXTURE_2D_enabled=-1;
 
 static int r_texcount = 0, r_cachedtexcount = 0;
-#if DXX_USE_OGLES
-static int ogl_rgba_internalformat = GL_RGBA;
-static int ogl_rgb_internalformat = GL_RGB;
-#else
 static int ogl_rgba_internalformat = GL_RGBA8;
 static int ogl_rgb_internalformat = GL_RGB8;
-#endif
 static std::unique_ptr<GLfloat[]> sphere_va, circle_va, disk_va;
 static std::array<std::unique_ptr<GLfloat[]>, 3> secondary_lva;
 static int r_polyc,r_tpolyc,r_bitmapc,r_ubitbltc;
@@ -1477,11 +1470,9 @@ static void ogl_filltexbuf(const palette_array_t &pal, const uint8_t *const data
 						(*(texp++)) = 255;
 						(*(texp++)) = 0; // transparent pixel
 						break;
-#if !DXX_USE_OGLES
 					case GL_COLOR_INDEX:
 						(*(texp++)) = c;
 						break;
-#endif
 					default:
 						Error("ogl_filltexbuf unhandled super-transparent texformat\n");
 						break;
@@ -1503,11 +1494,9 @@ static void ogl_filltexbuf(const palette_array_t &pal, const uint8_t *const data
 					case GL_LUMINANCE:
 						(*(texp++))=0;//transparent pixel
 						break;
-#if !DXX_USE_OGLES
 					case GL_COLOR_INDEX:
 						(*(texp++)) = c;
 						break;
-#endif
 					default:
 						Error("ogl_filltexbuf unknown texformat\n");
 						break;
@@ -1534,11 +1523,9 @@ static void ogl_filltexbuf(const palette_array_t &pal, const uint8_t *const data
 						(*(texp++)) = pal[c].b * 4;
 						(*(texp++)) = 255;//not transparent
 						break;
-#if !DXX_USE_OGLES
 					case GL_COLOR_INDEX:
 						(*(texp++)) = c;
 						break;
-#endif
 					default:
 						Error("ogl_filltexbuf unknown texformat\n");
 						break;
@@ -1787,10 +1774,8 @@ static int ogl_loadtexture(const palette_array_t &pal, const uint8_t *data, cons
 
 	// Generate OpenGL texture IDs.
 	glGenTextures (1, &tex.handle);
-#if !DXX_USE_OGLES
 	//set priority
 	glPrioritizeTextures (1, &tex.handle, &tex.prio);
-#endif
 	// Give our data to OpenGL.
 	OGL_BINDTEXTURE(tex.handle);
 	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);

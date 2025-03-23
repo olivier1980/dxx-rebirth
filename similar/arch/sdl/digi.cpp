@@ -23,11 +23,9 @@
 #include <string.h>
 #include <digi.h>
 #include <digi_audio.h>
-
-#if DXX_USE_SDLMIXER
 #include <digi_mixer.h>
 #include <SDL_mixer.h>
-#endif
+
 #ifdef _WIN32
 #include "hmp.h"
 #endif
@@ -43,7 +41,6 @@ int digi_volume = SOUND_MAX_VOLUME;
 #define DXX_STS_MIXER_WITH_COPY	1
 #define DXX_STS_NO_MIXER	2
 
-#if DXX_USE_SDLMIXER
 #ifndef DXX_SOUND_TABLE_STYLE
 #ifdef __PIE__
 /* PIE -> paranoid checks
@@ -53,9 +50,6 @@ int digi_volume = SOUND_MAX_VOLUME;
 #else
 #define DXX_SOUND_TABLE_STYLE	DXX_STS_MIXER_WITH_COPY
 #endif
-#endif
-#else
-#define DXX_SOUND_TABLE_STYLE	DXX_STS_NO_MIXER
 #endif
 
 /* Sound system function pointers */
@@ -150,7 +144,7 @@ namespace {
 	/* Some of the functions are in dsx, so the definition and
 	 * initializer must be in dsx.
 	 */
-#if DXX_USE_SDLMIXER
+
 constexpr sound_function_table_t digi_mixer_table{
 	&digi_mixer_init,
 	&digi_mixer_close,
@@ -163,7 +157,6 @@ constexpr sound_function_table_t digi_mixer_table{
 	&digi_mixer_stop_all_channels,
 	&digi_mixer_set_digi_volume,
 };
-#endif
 
 constexpr sound_function_table_t digi_audio_table{
 	&digi_audio_init,
@@ -196,7 +189,7 @@ const sound_function_table_t *sound_function_pointers_t::operator->()
 
 void digi_select_system()
 {
-#if DXX_USE_SDLMIXER
+
 	if (!CGameArg.SndDisableSdlMixer)
 	{
 		const auto vl = Mix_Linked_Version();
@@ -204,7 +197,7 @@ void digi_select_system()
 		fptr = digi_mixer_table;
 		return;
 	}
-#endif
+
 	con_puts(CON_NORMAL,"Using plain old SDL audio");
 		fptr = digi_audio_table;
 }

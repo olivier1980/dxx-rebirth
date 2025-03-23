@@ -31,34 +31,32 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 namespace dcx {
 
-#if DXX_USE_OGL
+
 namespace {
-#endif
-void gr_uscanline(grs_canvas &canvas, const unsigned x1, const unsigned x2, const unsigned y, const uint8_t color)
-{
-	switch(canvas.cv_bitmap.get_type())
-		{
-		case bm_mode::linear:
-#if DXX_USE_OGL
-		case bm_mode::ogl:
-#endif
+
+	void gr_uscanline(grs_canvas &canvas, const unsigned x1, const unsigned x2, const unsigned y, const uint8_t color)
+	{
+		switch(canvas.cv_bitmap.get_type())
 			{
-				const auto count = x2 - x1 + 1;
-				const std::span<uint8_t> data{&canvas.cv_bitmap.get_bitmap_data()[canvas.cv_bitmap.bm_rowsize * y + x1], count};
-				if (const auto r{gr_fade_table.valid_index(canvas.cv_fade_level)})
-					std::ranges::transform(data, data.begin(), [&t = gr_fade_table[*r]](const uint8_t c) { return t[c]; });
-				else
-					std::ranges::fill(data, color);
+			case bm_mode::linear:
+			case bm_mode::ogl:
+				{
+					const auto count = x2 - x1 + 1;
+					const std::span<uint8_t> data{&canvas.cv_bitmap.get_bitmap_data()[canvas.cv_bitmap.bm_rowsize * y + x1], count};
+					if (const auto r{gr_fade_table.valid_index(canvas.cv_fade_level)})
+						std::ranges::transform(data, data.begin(), [&t = gr_fade_table[*r]](const uint8_t c) { return t[c]; });
+					else
+						std::ranges::fill(data, color);
+				}
+				break;
+			case bm_mode::ilbm:
+			case bm_mode::rgb15:
+				break;
 			}
-			break;
-		case bm_mode::ilbm:
-		case bm_mode::rgb15:
-			break;
-		}
+	}
+
 }
-#if DXX_USE_OGL
-}
-#endif
+
 
 void gr_scanline(grs_canvas &canvas, int x1, int x2, const unsigned y, const uint8_t color)
 {

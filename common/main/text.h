@@ -135,6 +135,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #define TXT_W_SPREADFIRE        dxx_gettext(106, "Spreadfire Cannon")
 #define TXT_W_PLASMA            dxx_gettext(107, "Plasma Cannon")
 #define TXT_W_FUSION            dxx_gettext(108, "Fusion Cannon")
+//#define USE_BUILTIN_ENGLISH_TEXT_STRINGS 1
 
 #ifdef DXX_BUILD_DESCENT
 #if DXX_BUILD_DESCENT == 1

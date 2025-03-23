@@ -40,11 +40,9 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_range.h"
 #include "partial_range.h"
 #include "console.h"
-
-#if DXX_USE_SDLIMAGE
 #include "physfsrwops.h"
 #include <SDL_image.h>
-#endif
+
 
 namespace dcx {
 
@@ -77,7 +75,6 @@ struct PCXHeader
 } __pack__;
 #endif
 
-#if DXX_USE_SDLIMAGE
 static pcx_result pcx_read_bitmap(const char *const filename, grs_main_bitmap &bmp, palette_array_t &palette, RWops_ptr rw)
 {
 	RAII_SDL_Surface surface(IMG_LoadPCX_RW(rw.get()));
@@ -114,7 +111,6 @@ static pcx_result pcx_read_bitmap(const char *const filename, grs_main_bitmap &b
 	}
 	return pcx_result::SUCCESS;
 }
-#endif
 
 static pcx_result pcx_read_blank(grs_main_bitmap &bmp, palette_array_t &palette)
 {
@@ -139,14 +135,6 @@ static pcx_result pcx_read_blank(grs_main_bitmap &bmp, palette_array_t &palette)
 	return pcx_result::SUCCESS;
 }
 
-#if !DXX_USE_SDLIMAGE
-static pcx_result pcx_support_not_compiled(const char *const filename, grs_main_bitmap &bmp, palette_array_t &palette)
-{
-	con_printf(CON_NORMAL, "%s:%u: PCX support disabled at compile time; cannot read file \"%s\"", __FILE__, __LINE__, filename);
-	return pcx_read_blank(bmp, palette);
-}
-#endif
-
 }
 
 }
@@ -156,7 +144,6 @@ namespace dsx {
 
 namespace {
 
-#if DXX_USE_SDLIMAGE
 static std::pair<std::unique_ptr<uint8_t[]>, std::size_t> load_physfs_blob(const char *const filename)
 {
 	auto &&[file, physfserr] = PHYSFSX_openReadBuffered(filename);
@@ -195,22 +182,17 @@ static std::pair<std::unique_ptr<uint8_t[]>, std::size_t> load_decoded_physfs_bl
 	std::transform(std::make_reverse_iterator(std::next(b, data_size)), std::make_reverse_iterator(b), decoded_buffer.get(), transform_predicate);
 	return {std::move(decoded_buffer), data_size};
 }
-#endif
 
 }
 
 pcx_result bald_guy_load(const char *const filename, grs_main_bitmap &bmp, palette_array_t &palette)
 {
-#if DXX_USE_SDLIMAGE
 	const auto &&[bguy_data, data_size] = load_decoded_physfs_blob(filename);
 	if (!bguy_data)
 		return pcx_result::ERROR_OPENING;
 
 	RWops_ptr rw(SDL_RWFromConstMem(bguy_data.get(), data_size));
 	return pcx_read_bitmap(filename, bmp, palette, std::move(rw));
-#else
-	return pcx_support_not_compiled(filename, bmp, palette);
-#endif
 }
 
 }
@@ -220,7 +202,6 @@ namespace dcx {
 
 pcx_result pcx_read_bitmap(const char *const filename, grs_main_bitmap &bmp, palette_array_t &palette)
 {
-#if DXX_USE_SDLIMAGE
 	/* Try to enable buffering on the PHYSFS file.  On Windows,
 	 * unbuffered access to the file causes SDL_image to be slow enough
 	 * for users to detect the latency and report it as an issue.  On
@@ -233,9 +214,6 @@ pcx_result pcx_read_bitmap(const char *const filename, grs_main_bitmap &bmp, pal
 		return pcx_result::ERROR_OPENING;
 	}
 	return pcx_read_bitmap(filename, bmp, palette, std::move(rw));
-#else
-	return pcx_support_not_compiled(filename, bmp, palette);
-#endif
 }
 
 pcx_result pcx_read_bitmap_or_default(const char *const filename, grs_main_bitmap &bmp, palette_array_t &palette)
@@ -245,126 +223,6 @@ pcx_result pcx_read_bitmap_or_default(const char *const filename, grs_main_bitma
 		pcx_read_blank(bmp, palette);
 	return r;
 }
-
-#if !DXX_USE_OGL && DXX_USE_SCREENSHOT_FORMAT_LEGACY
-unsigned pcx_write_bitmap(PHYSFS_File *const PCXfile, const grs_bitmap *const bmp, palette_array_t &palette)
-{
-	static constexpr std::size_t PCXHEADER_SIZE{128};
-	ubyte data;
-	PCXHeader header{};
-
-	header.Manufacturer = 10;
-	header.Encoding = 1;
-	header.Nplanes = 1;
-	header.BitsPerPixel = 8;
-	header.Version = 5;
-	header.Xmax = bmp->bm_w-1;
-	header.Ymax = bmp->bm_h-1;
-	header.BytesPerLine = bmp->bm_w;
-
-	if (PHYSFSX_writeBytes(PCXfile, &header, PCXHEADER_SIZE) != PCXHEADER_SIZE)
-	{
-		return 1;
-	}
-
-	{
-		const uint_fast32_t bm_w = bmp->bm_w;
-		const uint_fast32_t bm_rowsize = bmp->bm_rowsize;
-		const auto bm_data = bmp->get_bitmap_data();
-		const auto e = &bm_data[bm_rowsize * bmp->bm_h];
-		for (auto i = &bm_data[0]; i != e; i += bm_rowsize)
-		{
-			if (!pcx_encode_line(std::span{i, bm_w}, PCXfile))
-			{
-				return 1;
-			}
-		}
-	}
-
-	// Mark an extended palette
-	data = 12;
-	if (PHYSFSX_writeBytes(PCXfile, &data, 1) != 1)
-	{
-		return 1;
-	}
-
-	const auto retval{PHYSFSX_writeBytes(PCXfile, palette.data(), palette.size())};
-	if (retval != palette.size())
-		return 1;
-	return 0;
-}
-
-namespace {
-
-// returns number of bytes written into outBuff, 0 if failed
-int pcx_encode_line(const std::span<const uint8_t> in, PHYSFS_File *fp)
-{
-	int i;
-	int total;
-	ubyte runCount; 	// max single runlength is 63
-	total = 0;
-	auto last = in.front();
-	runCount = 1;
-
-	range_for (const auto ub, unchecked_partial_range(in.data(), 1u, in.size()))
-	{
-		if (ub == last)	{
-			runCount++;			// it encodes
-			if (runCount == 63)	{
-				if (!(i=pcx_encode_byte(last, runCount, fp)))
-					return(0);
-				total += i;
-				runCount = 0;
-			}
-		} else {   	// this != last
-			if (runCount)	{
-				if (!(i=pcx_encode_byte(last, runCount, fp)))
-					return(0);
-				total += i;
-			}
-			last = ub;
-			runCount = 1;
-		}
-	}
-
-	if (runCount)	{		// finish up
-		if (!(i=pcx_encode_byte(last, runCount, fp)))
-			return 0;
-		return total + i;
-	}
-	return total;
-}
-
-static inline int PHYSFSX_putc(PHYSFS_File *file, uint8_t ch)
-{
-	if (PHYSFSX_writeBytes(file, &ch, 1) < 1)
-		return -1;
-	else
-		return ch;
-}
-
-// subroutine for writing an encoded byte pair
-// returns count of bytes written, 0 if error
-int pcx_encode_byte(ubyte byt, ubyte cnt, PHYSFS_File *fid)
-{
-	if (cnt) {
-		if ( (cnt==1) && (0xc0 != (0xc0 & byt)) )	{
-			if(EOF == PHYSFSX_putc(fid, static_cast<int>(byt)))
-				return 0; 	// disk write error (probably full)
-			return 1;
-		} else {
-			if(EOF == PHYSFSX_putc(fid, 0xC0 | cnt))
-				return 0; 	// disk write error
-			if(EOF == PHYSFSX_putc(fid, static_cast<int>(byt)))
-				return 0; 	// disk write error
-			return 2;
-		}
-	}
-	return 0;
-}
-
-}
-#endif
 
 //text for error messges
 constexpr char pcx_error_messages[] = {

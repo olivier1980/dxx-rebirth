@@ -44,23 +44,11 @@ song_number songs_is_playing();
 }
 
 #define SONG_EXT_HMP            "hmp"
-#if DXX_USE_SDLMIXER
 #define SONG_EXT_MID            "mid"
 #define SONG_EXT_OGG            "ogg"
 #define SONG_EXT_FLAC           "flac"
 #define SONG_EXT_MP3            "mp3"
-#endif
 
-#if !DXX_USE_SDLMIXER
-#ifdef _WIN32
-#define songs_play_file(filename,repeat,hook_finished_track)	songs_play_file(filename,repeat)
-#else
-#define songs_play_file(filename,repeat,hook_finished_track)	songs_play_file()
-#endif
-#if SDL_MAJOR_VERSION == 2
-#define songs_play_song(songnum,repeat)	songs_play_song(songnum)
-#endif
-#endif
 int songs_play_file(char *filename, int repeat, void (*hook_finished_track)());
 #ifdef DXX_BUILD_DESCENT
 namespace dsx {
