@@ -190,7 +190,6 @@ void build_colormap_good(const palette_array_t &palette, std::array<color_palett
 
 void gr_remap_bitmap_good(grs_bitmap &bmp, palette_array_t &palette, uint_fast32_t transparent_color, uint_fast32_t super_transparent_color)
 {
-	std::cout << "remap" << std::endl;
 	std::array<color_palette_index, 256> colormap;
 	build_colormap_good(palette, colormap);
 

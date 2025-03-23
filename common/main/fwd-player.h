@@ -32,7 +32,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #define MAX_ENERGY      i2f(200)    // go up to 200
 #define MAX_SHIELDS     i2f(200)
 
-#define INITIAL_LIVES               30   // start off with 3 lives
+#define INITIAL_LIVES               3   // start off with 3 lives
 
 // Values for special flags
 #ifdef DXX_BUILD_DESCENT

@@ -129,37 +129,37 @@ namespace {
 static int check_collision_delayfunc_exec()
 {
 	static fix64 last_play_time=0;
-	static auto start = std::chrono::system_clock::now();
-    static auto end = std::chrono::system_clock::now();
-
-	std::cout << F1_0/3 << std::endl;
-	std::cout << last_play_time + (F1_0/3) << std::endl;
-	std::cout << GameTime64 << std::endl;
+	// static auto start = std::chrono::system_clock::now();
+ //    static auto end = std::chrono::system_clock::now();
+ //
+	// std::cout << F1_0/3 << std::endl;
+	// std::cout << last_play_time + (F1_0/3) << std::endl;
+	// std::cout << GameTime64 << std::endl;
 
     // Aprox half a second delay, with multiplier 0.9
 	if (last_play_time + ((F1_0/3)*2.7) < GameTime64 || last_play_time > GameTime64)
 	{
-	    if (last_play_time > 0) {
-	        end = std::chrono::system_clock::now();
+	    // if (last_play_time > 0) {
+	    //     end = std::chrono::system_clock::now();
+     //
+     //        std::chrono::duration<double> elapsed_seconds = end-start;
+     //        std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+     //
+     //        // 0.37885s
+     //        std::cout << "finished computation at " << std::ctime(&end_time)
+     //          << "elapsed time: " << elapsed_seconds.count() << "s"
+     //          << std::endl;
+	    // }
 
-            std::chrono::duration<double> elapsed_seconds = end-start;
-            std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
-            // 0.37885s
-            std::cout << "finished computation at " << std::ctime(&end_time)
-              << "elapsed time: " << elapsed_seconds.count() << "s"
-              << std::endl;
-	    }
-
-	    std::cout << "Setting collision" << std::endl;
-	    start = std::chrono::system_clock::now();
+	    //std::cout << "Setting collision" << std::endl;
+	    //start = std::chrono::system_clock::now();
 
 		last_play_time = {GameTime64};
-		//last_play_time -= (d_rand()/2); // add some randomness
+		last_play_time -= (d_rand()/2); // add some randomness
 		return 1;
 	}
 
-	std::cout << GameTime64 - (last_play_time + (F1_0/3)) << std::endl;
+	//std::cout << GameTime64 - (last_play_time + (F1_0/3)) << std::endl;
 
 	return 0;
 }

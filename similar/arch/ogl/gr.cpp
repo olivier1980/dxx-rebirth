@@ -341,85 +341,6 @@ static int rpi_setup_element(int x, int y, Uint32 video_flags, int update)
 		SDL_SetWindowSize(SDLWindow, w, h);
 #endif
 
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-#ifndef RPI
-	// NOTE: on the RPi, the EGL stuff is not connected to the X11 window,
-	//       so there is no need to destroy and recreate this
-	ogles_destroy();
-#endif
-
-	SDL_VERSION(&info.version);
-
-	if (SDL_GetWMInfo(&info) > 0) {
-		if (info.subsystem == SDL_SYSWM_X11) {
-			x11Display = info.info.x11.display;
-			x11Window = info.info.x11.window;
-			con_printf (CON_DEBUG, "Display: %p, Window: %i ===", x11Display, static_cast<int>(x11Window));
-		}
-	}
-
-	if (eglDisplay == EGL_NO_DISPLAY) {
-		const EGLNativeDisplayType desiredEGLDisplay =
-#ifdef RPI
-		EGL_DEFAULT_DISPLAY;
-#else
-		x11Display;
-#endif
-		eglDisplay = eglGetDisplay(desiredEGLDisplay);
-		if (eglDisplay == EGL_NO_DISPLAY) {
-			con_printf(CON_URGENT, "EGL: Error querying EGL Display");
-		}
-
-		if (!eglInitialize(eglDisplay, &ver_maj, &ver_min)) {
-			con_printf(CON_URGENT, "EGL: Error initializing EGL");
-		} else {
-			con_printf(CON_DEBUG, "EGL: Initialized, version: major %i minor %i", ver_maj, ver_min);
-		}
-	}
-
-
-#ifdef RPI
-	if (rpi_setup_element(w,h,sdl_video_flags,1)) {
-		Error("RPi: Could not set up a %dx%d element\n", w, h);
-	}
-#endif
-
-	if (eglSurface == EGL_NO_SURFACE) {
-		if (!eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &iConfigs) || (iConfigs != 1)) {
-			con_printf(CON_URGENT, "EGL: Error choosing config");
-		} else {
-			con_printf(CON_DEBUG, "EGL: config chosen");
-		}
-
-#ifdef RPI
-		eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, static_cast<EGLNativeWindowType>(&nativewindow), winAttribs);
-#else
-		eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, x11Window, winAttribs);
-#endif
-		if ((!TestEGLError("eglCreateWindowSurface")) || eglSurface == EGL_NO_SURFACE) {
-			con_printf(CON_URGENT, "EGL: Error creating window surface");
-		} else {
-			con_printf(CON_DEBUG, "EGL: Created window surface");
-		}
-	}
-
-	if (eglContext == EGL_NO_CONTEXT) {
-		eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, contextAttribs);
-		if ((!TestEGLError("eglCreateContext")) || eglContext == EGL_NO_CONTEXT) {
-			con_printf(CON_URGENT, "EGL: Error creating context");
-		} else {
-			con_printf(CON_DEBUG, "EGL: Created context");
-		}
-	}
-
-	eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
-	if (!TestEGLError("eglMakeCurrent")) {
-		con_printf(CON_URGENT, "EGL: Error making current");
-	} else {
-		con_printf(CON_DEBUG, "EGL: made context current");
-	}
-#endif
-
         const auto w640 = w / 640;
         const auto h480 = h / 480;
         const auto min_wh = std::min(w640, h480);
@@ -823,7 +744,6 @@ static int ogl_init_load_library(void)
 	if (ogl_rt_loaded)
 		OpenGL_LoadLibrary(false, OglLibPath);
 #endif
-
     }
 }
 
@@ -1048,5 +968,4 @@ namespace dcx {
 
     //writes out an uncompressed RGB .tga file
     //if we got really spiffy, we could optionally link in libpng or something, and use that.
-
 }

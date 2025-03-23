@@ -346,12 +346,13 @@ static void draw_mine_exit_cover(grs_canvas &canvas)
 
 static void generate_starfield(d_unique_endlevel_state::starfield_type &stars)
 {
-	std::cout << stars.size() << std::endl;
+	//std::cout << stars.size() << std::endl;
+	// Define size of stars
 	range_for (auto &i, stars)
 	{
-		i.x = (d_rand() - D_RAND_MAX / 2) << 11;
-		i.z = (d_rand() - D_RAND_MAX / 2) << 11;
-		i.y = (d_rand() / 2) << 11;
+		i.x = (d_rand() - D_RAND_MAX / 2) << 14;
+		i.z = (d_rand() - D_RAND_MAX / 2) << 14;
+		i.y = (d_rand() / 2) << 14;
 	}
 }
 
@@ -376,6 +377,7 @@ void draw_stars(grs_canvas &canvas, const d_unique_endlevel_state::starfield_typ
 			p.p3_flags &= ~projection_flag::projected;
 			g3_project_point(p);
 
+			// sphere size?
 			g3_draw_sphere(canvas, p, F1_0 * 3, color);
 
 		}

@@ -140,7 +140,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #ifdef DXX_BUILD_DESCENT
 #if DXX_BUILD_DESCENT == 1
 #define TXT_COPYRIGHT           dxx_gettext(11, "Copyright (C) 1994, 1995 Parallax Software Corporation")
-#define TXT_REGISTER_DESCENT    dxx_gettext(56, "CD-Enhanced Descent Coming Summer 95!")
+#define TXT_REGISTER_DESCENT    dxx_gettext(56, "CD-Enhanced Descent Coming Summer '95!")
 #define TXT_W_C_MISSILE			dxx_gettext(109, "Concussion Missile")
 #define TXT_W_H_MISSILE			dxx_gettext(110, "Homing Missile")
 #define TXT_W_P_BOMB			dxx_gettext(111, "Proximity Bomb")

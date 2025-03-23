@@ -8,7 +8,7 @@
 #include "objnum.h"
 #include <array>
 
-constexpr std::integral_constant<unsigned, 5000> MAX_RENDER_SEGS{};
+constexpr std::integral_constant<unsigned, 500> MAX_RENDER_SEGS{};
 
 struct rect
 {

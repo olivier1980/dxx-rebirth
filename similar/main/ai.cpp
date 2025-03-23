@@ -646,7 +646,7 @@ void init_ai_object(const d_robot_info_array &Robot_info, const vmobjptridx_t ob
 
 	aip->SKIP_AI_COUNT = 0;
 
-	std::cout << "Determine cloaked" << std::endl;
+	//std::cout << "Determine cloaked" << std::endl;
 
 	if (robptr.cloak_type == RI_CLOAKED_ALWAYS)
 		aip->CLOAKED = 1;
