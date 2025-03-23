@@ -15,3 +15,6 @@
 - Extend countdown/disable
 - Rock ship after reactor
 - Transparent walls, load more of level
+- Add minimap
+- Add DEARGUI
+- Add rearview mini

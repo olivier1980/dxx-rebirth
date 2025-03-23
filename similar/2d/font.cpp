@@ -661,9 +661,7 @@ static void gr_ustring_mono(grs_canvas &canvas, const grs_font &cv_font, const i
 			break;
 		case bm_mode::ilbm:
 		case bm_mode::rgb15:
-#if DXX_USE_OGL
 		case bm_mode::ogl:
-#endif
 			break;
 	}
 }
@@ -1020,9 +1018,7 @@ void gr_remap_font(grs_font *font)
 		 */
 		return;
 	*font = std::move(*n.get());
-#if DXX_USE_OGL
 	ogl_init_font(font);
-#endif
 }
 
 void gr_set_curfont(grs_canvas &canvas, const grs_font &n)

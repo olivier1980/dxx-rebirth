@@ -162,18 +162,14 @@ static void InitGameArg()
 #endif
 	CGameArg.DbgVerbose = CON_NORMAL;
 	CGameArg.DbgBpp = 32;
-#if DXX_USE_OGL
 	CGameArg.OglSyncMethod = OGL_SYNC_METHOD_DEFAULT;
 	CGameArg.OglSyncWait = OGL_SYNC_WAIT_DEFAULT;
-#if DXX_USE_STEREOSCOPIC_RENDER
-	CGameArg.OglStereo = false;
-#endif
 	CGameArg.DbgGlIntensity4Ok 	= true;
 	CGameArg.DbgGlLuminance4Alpha4Ok = true;
 	CGameArg.DbgGlRGBA2Ok = true;
 	CGameArg.DbgGlReadPixelsOk = true;
 	CGameArg.DbgGlGetTexLevelParamOk = true;
-#endif
+
 }
 
 }
@@ -315,7 +311,7 @@ static void ReadCmdArgs(Inilist &ini, Arglist &&Args)
 		else if (!d_stricmp(p, "-lowresmovies"))
 			GameArg.GfxSkipHiresMovie 		= 1;
 #endif
-#if DXX_USE_OGL
+
 	// OpenGL Options
 
 		else if (!d_stricmp(p, "-gl_fixedfont"))
@@ -326,13 +322,7 @@ static void ReadCmdArgs(Inilist &ini, Arglist &&Args)
 			CGameArg.OglSyncWait = arg_integer(pp, end);
 		else if (!d_stricmp(p, "-gl_darkedges"))
 			CGameArg.OglDarkEdges = true;
-#if DXX_USE_STEREOSCOPIC_RENDER
-		else if (!d_stricmp(p, "-gl_stereo"))
-			CGameArg.OglStereo = true;
-		else if (!d_stricmp(p, "-gl_stereoview"))
-			CGameArg.OglStereoView = arg_integer(pp, end);
-#endif
-#endif
+
 
 	// Multiplayer Options
 

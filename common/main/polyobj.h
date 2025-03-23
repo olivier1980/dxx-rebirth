@@ -226,8 +226,6 @@ void polymodel_write(PHYSFS_File *fp, const polymodel &pm);
 namespace dsx {
 void polygon_model_data_read(polymodel *pm, PHYSFS_File *fp);
 polygon_model_index build_polygon_model_index_from_untrusted(unsigned i);
-#if DXX_USE_OGL
 void ogl_cache_polymodel_textures(polygon_model_index model_num);
-#endif
 }
 #endif

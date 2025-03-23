@@ -2468,7 +2468,7 @@ $ x86_64-pc-linux-gnu-g++-5.4.0 -x c++ -S -Wformat -o /dev/null -
 	@_custom_test
 	def check_compiler_useless_cast(self,context):
 		Compile = self.Compile
-		flags = {'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ('-Wuseless-cast',))}
+		flags = {'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ())}
 		if Compile(context, text='''
 /*
  * SDL on Raspbian provokes a warning from -Wuseless-cast
@@ -2725,7 +2725,7 @@ unsigned g(unsigned i)
 		'-Wsuggest-final-types',
 		'-Wsuggest-override',
 		'-Wlogical-op',
-		'-Wold-style-cast',
+# 		'-Wold-style-cast',
 		'-Wredundant-decls',
 	)
 	__preferred_win32_linker_options = (
@@ -4510,7 +4510,7 @@ class DXXCommon(LazyObjectConstructor):
 		env.Prepend(CXXFLAGS = cxxflags)
 		env.Append(
 			CXXFLAGS = ['-funsigned-char'],
-			CPPPATH = ['common/include', 'common/main', '.'],
+			CPPPATH = ['common/include', 'common/include/imgui', 'common/include/imgui/backends', 'common/main', '.'],
 			CPPFLAGS = SCons.Util.CLVar('-Wno-sign-compare'),
 			CPPDEFINES = [
 			# PhysFS 2.1 and later deprecate functions PHYSFS_read,
@@ -4688,6 +4688,13 @@ class DXXArchive(DXXCommon):
 
 	def get_objects_common(self,
 		__get_objects_common=DXXCommon.create_lazy_object_getter((
+		'common/include/imgui/imgui.cpp',
+		'common/include/imgui/imgui_draw.cpp',
+		'common/include/imgui/imgui_tables.cpp',
+		'common/include/imgui/imgui_widgets.cpp',
+		"common/include/imgui/backends/imgui_impl_sdl2.cpp",
+		'common/include/imgui/backends/imgui_impl_opengl3.cpp',
+
 'common/2d/2dsline.cpp',
 'common/2d/bitblt.cpp',
 'common/2d/bitmap.cpp',

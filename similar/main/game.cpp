@@ -201,51 +201,9 @@ void reset_palette_add()
 constexpr screen_mode initial_large_game_screen_mode{1024, 768};
 screen_mode Game_screen_mode = initial_large_game_screen_mode;
 
-#if DXX_USE_STEREOSCOPIC_RENDER
-StereoFormat VR_stereo;
-fix  VR_eye_width = F1_0;
-int VR_eye_offset{0};
-int VR_sync_width{20};
-grs_subcanvas VR_hud_left;
-grs_subcanvas VR_hud_right;
-#endif
-
 }
 
 namespace dsx {
-
-#if DXX_USE_STEREOSCOPIC_RENDER
-void init_stereo()
-{
-#if DXX_USE_OGL
-	// init stereo options
-	if (CGameArg.OglStereo || CGameArg.OglStereoView) {
-		if (VR_stereo == StereoFormat::None && !VR_eye_offset)
-			VR_stereo = (CGameArg.OglStereoView) ? static_cast<StereoFormat>(CGameArg.OglStereoView % (static_cast<unsigned>(StereoFormat::HighestFormat) + 1)) : StereoFormat::AboveBelow;
-		constexpr int half_width_eye_offset = -6;
-		constexpr int full_width_eye_offset = -12;
-		switch (VR_stereo)
-		{
-			case StereoFormat::None:
-			case StereoFormat::AboveBelow:
-			case StereoFormat::AboveBelowSync:
-				VR_eye_offset = full_width_eye_offset;
-				break;
-			case StereoFormat::SideBySideFullHeight:
-			case StereoFormat::SideBySideHalfHeight:
-				VR_eye_offset = half_width_eye_offset;
-				break;
-		}
-		VR_eye_width = (F1_0 * 7) / 10;	// Descent 1.5 defaults
-		VR_sync_width = (20 * SHEIGHT) / 480;
-		PlayerCfg.CockpitMode[1] = cockpit_mode_t::full_screen;
-	}
-	else {
-		VR_stereo = StereoFormat::None;
-	}
-#endif
-}
-#endif
 
 //initialize the various canvases on the game screen
 //called every time the screen mode or cockpit changes
@@ -292,31 +250,7 @@ void init_cockpit()
 			{
 				unsigned w = SWIDTH;
 				unsigned h = SHEIGHT;
-#if DXX_USE_STEREOSCOPIC_RENDER
-				switch (VR_stereo)
-				{
-					case StereoFormat::None:
-						/* Preserve width */
-						/* Preserve height */
-						break;
-					case StereoFormat::AboveBelow:
-					case StereoFormat::AboveBelowSync:
-						/* Preserve width */
-						/* Change height */
-						h /= 2;
-						break;
-					case StereoFormat::SideBySideHalfHeight:
-						/* Change width */
-						/* Change height */
-						h /= 2;
-						[[fallthrough]];
-					case StereoFormat::SideBySideFullHeight:
-						/* Change width */
-						/* Preserve height */
-						w /= 2;
-						break;
-				}
-#endif
+
 				game_init_render_sub_buffers(canvas, 0, 0, w, h);
 			}
 			break;
@@ -342,6 +276,15 @@ void init_cockpit()
 		}
 	}
 
+	// unsigned x1{0}, y1{0}, x2 = SWIDTH, y2 = SHEIGHT;
+	//
+	// game_init_render_sub_buffers(canvas,
+	// 	x1 * (static_cast<float>(SWIDTH) / 2),
+	// 	y1 * (static_cast<float>(SHEIGHT) / 2),
+	// 	(x2 - x1 + 1) * (static_cast<float>(SWIDTH) / 2),
+	// 	(y2 - y1 + 2) * (static_cast<float>(SHEIGHT) / 2)
+	// );
+
 	gr_set_default_canvas();
 }
 
@@ -350,11 +293,7 @@ void init_cockpit()
 //selects a given cockpit (or lack of one).  See types in game.h
 void select_cockpit(const cockpit_mode_t mode)
 {
-#if DXX_USE_STEREOSCOPIC_RENDER
-	// skip switching cockpit views while stereo viewport active
-	if (VR_stereo != StereoFormat::None && mode != cockpit_mode_t::full_screen)
-		return;
-#endif
+
 
 	if (mode != PlayerCfg.CockpitMode[1]) {		//new mode
 		PlayerCfg.CockpitMode[1]=mode;
@@ -376,57 +315,7 @@ void game_init_render_sub_buffers(grs_canvas &canvas, const int x, const int y, 
 	gr_clear_canvas(canvas, 0);
 	gr_init_sub_canvas(Screen_3d_window, canvas, x, y, w, h);
 
-#if DXX_USE_STEREOSCOPIC_RENDER
-	if (VR_stereo != StereoFormat::None)
-	{
-		// offset HUD screen rects to force out-of-screen parallax on HUD overlays
-		const int dx = (VR_eye_offset < 0) ? -VR_eye_offset : 0;
-		const int dy = VR_sync_width / 2;
-		struct {
-			uint16_t x;
-			uint16_t y;
-			uint16_t w;
-			uint16_t h;
-		} l, r;
-		switch (VR_stereo) {
-			case StereoFormat::None:
-			default:
-				return;
-			case StereoFormat::AboveBelow:
-				l.x = x + dx;
-				l.y = y;
-				l.w = r.w = w - dx;
-				l.h = r.h = h;
-				r.x = x;
-				r.y = y + h;
-				break;
-			case StereoFormat::AboveBelowSync:
-				l.x = x + dx;
-				l.y = y;
-				l.w = r.w = w - dx;
-				l.h = r.h = h - dy;
-				r.x = x;
-				r.y = y + h + dy;
-				break;
-			case StereoFormat::SideBySideFullHeight:
-				l.x = x + dx;
-				l.y = r.y = y;
-				l.w = r.w = w - dx;
-				l.h = r.h = h;
-				r.x = x + w;
-				break;
-			case StereoFormat::SideBySideHalfHeight:
-				l.x = x + dx;
-				l.y = r.y = y + (h / 2);
-				l.w = r.w = w - dx;
-				l.h = r.h = h;
-				r.x = x + w;
-				break;
-		}
-		gr_init_sub_canvas(VR_hud_left,  grd_curscreen->sc_canvas, l.x, l.y, l.w, l.h);
-		gr_init_sub_canvas(VR_hud_right, grd_curscreen->sc_canvas, r.x, r.y, r.w, r.h);
-	}
-#endif
+
 }
 
 }
@@ -1656,9 +1545,7 @@ game_window *game_setup()
 
 	auto game_wind = window_create<game_window>(grd_curscreen->sc_canvas, 0, 0, SWIDTH, SHEIGHT);
 	reset_palette_add();
-#if DXX_USE_STEREOSCOPIC_RENDER
-	init_stereo();
-#endif
+
 	init_cockpit();
 	init_gauges();
 	netplayerinfo_on = 0;

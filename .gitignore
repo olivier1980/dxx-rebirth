@@ -52,3 +52,5 @@ xcuserdata
 # Brewfile installation artifacts
 #################################
 Brewfile.lock.json
+
+common/include/imgui

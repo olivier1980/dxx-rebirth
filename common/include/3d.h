@@ -179,11 +179,7 @@ void g3_start_frame(grs_canvas &);
 void g3_set_view_matrix(const vms_vector &view_pos,const vms_matrix &view_matrix,fix zoom);
 
 //end the frame
-#if DXX_USE_OGL
 #define g3_end_frame() ogl_end_frame()
-#else
-#define g3_end_frame()
-#endif
 
 //Instancing
 

@@ -51,17 +51,9 @@
 #include "config.h"
 #include "vers_id.h"
 
-#if defined(__APPLE__) && defined(__MACH__)
-#include <OpenGL/glu.h>
-#else
-#if DXX_USE_OGLES
-#include <EGL/egl.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <SDL_syswm.h>
-#endif
-#endif
-
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_sdl2.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 #include "ogl_sync.h"
 #include <memory>
 
@@ -81,8 +73,8 @@ static DISPMANX_DISPLAY_HANDLE_T dispman_display=DISPMANX_NO_HANDLE;
 #endif
 
 #else
-SDL_Window *g_pRebirthSDLMainWindow;
-static int g_iRebirthWindowX, g_iRebirthWindowY;
+    SDL_Window *g_pRebirthSDLMainWindow;
+    static int g_iRebirthWindowX, g_iRebirthWindowY;
 #endif
     static ogl_sync sync_helper;
     static int gr_installed;
@@ -96,18 +88,16 @@ static int sdl_no_modeswitch;
 }
 
 namespace dsx {
-static void gr_set_mode_from_window_size(SDL_Window *const SDLWindow)
-{
-	assert(SDLWindow);
-	int w, h;
-	SDL_GL_GetDrawableSize(SDLWindow, &w, &h);
-	gr_set_mode(screen_mode(w, h));
-}
+    static void gr_set_mode_from_window_size(SDL_Window *const SDLWindow) {
+        assert(SDLWindow);
+        int w, h;
+        SDL_GL_GetDrawableSize(SDLWindow, &w, &h);
+        gr_set_mode(screen_mode(w, h));
+    }
 
-void gr_set_mode_from_window_size()
-{
-	gr_set_mode_from_window_size(g_pRebirthSDLMainWindow);
-}
+    void gr_set_mode_from_window_size() {
+        gr_set_mode_from_window_size(g_pRebirthSDLMainWindow);
+    }
 }
 
 #if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
@@ -140,7 +130,7 @@ namespace dcx {
 #if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
 	eglSwapBuffers(eglDisplay, eglSurface);
 #else
-	SDL_GL_SwapWindow(g_pRebirthSDLMainWindow);
+        SDL_GL_SwapWindow(g_pRebirthSDLMainWindow);
 #endif
         sync_helper.after_swap();
     }
@@ -338,69 +328,22 @@ static int rpi_setup_element(int x, int y, Uint32 video_flags, int update)
 
 namespace dcx {
     int gr_check_fullscreen(void) {
-	return !!(SDL_GetWindowFlags(g_pRebirthSDLMainWindow) & SDL_WINDOW_FULLSCREEN);
+        return !!(SDL_GetWindowFlags(g_pRebirthSDLMainWindow) & SDL_WINDOW_FULLSCREEN);
     }
 
     void gr_toggle_fullscreen() {
-#if SDL_MAJOR_VERSION == 1
-	const auto local_sdl_video_flags = (sdl_video_flags ^= SDL_FULLSCREEN);
-	if (gl_initialized)
-	{
-		if (sdl_no_modeswitch == 0) {
-			auto gsm = Game_screen_mode;
-			const auto DbgBpp{CGameArg.DbgBpp};
-			if (!SDL_VideoModeOK(gsm.width, gsm.height, DbgBpp, local_sdl_video_flags))
-			{
-				con_printf(CON_URGENT, "Cannot set %ix%i. Fallback to 640x480", gsm.width, gsm.height);
-				gsm.width = 640;
-				gsm.height = 480;
-				Game_screen_mode = gsm;
-			}
-			if (!SDL_SetVideoMode(gsm.width, gsm.height, DbgBpp, local_sdl_video_flags))
-			{
-				Error("Could not set %dx%dx%d opengl video mode: %s\n", gsm.width, gsm.height, DbgBpp, SDL_GetError());
-			}
-		}
-#ifdef RPI
-		if (rpi_setup_element(SM_W(Game_screen_mode), SM_H(Game_screen_mode), local_sdl_video_flags, 1)) {
-			 Error("RPi: Could not set up %dx%d element\n", SM_W(Game_screen_mode), SM_H(Game_screen_mode));
-		}
-#endif
-	}
-
-	gr_remap_color_fonts();
-
-	if (gl_initialized) // update viewing values for menus
-	{
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-#if DXX_USE_OGLES
-		glOrthof(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-#else
- 		glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-#endif
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();//clear matrix
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		ogl_smash_texture_list_internal();//if we are or were fullscreen, changing vid mode will invalidate current textures
-	}
-	CGameCfg.WindowMode = !(local_sdl_video_flags & SDL_FULLSCREEN);
-#elif SDL_MAJOR_VERSION == 2
-	const auto SDLWindow{g_pRebirthSDLMainWindow};
-	const auto is_fullscreen_before_change = SDL_GetWindowFlags(SDLWindow) & SDL_WINDOW_FULLSCREEN;
-	CGameCfg.WindowMode = !!is_fullscreen_before_change;
-	if (!is_fullscreen_before_change)
-		SDL_GetWindowPosition(SDLWindow, &g_iRebirthWindowX, &g_iRebirthWindowY);
-	SDL_SetWindowFullscreen(SDLWindow, is_fullscreen_before_change ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
-	if (is_fullscreen_before_change)
-	{
-		const auto mode{Game_screen_mode};
-		SDL_SetWindowPosition(SDLWindow, g_iRebirthWindowX, g_iRebirthWindowY);
-		SDL_SetWindowSize(SDLWindow, SM_W(mode), SM_H(mode));
-	}
-	gr_set_mode_from_window_size(SDLWindow);
-#endif
+        const auto SDLWindow{g_pRebirthSDLMainWindow};
+        const auto is_fullscreen_before_change = SDL_GetWindowFlags(SDLWindow) & SDL_WINDOW_FULLSCREEN;
+        CGameCfg.WindowMode = !!is_fullscreen_before_change;
+        if (!is_fullscreen_before_change)
+            SDL_GetWindowPosition(SDLWindow, &g_iRebirthWindowX, &g_iRebirthWindowY);
+        SDL_SetWindowFullscreen(SDLWindow, is_fullscreen_before_change ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+        if (is_fullscreen_before_change) {
+            const auto mode{Game_screen_mode};
+            SDL_SetWindowPosition(SDLWindow, g_iRebirthWindowX, g_iRebirthWindowY);
+            SDL_SetWindowSize(SDLWindow, SM_W(mode), SM_H(mode));
+        }
+        gr_set_mode_from_window_size(SDLWindow);
     }
 
     static void ogl_init_state(void) {
@@ -410,11 +353,7 @@ namespace dcx {
         /* initialize viewing values */
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-#if DXX_USE_OGLES
-	glOrthof(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-#else
         glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-#endif
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity(); //clear matrix
         glEnable(GL_BLEND);
@@ -427,7 +366,6 @@ namespace dcx {
 
 namespace dsx {
     static void ogl_tune_for_current(void) {
-#if !DXX_USE_OGLES
         const auto gl_vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         const auto gl_renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         const auto gl_version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -452,10 +390,6 @@ namespace dsx {
                 //  orulz (Matrox G200)
                 CGameArg.DbgGlIntensity4Ok = 0;
             }
-#ifdef macintosh
-	if (d_stricmp(gl_renderer,"3dfx Voodoo 3")==0) // strangely, includes Voodoo 2
-		CGameArg.DbgGlGetTexLevelParamOk = false;	// Always returns 0
-#endif
         }
 
 #ifndef NDEBUG
@@ -468,7 +402,6 @@ namespace dsx {
             con_puts(CON_VERBOSE, "DXX-Rebirth: OpenGL: anisotropic texture filter not supported");
             CGameCfg.TexAnisotropy = false;
         }
-#endif
     }
 }
 
@@ -531,7 +464,6 @@ static int ogl_init_load_library(void)
 #endif
 
     void gr_set_attributes(void) {
-#if !DXX_USE_OGLES
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
         SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
@@ -539,7 +471,7 @@ static int ogl_init_load_library(void)
         SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
         SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetSwapInterval(CGameCfg.VSync ? 1 : 0);
+        SDL_GL_SetSwapInterval(CGameCfg.VSync ? 1 : 0);
 
         int buffers, samples;
         if (CGameCfg.Multisample) {
@@ -550,12 +482,7 @@ static int ogl_init_load_library(void)
         }
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, buffers);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
-#else
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-#endif
         ogl_smash_texture_list_internal();
         gr_remap_color_fonts();
     }
@@ -587,24 +514,43 @@ static int ogl_init_load_library(void)
 
         gr_set_attributes();
 
-	assert(!g_pRebirthSDLMainWindow);
-	unsigned sdl_window_flags = SDL_WINDOW_OPENGL;
-	if (CGameArg.SysNoBorders)
-		sdl_window_flags |= SDL_WINDOW_BORDERLESS;
-	if (!CGameCfg.WindowMode && !CGameArg.SysWindow)
-		sdl_window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        assert(!g_pRebirthSDLMainWindow);
+        unsigned sdl_window_flags = SDL_WINDOW_OPENGL;
+        if (CGameArg.SysNoBorders)
+            sdl_window_flags |= SDL_WINDOW_BORDERLESS;
+        if (!CGameCfg.WindowMode && !CGameArg.SysWindow)
+            sdl_window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 #if defined(__APPLE__) && defined(__MACH__)
 	sdl_window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-	const auto mode{Game_screen_mode};
-	const auto SDLWindow = SDL_CreateWindow(DESCENT_VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SM_W(mode), SM_H(mode), sdl_window_flags);
-	if (!SDLWindow)
-		return -1;
-	SDL_GetWindowPosition(SDLWindow, &g_iRebirthWindowX, &g_iRebirthWindowY);
-	g_pRebirthSDLMainWindow = SDLWindow;
-	SDL_GL_CreateContext(SDLWindow);
-	if (const auto window_icon = SDL_LoadBMP(DXX_SDL_WINDOW_ICON_BITMAP))
-		SDL_SetWindowIcon(SDLWindow, window_icon);
+        const auto mode{Game_screen_mode};
+        const auto SDLWindow = SDL_CreateWindow(DESCENT_VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                                SM_W(mode), SM_H(mode), sdl_window_flags);
+        if (!SDLWindow)
+            return -1;
+
+        SDL_GetWindowPosition(SDLWindow, &g_iRebirthWindowX, &g_iRebirthWindowY);
+        g_pRebirthSDLMainWindow = SDLWindow;
+        SDL_GLContext glContext = SDL_GL_CreateContext(SDLWindow);
+		if (glContext == nullptr)
+		{
+			printf("Error: SDL_GL_CreateContext(): %s\n", SDL_GetError());
+			return -1;
+		}
+		SDL_GL_MakeCurrent(SDLWindow, glContext);
+		IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+
+		ImGui_ImplSDL2_InitForOpenGL(SDLWindow, glContext);
+		ImGui_ImplOpenGL3_Init();
+
+
+        if (const auto window_icon = SDL_LoadBMP(DXX_SDL_WINDOW_ICON_BITMAP))
+            SDL_SetWindowIcon(SDLWindow, window_icon);
         ogl_init_texture_list_internal();
 
         grd_curscreen = std::make_unique<grs_screen>();

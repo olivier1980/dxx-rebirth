@@ -91,9 +91,7 @@ enum class bm_mode : uint8_t
 	linear,
 	ilbm,
 	rgb15 = 3,	//5 bits each r,g,b stored at 16 bits
-#if DXX_USE_OGL
 	ogl = 5,
-#endif /* def OGL */
 };
 
 }

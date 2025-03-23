@@ -148,19 +148,6 @@ struct d_game_unique_state
 	}
 };
 
-#if DXX_USE_STEREOSCOPIC_RENDER
-// Stereo viewport formats
-enum class StereoFormat : uint8_t
-{
-	None = 0,
-	AboveBelow,
-	SideBySideFullHeight,
-	SideBySideHalfHeight,
-	AboveBelowSync,
-	HighestFormat = AboveBelowSync
-};
-#endif
-
 }
 
 #ifdef DXX_BUILD_DESCENT

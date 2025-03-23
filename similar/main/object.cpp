@@ -755,10 +755,6 @@ void render_object(grs_canvas &canvas, const d_level_unique_light_state &LevelUn
 		return;
 	}
 
-#if !DXX_USE_OGL
-	const auto mld_save = std::exchange(Max_linear_depth, Max_linear_depth_objects);
-#endif
-
 	bool alpha = false;
 	switch (obj->render_type)
 	{

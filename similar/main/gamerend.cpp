@@ -66,12 +66,12 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #endif
 
 namespace dcx {
-int netplayerinfo_on;
-cockpit_mode_t last_drawn_cockpit = cockpit_mode_t{UINT8_MAX};
+    int netplayerinfo_on;
+    cockpit_mode_t last_drawn_cockpit = cockpit_mode_t{UINT8_MAX};
 }
 
 namespace dsx {
-namespace {
+    namespace {
 #if DXX_BUILD_DESCENT == 1
 static inline void game_draw_marker_message(grs_canvas &)
 {
@@ -88,207 +88,214 @@ static void game_draw_marker_message(grs_canvas &canvas)
 }
 #endif
 
-static void update_cockpits(grs_canvas &);
-}
+        static void update_cockpits(grs_canvas &);
+    }
 }
 
 namespace dcx {
+    namespace {
+        static void game_draw_multi_message(grs_canvas &canvas) {
+            if (!(Game_mode & GM_MULTI))
+                return;
+            const auto sending = multi_sending_message[Player_num];
+            std::array<char, 64> buffer;
+            if (sending != msgsend_state::none)
+                std::snprintf(std::data(buffer), std::size(buffer), "%s: %s_", TXT_MESSAGE, Network_message.data());
+            else if (const auto defining{multi_defining_message}; defining != multi_macro_message_index::None)
+                /* Use 1-based counting for user-visible text. */
+                std::snprintf(std::data(buffer), std::size(buffer), "%s #%d: %s_", TXT_MACRO,
+                              1 + underlying_value(defining), Network_message.data());
+            else
+                return;
+            gr_set_fontcolor(canvas, BM_XRGB(0, 63, 0), -1)
+            ;
+            auto &game_font = *GAME_FONT;
+            const auto &&y = (LINE_SPACING(game_font, game_font) * 5) + FSPACY(1);
+            gr_string(canvas, game_font, 0x8000, y, std::data(buffer));
+        }
 
-namespace {
-
-static void game_draw_multi_message(grs_canvas &canvas)
-{
-	if (!(Game_mode&GM_MULTI))
-		return;
-	const auto sending = multi_sending_message[Player_num];
-	std::array<char, 64> buffer;
-	if (sending != msgsend_state::none)
-		std::snprintf(std::data(buffer), std::size(buffer), "%s: %s_", TXT_MESSAGE, Network_message.data());
-	else if (const auto defining{multi_defining_message}; defining != multi_macro_message_index::None)
-		/* Use 1-based counting for user-visible text. */
-		std::snprintf(std::data(buffer), std::size(buffer), "%s #%d: %s_", TXT_MACRO, 1 + underlying_value(defining), Network_message.data());
-	else
-		return;
-	gr_set_fontcolor(canvas, BM_XRGB(0, 63, 0),-1);
-	auto &game_font = *GAME_FONT;
-	const auto &&y = (LINE_SPACING(game_font, game_font) * 5) + FSPACY(1);
-	gr_string(canvas, game_font, 0x8000, y, std::data(buffer));
-}
-
-static void show_framerate(grs_canvas &canvas)
-{
-	static int fps_count = 0, fps_rate = 0;
-	static fix64 fps_time = 0;
-	fps_count++;
-	const auto tq = timer_query();
-	if (tq >= fps_time + F1_0)
-	{
-		fps_rate = fps_count;
-		fps_count = 0;
-		fps_time += F1_0;
-	}
-	const auto &&line_spacing = LINE_SPACING(*canvas.cv_font, *GAME_FONT);
-	unsigned line_displacement;
-	switch (PlayerCfg.CockpitMode[1])
-	{
-		case cockpit_mode_t::full_cockpit:
-			line_displacement = line_spacing * 2;
-			break;
-		case cockpit_mode_t::status_bar:
-			line_displacement = line_spacing;
-			break;
-		case cockpit_mode_t::full_screen:
-			switch (PlayerCfg.HudMode)
-			{
-				case HudType::Standard:
-					line_displacement = line_spacing * 4;
-					break;
-				case HudType::Alternate1:
-					line_displacement = line_spacing * 6;
-					if (Game_mode & GM_MULTI)
-						line_displacement -= line_spacing * 4;
-					break;
-				case HudType::Alternate2:
-					line_displacement = line_spacing;
-					break;
-				case HudType::Hidden:
-				default:
-					return;
-			}
-			break;
-		case cockpit_mode_t::letterbox:
-		case cockpit_mode_t::rear_view:
-		default:
-			return;
-	}
-	const auto &game_font = *GAME_FONT;
-	gr_set_fontcolor(canvas, BM_XRGB(0, 31, 0),-1);
-	char buf[16];
-	if (CGameArg.DbgVerbose)
-		snprintf(buf, sizeof(buf), "%iFPS (%.2fms)", fps_rate, (FrameTime * 1000.) / F1_0);
-	else
-		snprintf(buf, sizeof(buf), "%iFPS", fps_rate);
-	const auto &&[w, h] = gr_get_string_size(game_font, buf);
-	const auto bm_h = canvas.cv_bitmap.bm_h;
-	gr_string(canvas, game_font, FSPACX(318) - w, bm_h - line_displacement, buf, w, h);
-}
-
-}
-
+        static void show_framerate(grs_canvas &canvas) {
+            static int fps_count = 0, fps_rate = 0;
+            static fix64 fps_time = 0;
+            fps_count++;
+            const auto tq = timer_query();
+            if (tq >= fps_time + F1_0) {
+                fps_rate = fps_count;
+                fps_count = 0;
+                fps_time += F1_0;
+            }
+            const auto &&line_spacing = LINE_SPACING(*canvas.cv_font, *GAME_FONT);
+            unsigned line_displacement;
+            switch (PlayerCfg.CockpitMode[1]) {
+                case cockpit_mode_t::full_cockpit:
+                    line_displacement = line_spacing * 2;
+                    break;
+                case cockpit_mode_t::status_bar:
+                    line_displacement = line_spacing;
+                    break;
+                case cockpit_mode_t::full_screen:
+                    switch (PlayerCfg.HudMode) {
+                        case HudType::Standard:
+                            line_displacement = line_spacing * 4;
+                            break;
+                        case HudType::Alternate1:
+                            line_displacement = line_spacing * 6;
+                            if (Game_mode & GM_MULTI)
+                                line_displacement -= line_spacing * 4;
+                            break;
+                        case HudType::Alternate2:
+                            line_displacement = line_spacing;
+                            break;
+                        case HudType::Hidden:
+                        default:
+                            return;
+                    }
+                    break;
+                case cockpit_mode_t::letterbox:
+                case cockpit_mode_t::rear_view:
+                default:
+                    return;
+            }
+            const auto &game_font = *GAME_FONT;
+            gr_set_fontcolor(canvas, BM_XRGB(0, 31, 0), -1)
+            ;
+            char buf[16];
+            if (CGameArg.DbgVerbose)
+                snprintf(buf, sizeof(buf), "%iFPS (%.2fms)", fps_rate, (FrameTime * 1000.) / F1_0);
+            else
+                snprintf(buf, sizeof(buf), "%iFPS", fps_rate);
+            const auto &&[w, h] = gr_get_string_size(game_font, buf);
+            const auto bm_h = canvas.cv_bitmap.bm_h;
+            gr_string(canvas, game_font, FSPACX(318) - w, bm_h - line_displacement, buf, w, h);
+        }
+    }
 }
 
 namespace dsx {
+    namespace {
+        static void show_netplayerinfo(grs_canvas &canvas) {
+            auto &Objects = LevelUniqueObjectState.Objects;
+            auto &vcobjptr = Objects.vcptr;
+            int x{0}, y = 0;
+            static const char *const eff_strings[] = {
+                "trashing", "really hurting", "seriously affecting", "hurting", "affecting", "tarnishing"
+            };
 
-namespace {
+            gr_set_fontcolor(canvas, 255, -1)
+            ;
 
-static void show_netplayerinfo(grs_canvas &canvas)
-{
-	auto &Objects = LevelUniqueObjectState.Objects;
-	auto &vcobjptr = Objects.vcptr;
-	int x{0}, y=0;
-	static const char *const eff_strings[]={"trashing","really hurting","seriously affecting","hurting","affecting","tarnishing"};
+            const auto &&fspacx = FSPACX();
+            const auto &&fspacx120 = fspacx(120);
+            const auto &&fspacy84 = FSPACY(84);
+            x = (SWIDTH / 2) - fspacx120;
+            y = (SHEIGHT / 2) - fspacy84;
 
-	gr_set_fontcolor(canvas, 255, -1);
+            gr_settransblend(canvas, gr_fade_level{14}, gr_blend::normal);
+            const uint8_t color000 = BM_XRGB(0, 0, 0);
+            gr_rect(canvas, (SWIDTH / 2) - fspacx120, (SHEIGHT / 2) - fspacy84, (SWIDTH / 2) + fspacx120,
+                    (SHEIGHT / 2) + fspacy84, color000);
+            gr_settransblend(canvas, GR_FADE_OFF, gr_blend::normal);
 
-	const auto &&fspacx = FSPACX();
-	const auto &&fspacx120 = fspacx(120);
-	const auto &&fspacy84 = FSPACY(84);
-	x = (SWIDTH / 2) - fspacx120;
-	y = (SHEIGHT / 2) - fspacy84;
+            // general game information
+            const auto &&line_spacing = LINE_SPACING(*canvas.cv_font, *GAME_FONT);
+            y += line_spacing;
+            auto &game_font = *GAME_FONT;
+            gr_string(canvas, game_font, 0x8000, y, Netgame.game_name.data());
+            y += line_spacing;
+            gr_printf(canvas, game_font, 0x8000, y, "%s - lvl: %i", Netgame.mission_title.data(), Netgame.levelnum);
 
-	gr_settransblend(canvas, gr_fade_level{14}, gr_blend::normal);
-	const uint8_t color000 = BM_XRGB(0, 0, 0);
-	gr_rect(canvas, (SWIDTH / 2) - fspacx120, (SHEIGHT / 2) - fspacy84, (SWIDTH / 2) + fspacx120, (SHEIGHT / 2) + fspacy84, color000);
-	gr_settransblend(canvas, GR_FADE_OFF, gr_blend::normal);
+            const auto &&fspacx8 = fspacx(8);
+            x += fspacx8;
+            y += line_spacing * 2;
+            const auto gamemode = underlying_value(Netgame.gamemode);
+            gr_printf(canvas, game_font, x, y, "game mode: %s",
+                      gamemode < GMNames.size() ? GMNames[gamemode] : "INVALID");
+            y += line_spacing;
+            gr_printf(canvas, game_font, x, y, "difficulty: %s", MENU_DIFFICULTY_TEXT(Netgame.difficulty));
+            y += line_spacing; {
+                auto &plr = get_local_player();
+                gr_printf(canvas, game_font, x, y, "level time: %i:%02i:%02i", plr.hours_level,
+                          f2i(plr.time_level) / 60 % 60, f2i(plr.time_level) % 60);
+                y += line_spacing;
+                gr_printf(canvas, game_font, x, y, "total time: %i:%02i:%02i", plr.hours_total,
+                          f2i(plr.time_total) / 60 % 60, f2i(plr.time_total) % 60);
+            }
+            y += line_spacing;
+            if (Netgame.KillGoal)
+                gr_printf(canvas, game_font, x, y, "Kill goal: %d", Netgame.KillGoal * 5);
 
-	// general game information
-	const auto &&line_spacing = LINE_SPACING(*canvas.cv_font, *GAME_FONT);
-	y += line_spacing;
-	auto &game_font = *GAME_FONT;
-	gr_string(canvas, game_font, 0x8000, y, Netgame.game_name.data());
-	y += line_spacing;
-	gr_printf(canvas, game_font, 0x8000, y, "%s - lvl: %i", Netgame.mission_title.data(), Netgame.levelnum);
+            // player information (name, kills, ping, game efficiency)
+            y += line_spacing * 2;
+            gr_string(canvas, game_font, x, y, "player");
+            gr_string(canvas, game_font, x + fspacx8 * 7, y, ((Game_mode & GM_MULTI_COOP)
+                                                                  ? "score"
+                                                                  : (gr_string(canvas, game_font, x + fspacx8 * 12, y,
+                                                                               "deaths"), "kills")
+                      ));
+            gr_string(canvas, game_font, x + fspacx8 * 18, y, "ping");
+            gr_string(canvas, game_font, x + fspacx8 * 23, y, "efficiency");
 
-	const auto &&fspacx8 = fspacx(8);
-	x += fspacx8;
-	y += line_spacing * 2;
-	const auto gamemode = underlying_value(Netgame.gamemode);
-	gr_printf(canvas, game_font, x, y, "game mode: %s", gamemode < GMNames.size() ? GMNames[gamemode] : "INVALID");
-	y += line_spacing;
-	gr_printf(canvas, game_font, x, y,"difficulty: %s", MENU_DIFFICULTY_TEXT(Netgame.difficulty));
-	y += line_spacing;
-	{
-		auto &plr = get_local_player();
-		gr_printf(canvas, game_font, x, y,"level time: %i:%02i:%02i", plr.hours_level, f2i(plr.time_level) / 60 % 60, f2i(plr.time_level) % 60);
-	y += line_spacing;
-		gr_printf(canvas, game_font, x, y,"total time: %i:%02i:%02i", plr.hours_total, f2i(plr.time_total) / 60 % 60, f2i(plr.time_total) % 60);
-	}
-	y += line_spacing;
-	if (Netgame.KillGoal)
-		gr_printf(canvas, game_font, x, y,"Kill goal: %d",Netgame.KillGoal*5);
+            // process players table
+            for (unsigned i = 0; i < MAX_PLAYERS; ++i) {
+                auto &plr = *vcplayerptr(i);
+                if (plr.connected == player_connection_status::disconnected)
+                    continue;
 
-	// player information (name, kills, ping, game efficiency)
-	y += line_spacing * 2;
-	gr_string(canvas, game_font, x, y, "player");
-	gr_string(canvas, game_font, x + fspacx8 * 7, y, ((Game_mode & GM_MULTI_COOP)
-		? "score"
-		: (gr_string(canvas, game_font, x + fspacx8 * 12, y, "deaths"), "kills")
-	));
-	gr_string(canvas, game_font, x + fspacx8 * 18, y, "ping");
-	gr_string(canvas, game_font, x + fspacx8 * 23, y, "efficiency");
+                y += line_spacing;
 
-	// process players table
-	for (unsigned i = 0; i < MAX_PLAYERS; ++i)
-	{
-		auto &plr = *vcplayerptr(i);
-		if (plr.connected == player_connection_status::disconnected)
-			continue;
+                const auto color{get_player_or_team_color(Netgame, Game_mode, i)};
+                auto &prgb = player_rgb[color];
+                gr_set_fontcolor(canvas, BM_XRGB(prgb.r, prgb.g, prgb.b), -1)
+                ;
+                gr_string(canvas, game_font, x, y, plr.callsign); {
+                    auto &plrobj = *vcobjptr(plr.objnum);
+                    auto &player_info = plrobj.ctype.player_info;
+                    auto v = ((Game_mode & GM_MULTI_COOP)
+                                  ? player_info.mission.score
+                                  : (gr_printf(canvas, game_font, x + fspacx8 * 12, y, "%-6d",
+                                               player_info.net_killed_total), player_info.net_kills_total)
+                    );
+                    gr_printf(canvas, game_font, x + fspacx8 * 7, y, "%-6d", v);
+                }
 
-		y += line_spacing;
+                gr_printf(canvas, game_font, x + fspacx8 * 18, y, "%-6d", Netgame.players[i].ping);
+                if (i != Player_num)
+                    gr_printf(canvas, game_font, x + fspacx8 * 23, y, "%hu/%hu", kill_matrix[Player_num][i],
+                              kill_matrix[i][Player_num]);
+            }
 
-		const auto color{get_player_or_team_color(Netgame, Game_mode, i)};
-		auto &prgb = player_rgb[color];
-		gr_set_fontcolor(canvas, BM_XRGB(prgb.r, prgb.g, prgb.b), -1);
-		gr_string(canvas, game_font, x, y, plr.callsign);
-		{
-			auto &plrobj = *vcobjptr(plr.objnum);
-			auto &player_info = plrobj.ctype.player_info;
-			auto v = ((Game_mode & GM_MULTI_COOP)
-				? player_info.mission.score
-				: (gr_printf(canvas, game_font, x + fspacx8 * 12, y,"%-6d", player_info.net_killed_total), player_info.net_kills_total)
-			);
-			gr_printf(canvas, game_font, x + fspacx8 * 7, y, "%-6d", v);
-		}
+            y += (line_spacing * 2) + (line_spacing * (MAX_PLAYERS - N_players));
 
-		gr_printf(canvas, game_font, x + fspacx8 * 18, y,"%-6d", Netgame.players[i].ping);
-		if (i != Player_num)
-			gr_printf(canvas, game_font, x + fspacx8 * 23, y, "%hu/%hu", kill_matrix[Player_num][i], kill_matrix[i][Player_num]);
-	}
+            // printf team scores
+            if (Game_mode & GM_TEAM) {
+                gr_set_fontcolor(canvas, 255, -1)
+                ;
+                gr_string(canvas, game_font, x, y, "team");
+                gr_string(canvas, game_font, x + fspacx8 * 8, y, "score");
+                y += line_spacing;
+                gr_set_fontcolor(
+                    canvas,
+                    BM_XRGB(player_rgb[player_ship_color::blue].r, player_rgb[player_ship_color::blue].g, player_rgb[
+                        player_ship_color::blue].b), -1)
+                ;
+                gr_printf(canvas, game_font, x, y, "%s:", Netgame.team_name[team_number::blue].operator const char *());
+                gr_printf(canvas, game_font, x + fspacx8 * 8, y, "%i", team_kills[team_number::blue]);
+                y += line_spacing;
+                gr_set_fontcolor(
+                    canvas,
+                    BM_XRGB(player_rgb[player_ship_color::red].r, player_rgb[player_ship_color::red].g, player_rgb[
+                        player_ship_color::red].b), -1)
+                ;
+                gr_printf(canvas, game_font, x, y, "%s:", Netgame.team_name[team_number::red].operator const char *());
+                gr_printf(canvas, game_font, x + fspacx8 * 8, y, "%i", team_kills[team_number::red]);
+                y += line_spacing * 2;
+            } else
+                y += line_spacing * 4;
 
-	y += (line_spacing * 2) + (line_spacing * (MAX_PLAYERS - N_players));
+            gr_set_fontcolor(canvas, 255, -1)
+            ;
 
-	// printf team scores
-	if (Game_mode & GM_TEAM)
-	{
-		gr_set_fontcolor(canvas, 255, -1);
-		gr_string(canvas, game_font, x, y, "team");
-		gr_string(canvas, game_font, x + fspacx8 * 8, y, "score");
-		y += line_spacing;
-		gr_set_fontcolor(canvas, BM_XRGB(player_rgb[player_ship_color::blue].r, player_rgb[player_ship_color::blue].g, player_rgb[player_ship_color::blue].b), -1);
-		gr_printf(canvas, game_font, x, y, "%s:", Netgame.team_name[team_number::blue].operator const char *());
-		gr_printf(canvas, game_font, x + fspacx8 * 8, y, "%i", team_kills[team_number::blue]);
-		y += line_spacing;
-		gr_set_fontcolor(canvas, BM_XRGB(player_rgb[player_ship_color::red].r, player_rgb[player_ship_color::red].g, player_rgb[player_ship_color::red].b), -1);
-		gr_printf(canvas, game_font, x, y, "%s:", Netgame.team_name[team_number::red].operator const char *());
-		gr_printf(canvas, game_font, x + fspacx8 * 8, y, "%i", team_kills[team_number::red]);
-		y += line_spacing * 2;
-	}
-	else
-		y += line_spacing * 4;
-
-	gr_set_fontcolor(canvas, 255, -1);
-
-	// additional information about game - hoard, ranking
+            // additional information about game - hoard, ranking
 
 #if DXX_BUILD_DESCENT == 2
 	if (game_mode_hoard(Game_mode))
@@ -300,29 +307,28 @@ static void show_netplayerinfo(grs_canvas &canvas)
 	}
 	else
 #endif
-	if (!PlayerCfg.NoRankings)
-	{
-		const int ieff = (PlayerCfg.NetlifeKills + PlayerCfg.NetlifeKilled <= 0)
-			? 0
-			: static_cast<int>(
-				static_cast<float>(PlayerCfg.NetlifeKills) / (
-					static_cast<float>(PlayerCfg.NetlifeKilled) + static_cast<float>(PlayerCfg.NetlifeKills)
-				) * 100.0
-			);
-		const unsigned eff = ieff < 0 ? 0 : static_cast<unsigned>(ieff);
-		gr_printf(canvas, game_font, 0x8000, y, "Your lifetime efficiency of %d%% (%d/%d)", eff, PlayerCfg.NetlifeKills, PlayerCfg.NetlifeKilled);
-		y += line_spacing;
-		if (eff<60)
-			gr_printf(canvas, game_font, 0x8000, y, "is %s your ranking.", eff_strings[eff / 10]);
-		else
-			gr_string(canvas, game_font, 0x8000, y, "is serving you well.");
-		y += line_spacing;
-		gr_printf(canvas, game_font, 0x8000, y, "your rank is: %s", RankStrings[GetMyNetRanking()]);
-	}
-}
-
-}
-
+            if (!PlayerCfg.NoRankings) {
+                const int ieff = (PlayerCfg.NetlifeKills + PlayerCfg.NetlifeKilled <= 0)
+                                     ? 0
+                                     : static_cast<int>(
+                                         static_cast<float>(PlayerCfg.NetlifeKills) / (
+                                             static_cast<float>(PlayerCfg.NetlifeKilled) + static_cast<float>(PlayerCfg.
+                                                 NetlifeKills)
+                                         ) * 100.0
+                                     );
+                const unsigned eff = ieff < 0 ? 0 : static_cast<unsigned>(ieff);
+                gr_printf(canvas, game_font, 0x8000, y, "Your lifetime efficiency of %d%% (%d/%d)", eff,
+                          PlayerCfg.NetlifeKills, PlayerCfg.NetlifeKilled);
+                y += line_spacing;
+                if (eff < 60)
+                    gr_printf(canvas, game_font, 0x8000, y, "is %s your ranking.", eff_strings[eff / 10]);
+                else
+                    gr_string(canvas, game_font, 0x8000, y, "is serving you well.");
+                y += line_spacing;
+                gr_printf(canvas, game_font, 0x8000, y, "your rank is: %s", RankStrings[GetMyNetRanking()]);
+            }
+        }
+    }
 }
 
 #ifndef NDEBUG
@@ -330,68 +336,77 @@ static void show_netplayerinfo(grs_canvas &canvas)
 fix Show_view_text_timer = -1;
 
 namespace {
+    static void draw_window_label(object_array &Objects, grs_canvas &canvas) {
+        auto &vcobjptridx = Objects.vcptridx;
+        if (Show_view_text_timer > 0) {
+            const char *viewer_name, *control_name, *viewer_id;
+            Show_view_text_timer -= FrameTime;
 
-static void draw_window_label(object_array &Objects, grs_canvas &canvas)
-{
-	auto &vcobjptridx = Objects.vcptridx;
-	if ( Show_view_text_timer > 0 )
-	{
-		const char	*viewer_name,*control_name,*viewer_id;
-		Show_view_text_timer -= FrameTime;
-
-		viewer_id = "";
-		switch( Viewer->type )
-		{
-			case OBJ_FIREBALL:	viewer_name = "Fireball"; break;
-			case OBJ_ROBOT:		viewer_name = "Robot";
+            viewer_id = "";
+            switch (Viewer->type) {
+                case OBJ_FIREBALL: viewer_name = "Fireball";
+                    break;
+                case OBJ_ROBOT: viewer_name = "Robot";
 #if DXX_USE_EDITOR
 				viewer_id = Robot_names[get_robot_id(*Viewer)].data();
 #endif
-				break;
-			case OBJ_HOSTAGE:		viewer_name = "Hostage"; break;
-			case OBJ_PLAYER:		viewer_name = "Player"; break;
-			case OBJ_WEAPON:		viewer_name = "Weapon"; break;
-			case OBJ_CAMERA:		viewer_name = "Camera"; break;
-			case OBJ_POWERUP:		viewer_name = "Powerup";
+                    break;
+                case OBJ_HOSTAGE: viewer_name = "Hostage";
+                    break;
+                case OBJ_PLAYER: viewer_name = "Player";
+                    break;
+                case OBJ_WEAPON: viewer_name = "Weapon";
+                    break;
+                case OBJ_CAMERA: viewer_name = "Camera";
+                    break;
+                case OBJ_POWERUP: viewer_name = "Powerup";
 #if DXX_USE_EDITOR
 				viewer_id = Powerup_names[get_powerup_id(*Viewer)].data();
 #endif
-				break;
-			case OBJ_DEBRIS:		viewer_name = "Debris"; break;
-			case OBJ_CNTRLCEN:	viewer_name = "Reactor"; break;
-			default:					viewer_name = "Unknown"; break;
-		}
+                    break;
+                case OBJ_DEBRIS: viewer_name = "Debris";
+                    break;
+                case OBJ_CNTRLCEN: viewer_name = "Reactor";
+                    break;
+                default: viewer_name = "Unknown";
+                    break;
+            }
 
-		switch ( Viewer->control_source) {
-			case object::control_type::None:			control_name = "Stopped"; break;
-			case object::control_type::ai:				control_name = "AI"; break;
-			case object::control_type::flying:		control_name = "Flying"; break;
-			case object::control_type::slew:			control_name = "Slew"; break;
-			case object::control_type::flythrough:	control_name = "Flythrough"; break;
-			case object::control_type::morph:			control_name = "Morphing"; break;
-			default:					control_name = "Unknown"; break;
-		}
+            switch (Viewer->control_source) {
+                case object::control_type::None: control_name = "Stopped";
+                    break;
+                case object::control_type::ai: control_name = "AI";
+                    break;
+                case object::control_type::flying: control_name = "Flying";
+                    break;
+                case object::control_type::slew: control_name = "Slew";
+                    break;
+                case object::control_type::flythrough: control_name = "Flythrough";
+                    break;
+                case object::control_type::morph: control_name = "Morphing";
+                    break;
+                default: control_name = "Unknown";
+                    break;
+            }
 
-		gr_set_fontcolor(canvas, BM_XRGB(31, 0, 0),-1);
-		auto &game_font = *GAME_FONT;
-		gr_printf(canvas, game_font, 0x8000, (SHEIGHT / 10), "%hu: %s [%s] View - %s", vcobjptridx(Viewer).get_unchecked_index(), viewer_name, viewer_id, control_name);
-
-	}
-}
-
+            gr_set_fontcolor(canvas, BM_XRGB(31, 0, 0), -1)
+            ;
+            auto &game_font = *GAME_FONT;
+            gr_printf(canvas, game_font, 0x8000, (SHEIGHT / 10), "%hu: %s [%s] View - %s",
+                      vcobjptridx(Viewer).get_unchecked_index(), viewer_name, viewer_id, control_name);
+        }
+    }
 }
 #endif
 
 namespace dsx {
-
-namespace {
-
-static void render_countdown_gauge(grs_canvas &canvas)
-{
-	auto &LevelUniqueControlCenterState = LevelUniqueObjectState.ControlCenterState;
-	int Countdown_seconds_left;
-	if (!Endlevel_sequence && LevelUniqueControlCenterState.Control_center_destroyed && (Countdown_seconds_left = LevelUniqueControlCenterState.Countdown_seconds_left) > -1)
-	{ // && (Countdown_seconds_left<127))
+    namespace {
+        static void render_countdown_gauge(grs_canvas &canvas) {
+            auto &LevelUniqueControlCenterState = LevelUniqueObjectState.ControlCenterState;
+            int Countdown_seconds_left;
+            if (!Endlevel_sequence && LevelUniqueControlCenterState.Control_center_destroyed && (
+                    Countdown_seconds_left = LevelUniqueControlCenterState.Countdown_seconds_left) > -1) {
+                // && (Countdown_seconds_left<127))
 #if DXX_BUILD_DESCENT == 2
 		if (!is_D2_OEM && !is_MAC_SHARE && !is_SHAREWARE)    // no countdown on registered only
 		{
@@ -405,65 +420,69 @@ static void render_countdown_gauge(grs_canvas &canvas)
 			}
 		}
 #endif
-		gr_set_fontcolor(canvas, BM_XRGB(0, 63, 0),-1);
-		auto &game_font = *GAME_FONT;
-		gr_printf(canvas, game_font, 0x8000, (LINE_SPACING(game_font, game_font) * 6) + FSPACY(1), "T-%d s", Countdown_seconds_left);
-	}
-}
+                gr_set_fontcolor(canvas, BM_XRGB(0, 63, 0), -1)
+                ;
+                auto &game_font = *GAME_FONT;
+                gr_printf(canvas, game_font, 0x8000, (LINE_SPACING(game_font, game_font) * 6) + FSPACY(1), "T-%d s",
+                          Countdown_seconds_left);
+            }
+        }
 
-static void game_draw_hud_stuff(const d_robot_info_array &Robot_info, grs_canvas &canvas, const control_info &Controls)
-{
-	auto &Objects = LevelUniqueObjectState.Objects;
-	auto &vmobjptr = Objects.vmptr;
+        static void game_draw_hud_stuff(const d_robot_info_array &Robot_info, grs_canvas &canvas,
+                                        const control_info &Controls) {
+            auto &Objects = LevelUniqueObjectState.Objects;
+            auto &vmobjptr = Objects.vmptr;
 #ifndef NDEBUG
-	draw_window_label(Objects, canvas);
+            draw_window_label(Objects, canvas);
 #endif
 
-	game_draw_multi_message(canvas);
+            game_draw_multi_message(canvas);
 
-	game_draw_marker_message(canvas);
+            game_draw_marker_message(canvas);
 
-	if ((Newdemo_state == ND_STATE_PLAYBACK || Newdemo_state == ND_STATE_RECORDING) && PlayerCfg.CockpitMode[1] != cockpit_mode_t::rear_view)
-	{
-		int y;
+            if ((Newdemo_state == ND_STATE_PLAYBACK || Newdemo_state == ND_STATE_RECORDING) && PlayerCfg.CockpitMode[1]
+                != cockpit_mode_t::rear_view) {
+                int y;
 
-		auto &game_font = *GAME_FONT;
-		gr_set_curfont(canvas, game_font);
-		gr_set_fontcolor(canvas, BM_XRGB(27, 0, 0), -1);
+                auto &game_font = *GAME_FONT;
+                gr_set_curfont(canvas, game_font);
+                gr_set_fontcolor(canvas, BM_XRGB(27, 0, 0), -1)
+                ;
 
-		y = canvas.cv_bitmap.bm_h - (LINE_SPACING(*canvas.cv_font, *GAME_FONT) * 2);
+                y = canvas.cv_bitmap.bm_h - (LINE_SPACING(*canvas.cv_font, *GAME_FONT) * 2);
 
-		if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit)
-			y = canvas.cv_bitmap.bm_h / 1.2 ;
-		if (Newdemo_state == ND_STATE_PLAYBACK) {
-			if (Newdemo_show_percentage) {
-				gr_printf(canvas, game_font, 0x8000, y, "%s (%d%% %s)", TXT_DEMO_PLAYBACK, newdemo_get_percent_done(), TXT_DONE);
-			}
-		} else {
-			gr_printf(canvas, game_font, 0x8000, y, "%s (%dK)", TXT_DEMO_RECORDING, (Newdemo_num_written / 1024));
-		}
-	}
+                if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit)
+                    y = canvas.cv_bitmap.bm_h / 1.2;
+                if (Newdemo_state == ND_STATE_PLAYBACK) {
+                    if (Newdemo_show_percentage) {
+                        gr_printf(canvas, game_font, 0x8000, y, "%s (%d%% %s)", TXT_DEMO_PLAYBACK,
+                                  newdemo_get_percent_done(), TXT_DONE);
+                    }
+                } else {
+                    gr_printf(canvas, game_font, 0x8000, y, "%s (%dK)", TXT_DEMO_RECORDING,
+                              (Newdemo_num_written / 1024));
+                }
+            }
 
-	render_countdown_gauge(canvas);
+            render_countdown_gauge(canvas);
 
-	if (CGameCfg.FPSIndicator && PlayerCfg.CockpitMode[1] != cockpit_mode_t::rear_view)
-		show_framerate(canvas);
+            if (CGameCfg.FPSIndicator && PlayerCfg.CockpitMode[1] != cockpit_mode_t::rear_view)
+                show_framerate(canvas);
 
-	auto previous_game_mode = Game_mode;
-	if (Newdemo_state == ND_STATE_PLAYBACK)
-		Game_mode = Newdemo_game_mode;
+            auto previous_game_mode = Game_mode;
+            if (Newdemo_state == ND_STATE_PLAYBACK)
+                Game_mode = Newdemo_game_mode;
 
-	auto &plrobj = get_local_plrobj();
-	draw_hud(Robot_info, canvas, plrobj, Controls, Game_mode);
+            auto &plrobj = get_local_plrobj();
+            draw_hud(Robot_info, canvas, plrobj, Controls, Game_mode);
 
-	if (Newdemo_state == ND_STATE_PLAYBACK)
-		Game_mode = previous_game_mode;
+            if (Newdemo_state == ND_STATE_PLAYBACK)
+                Game_mode = previous_game_mode;
 
-	if (Player_dead_state != player_dead_state::no)
-		player_dead_message(canvas);
-}
-
-}
+            if (Player_dead_state != player_dead_state::no)
+                player_dead_message(canvas);
+        }
+    }
 
 #if DXX_BUILD_DESCENT == 2
 
@@ -631,11 +650,11 @@ static void show_extra_views(grs_canvas &canvas)
 		}
 		else
 			do_cockpit_window_view(gauge_inset_window_view::primary, weapon_box_user::weapon);
-	
+
 		if (DemoDoRight)
 		{
 			DemoDoingRight=DemoDoRight;
-			
+
 			if (DemoDoRight==3)
 				do_cockpit_window_view(canvas, gauge_inset_window_view::secondary, *ConsoleObject, 1, weapon_box_user::rear, "REAR");
 			else
@@ -643,7 +662,7 @@ static void show_extra_views(grs_canvas &canvas)
 		}
 		else
 			do_cockpit_window_view(gauge_inset_window_view::secondary, weapon_box_user::weapon);
-		
+
 		DemoDoLeft=DemoDoRight=0;
 		DemoDoingLeft=DemoDoingRight=0;
 		return;
@@ -663,7 +682,7 @@ static void show_extra_views(grs_canvas &canvas)
 			auto &player_info = get_local_plrobj().ctype.player_info;
 			do_cockpit_window_view(canvas, gauge_inset_window_view::secondary, *gimobj, 0, weapon_box_user::guided, "GUIDED", &player_info);
 		}
-			
+
 		did_missile_view=1;
 	}
 	else {
@@ -732,8 +751,8 @@ static void show_one_extra_view(grs_canvas &canvas, const gauge_inset_window_vie
 			case cockpit_3d_view::Coop: {
 				const auto player = Coop_view_player[w];
 
-	         RenderingType=255; // don't handle coop stuff			
-				
+	         RenderingType=255; // don't handle coop stuff
+
 				if (player < Players.size() && vcplayerptr(player)->connected != player_connection_status::disconnected && ((Game_mode & GM_MULTI_COOP) || ((Game_mode & GM_TEAM) && (multi_get_team_from_player(Netgame, player) == multi_get_team_from_player(Netgame, Player_num)))))
 				{
 					auto &p = *vcplayerptr(player);
@@ -775,14 +794,12 @@ static void show_one_extra_view(grs_canvas &canvas, const gauge_inset_window_vie
 uint8_t BigWindowSwitch;
 #endif
 
-//render a frame for the game
-void game_render_frame_mono(const d_robot_info_array &Robot_info, const control_info &Controls)
-{
-	int no_draw_hud{0};
+    //render a frame for the game
+    void game_render_frame_mono(const d_robot_info_array &Robot_info, const control_info &Controls) {
+        int no_draw_hud{0};
 
-	gr_set_current_canvas(Screen_3d_window);
-	{
-	auto &canvas = *grd_curcanv;
+        gr_set_current_canvas(Screen_3d_window); {
+            auto &canvas = *grd_curcanv;
 #if DXX_BUILD_DESCENT == 2
 	auto &Objects = LevelUniqueObjectState.Objects;
 	auto &vmobjptr = Objects.vmptr;
@@ -804,14 +821,6 @@ void game_render_frame_mono(const d_robot_info_array &Robot_info, const control_
 		Viewer = gimobj;
 
 		window_rendered_data window;
-#if DXX_USE_STEREOSCOPIC_RENDER
-		if (VR_stereo != StereoFormat::None)
-		{
-			render_frame(canvas, -VR_eye_width, window);
-			render_frame(canvas, +VR_eye_width, window);
-		}
-		else
-#endif
 		{
 			render_frame(canvas, 0, window);
 		}
@@ -835,7 +844,7 @@ void game_render_frame_mono(const d_robot_info_array &Robot_info, const control_
 	}
 	else
 #endif
-	{
+            {
 #if DXX_BUILD_DESCENT == 2
 		if (BigWindowSwitch)
 		{
@@ -845,177 +854,139 @@ void game_render_frame_mono(const d_robot_info_array &Robot_info, const control_
 			return;
 		}
 #endif
-		window_rendered_data window;
-#if DXX_USE_STEREOSCOPIC_RENDER
-		if (VR_stereo != StereoFormat::None)
-		{
-			render_frame(canvas, -VR_eye_width, window);
-			render_frame(canvas, +VR_eye_width, window);
-		}
-		else
-#endif
-		{
-			render_frame(canvas, 0, window);
-		}
-	}
-	}
-	gr_set_default_canvas();
-	{
-	auto &canvas = *grd_curcanv;
-	update_cockpits(canvas);
+                window_rendered_data window;
 
-	if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit || PlayerCfg.CockpitMode[1] == cockpit_mode_t::status_bar)
-		render_gauges(canvas, Newdemo_state == ND_STATE_PLAYBACK ? Newdemo_game_mode : Game_mode);
-	}
+                {
+                    render_frame(canvas, 0, window);
+                }
+            }
+        }
+        gr_set_default_canvas(); {
+            auto &canvas = *grd_curcanv;
+            update_cockpits(canvas);
 
-	if (!no_draw_hud) {
-#if DXX_USE_STEREOSCOPIC_RENDER
-		if (VR_stereo != StereoFormat::None)
-		{
-			game_draw_hud_stuff(Robot_info, VR_hud_left, Controls);
-			game_draw_hud_stuff(Robot_info, VR_hud_right, Controls);
-		}
-		else
-#endif
-		{
-			game_draw_hud_stuff(Robot_info, Screen_3d_window, Controls);
-		}
-	}
+            if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit || PlayerCfg.CockpitMode[1] ==
+                cockpit_mode_t::status_bar)
+                render_gauges(canvas, Newdemo_state == ND_STATE_PLAYBACK ? Newdemo_game_mode : Game_mode);
+        }
+
+        if (!no_draw_hud) {
+
+            {
+                game_draw_hud_stuff(Robot_info, Screen_3d_window, Controls);
+            }
+        }
 
 #if DXX_BUILD_DESCENT == 2
 	gr_set_default_canvas();
 	show_extra_views(*grd_curcanv);		//missile view, buddy bot, etc.
 #endif
 
-	if (netplayerinfo_on && Game_mode & GM_MULTI)
-	{
-		gr_set_default_canvas();
-		show_netplayerinfo(*grd_curcanv);
-	}
+        if (netplayerinfo_on && Game_mode & GM_MULTI) {
+            gr_set_default_canvas();
+            show_netplayerinfo(*grd_curcanv);
+        }
+    }
 }
 
-}
+void toggle_cockpit() {
+    if (Rear_view || Player_dead_state != player_dead_state::no)
+        return;
 
-void toggle_cockpit()
-{
-	if (Rear_view || Player_dead_state != player_dead_state::no)
-		return;
-#if DXX_USE_STEREOSCOPIC_RENDER
-	if (VR_stereo != StereoFormat::None)
-		return;
-#endif
+    auto new_mode = cockpit_mode_t::full_screen;
 
-	auto new_mode = cockpit_mode_t::full_screen;
+    switch (PlayerCfg.CockpitMode[1]) {
+        case cockpit_mode_t::full_cockpit:
+            new_mode = cockpit_mode_t::status_bar;
+            break;
+        case cockpit_mode_t::status_bar:
+            new_mode = cockpit_mode_t::full_screen;
+            break;
+        case cockpit_mode_t::full_screen:
+            new_mode = cockpit_mode_t::full_cockpit;
+            break;
+        case cockpit_mode_t::rear_view:
+        case cockpit_mode_t::letterbox:
+            break;
+    }
 
-	switch (PlayerCfg.CockpitMode[1])
-	{
-		case cockpit_mode_t::full_cockpit:
-			new_mode = cockpit_mode_t::status_bar;
-			break;
-		case cockpit_mode_t::status_bar:
-			new_mode = cockpit_mode_t::full_screen;
-			break;
-		case cockpit_mode_t::full_screen:
-			new_mode = cockpit_mode_t::full_cockpit;
-			break;
-		case cockpit_mode_t::rear_view:
-		case cockpit_mode_t::letterbox:
-			break;
-	}
-
-	select_cockpit(new_mode);
-	HUD_clear_messages();
-	PlayerCfg.CockpitMode[0] = new_mode;
-	write_player_file();
+    select_cockpit(new_mode);
+    HUD_clear_messages();
+    PlayerCfg.CockpitMode[0] = new_mode;
+    write_player_file();
 }
 
 namespace dsx {
-namespace {
-
-// This actually renders the new cockpit onto the screen.
-static void update_cockpits(grs_canvas &canvas)
-{
-	const auto raw_cockpit_mode{PlayerCfg.CockpitMode[1]};
-	const auto cp_idx{
+    namespace {
+        // This actually renders the new cockpit onto the screen.
+        static void update_cockpits(grs_canvas &canvas) {
+            const auto raw_cockpit_mode{PlayerCfg.CockpitMode[1]};
+            const auto cp_idx{
 #if DXX_BUILD_DESCENT == 2
 		HIRESMODE
 			? static_cast<cockpit_bitmap_index>(underlying_value(raw_cockpit_mode) + 3)
 			:
 #endif
-		static_cast<cockpit_bitmap_index>(raw_cockpit_mode)
-	};
+                static_cast<cockpit_bitmap_index>(raw_cockpit_mode)
+            };
 
-	switch( PlayerCfg.CockpitMode[1] )	{
-		case cockpit_mode_t::full_cockpit:
-		case cockpit_mode_t::rear_view:
-			{
-				const auto bi{cockpit_bitmap[cp_idx]};
-				PIGGY_PAGE_IN(bi);
-				grs_bitmap *const bm = &GameBitmaps[bi];
-#if DXX_USE_OGL
-			ogl_ubitmapm_cs(canvas, 0, 0, opengl_bitmap_use_dst_canvas, opengl_bitmap_use_dst_canvas, *bm, 255);
-#else
-			gr_ubitmapm(canvas, 0, 0, *bm);
-#endif
-			}
-			break;
-	
-		case cockpit_mode_t::full_screen:
-			break;
-	
-		case cockpit_mode_t::status_bar:
-			{
-				const auto bi{cockpit_bitmap[cp_idx]};
-				PIGGY_PAGE_IN(bi);
-				grs_bitmap *const bm = &GameBitmaps[bi];
-#if DXX_USE_OGL
-			ogl_ubitmapm_cs(canvas, 0, (HIRESMODE ? (SHEIGHT * 2) / 2.6 : (SHEIGHT * 2) / 2.72), opengl_bitmap_use_dst_canvas, (static_cast<int>(static_cast<double>(bm->bm_h) * (HIRESMODE ? static_cast<double>(SHEIGHT) / 480 : static_cast<double>(SHEIGHT) / 200) + 0.5)), *bm, 255);
-#else
-			gr_ubitmapm(canvas, 0, SHEIGHT - bm->bm_h, *bm);
-#endif
-			}
-			break;
-	
-		case cockpit_mode_t::letterbox:
-			break;
-	}
-	if (PlayerCfg.CockpitMode[1] != last_drawn_cockpit)
-		last_drawn_cockpit = PlayerCfg.CockpitMode[1];
-	else
-		return;
+            switch (PlayerCfg.CockpitMode[1]) {
+                case cockpit_mode_t::full_cockpit:
+                case cockpit_mode_t::rear_view: {
+                    const auto bi{cockpit_bitmap[cp_idx]};
+                    PIGGY_PAGE_IN(bi);
+                    grs_bitmap *const bm = &GameBitmaps[bi];
+                    ogl_ubitmapm_cs(canvas, 0, 0, opengl_bitmap_use_dst_canvas, opengl_bitmap_use_dst_canvas, *bm, 255);
+                }
+                break;
+                case cockpit_mode_t::full_screen:
+                    break;
+                case cockpit_mode_t::status_bar: {
+                    const auto bi{cockpit_bitmap[cp_idx]};
+                    PIGGY_PAGE_IN(bi);
+                    grs_bitmap *const bm = &GameBitmaps[bi];
+					ogl_ubitmapm_cs(canvas, 0, (HIRESMODE ? (SHEIGHT * 2) / 2.6 : (SHEIGHT * 2) / 2.72), opengl_bitmap_use_dst_canvas, (static_cast<int>(static_cast<double>(bm->bm_h) * (HIRESMODE ? static_cast<double>(SHEIGHT) / 480 : static_cast<double>(SHEIGHT) / 200) + 0.5)), *bm, 255);
+                }
+                break;
 
-	if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit || PlayerCfg.CockpitMode[1] == cockpit_mode_t::status_bar)
-		init_gauges();
+                case cockpit_mode_t::letterbox:
+                    break;
+            }
+            if (PlayerCfg.CockpitMode[1] != last_drawn_cockpit)
+                last_drawn_cockpit = PlayerCfg.CockpitMode[1];
+            else
+                return;
 
-}
-}
+            if (PlayerCfg.CockpitMode[1] == cockpit_mode_t::full_cockpit || PlayerCfg.CockpitMode[1] ==
+                cockpit_mode_t::status_bar)
+                init_gauges();
+        }
+    }
 
-void game_render_frame(const d_robot_info_array &Robot_info, const control_info &Controls)
-{
-	auto &Objects = LevelUniqueObjectState.Objects;
-	auto &vmobjptr = Objects.vmptr;
-	set_screen_mode( SCREEN_GAME );
-	auto &player_info = get_local_plrobj().ctype.player_info;
-	play_homing_warning(player_info);
-	gr_set_default_canvas();
-	game_render_frame_mono(Robot_info, Controls);
-}
-
+    void game_render_frame(const d_robot_info_array &Robot_info, const control_info &Controls) {
+        auto &Objects = LevelUniqueObjectState.Objects;
+        auto &vmobjptr = Objects.vmptr;
+        set_screen_mode(SCREEN_GAME);
+        auto &player_info = get_local_plrobj().ctype.player_info;
+        play_homing_warning(player_info);
+        gr_set_default_canvas();
+        game_render_frame_mono(Robot_info, Controls);
+    }
 }
 
 //show a message in a nice little box
-void show_boxed_message(grs_canvas &canvas, const char *msg)
-{
-	int x,y;
-	
-	gr_set_fontcolor(canvas, BM_XRGB(31, 31, 31), -1);
-	auto &medium1_font = *MEDIUM1_FONT;
-	const auto &&[w, h] = gr_get_string_size(medium1_font, msg);
-	
-	x = (SWIDTH-w)/2;
-	y = (SHEIGHT-h)/2;
-	
-	nm_draw_background(canvas, x - BORDERX, y - BORDERY, x + w + BORDERX, y + h + BORDERY);
-	
-	gr_string(canvas, medium1_font, 0x8000, y, msg, w, h);
+void show_boxed_message(grs_canvas &canvas, const char *msg) {
+    int x, y;
+
+    gr_set_fontcolor(canvas, BM_XRGB(31, 31, 31), -1)
+    ;
+    auto &medium1_font = *MEDIUM1_FONT;
+    const auto &&[w, h] = gr_get_string_size(medium1_font, msg);
+
+    x = (SWIDTH - w) / 2;
+    y = (SHEIGHT - h) / 2;
+
+    nm_draw_background(canvas, x - BORDERX, y - BORDERY, x + w + BORDERX, y + h + BORDERY);
+
+    gr_string(canvas, medium1_font, 0x8000, y, msg, w, h);
 }

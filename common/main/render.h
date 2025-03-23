@@ -72,12 +72,7 @@ constexpr std::integral_constant<unsigned, 20> Max_linear_depth_objects{};
 constexpr std::integral_constant<unsigned, 50> Simple_model_threshhold_scale{}; // switch to simpler model when the object has depth greater than this value times its radius.
 constexpr std::integral_constant<unsigned, 15> Max_debris_objects{}; // How many debris objects to create
 
-#if DXX_USE_OGL
 #define DETRIANGULATION 0
-#else
-#define DETRIANGULATION 1
-extern unsigned Max_linear_depth; //	Deepest segment at which linear extern interpolation will be used.
-#endif
 
 extern int Clear_window;    // 1 = Clear whole background window, 2 = clear view portals into rest of world, 0 = no clear
 

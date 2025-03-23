@@ -761,11 +761,9 @@ int load_exit_models()
 	{
 		exit_modelnum = load_polygon_model("exit01.pof", 3, start_num, NULL);
 		destroyed_exit_modelnum = load_polygon_model("exit01d.pof", 3, start_num + 3, NULL);
-
-#if DXX_USE_OGL
 		ogl_cache_polymodel_textures(exit_modelnum);
 		ogl_cache_polymodel_textures(destroyed_exit_modelnum);
-#endif
+
 	}
 	else if ((exit_hamfile = PHYSFSX_openReadBuffered_updateCase(descent_pig_basename).first))
 	{

@@ -578,9 +578,8 @@ static int main(int argc, char *argv[])
 			con_printf(CON_VERBOSE, "D" DXX_NAME_NUMBER "X-Rebirth built with SDL_mixer %u.%u.%u; loaded with SDL_mixer %u.%u.%u", vc.major, vc.minor, vc.patch, vl->major, vl->minor, vl->patch);
 		}
 
-#if DXX_USE_SCREENSHOT_FORMAT_PNG
 		con_printf(CON_VERBOSE, "D" DXX_NAME_NUMBER "X-Rebirth built with libpng version " PNG_LIBPNG_VER_STRING "; loaded with libpng version %s", png_get_libpng_ver(nullptr));
-#endif
+
 		{
 			const auto &&m = TXT_VERBOSE_1;
 			con_puts(CON_VERBOSE, {m, strlen(m)});
@@ -611,12 +610,7 @@ static int main(int argc, char *argv[])
 
 	con_puts(CON_DEBUG, "Initializing font system...");
 	gamefont_init();	// must load after palette data loaded.
-
-#if DXX_USE_OGL
 	gr_set_mode_from_window_size();
-#else
-	gr_set_mode(Game_screen_mode);
-#endif
 
 #if DXX_BUILD_DESCENT == 2
 	con_puts(CON_DEBUG, "Initializing movie libraries...");
