@@ -19,10 +19,7 @@
 
 #include <SDL.h>
 #include <SDL_version.h>
-#if SDL_MAJOR_VERSION == 2
 #include <SDL_keycode.h>
-#endif
-
 #include "event.h"
 #include "dxxerror.h"
 #include "key.h"
@@ -113,20 +110,6 @@ constexpr std::array<key_props, 256> key_properties = {{
 { "F8",     255,    SDLK_F8            },
 { "F9",     255,    SDLK_F9            },
 { "F10",    255,    SDLK_F10           },
-#if SDL_MAJOR_VERSION == 1
-#define SDLK_NUMLOCKCLEAR	SDLK_NUMLOCK
-#define SDLK_SCROLLLOCK	SDLK_SCROLLOCK
-#define SDLK_KP_0	SDLK_KP0
-#define SDLK_KP_1	SDLK_KP1
-#define SDLK_KP_2	SDLK_KP2
-#define SDLK_KP_3	SDLK_KP3
-#define SDLK_KP_4	SDLK_KP4
-#define SDLK_KP_5	SDLK_KP5
-#define SDLK_KP_6	SDLK_KP6
-#define SDLK_KP_7	SDLK_KP7
-#define SDLK_KP_8	SDLK_KP8
-#define SDLK_KP_9	SDLK_KP9
-#endif
 { "NMLCK",  255,    SDLK_NUMLOCKCLEAR  },
 { "SCLK",   255,    SDLK_SCROLLLOCK    }, // 70
 { "PAD7",   255,    SDLK_KP_7          },
@@ -156,7 +139,6 @@ constexpr std::array<key_props, 256> key_properties = {{
 { "",       255,    SDLK_UNKNOWN                 },
 { "",       255,    SDLK_UNKNOWN                 },
 { "PAUSE",  255,    SDLK_PAUSE         },
-#if SDL_MAJOR_VERSION == 2
 #define SDLK_WORLD_0	SDLK_UNKNOWN
 #define SDLK_WORLD_1	SDLK_UNKNOWN
 #define SDLK_WORLD_2	SDLK_UNKNOWN
@@ -209,7 +191,6 @@ constexpr std::array<key_props, 256> key_properties = {{
 #define SDLK_WORLD_49	SDLK_UNKNOWN
 #define SDLK_WORLD_50	SDLK_UNKNOWN
 #define SDLK_WORLD_51	SDLK_UNKNOWN
-#endif
 { "W0",     255,    SDLK_WORLD_0       },
 { "W1",     255,    SDLK_WORLD_1       },
 { "W2",     255,    SDLK_WORLD_2       }, // 100
@@ -270,10 +251,8 @@ constexpr std::array<key_props, 256> key_properties = {{
 { "",       255,    SDLK_UNKNOWN                 },
 { "PAD",    255,    SDLK_KP_ENTER      },
 { "RCTRL",  255,    SDLK_RCTRL         },
-#if SDL_MAJOR_VERSION == 2
 #define SDLK_LMETA	SDLK_UNKNOWN
 #define SDLK_RMETA	SDLK_UNKNOWN
-#endif
 { "LCMD",   255,    SDLK_LMETA         },
 { "RCMD",   255,    SDLK_RMETA         },
 { "",       255,    SDLK_UNKNOWN                 }, // 160
@@ -299,9 +278,6 @@ constexpr std::array<key_props, 256> key_properties = {{
 { "",       255,    SDLK_UNKNOWN                 }, // 180
 { "PAD/",   255,    SDLK_KP_DIVIDE     },
 { "",       255,    SDLK_UNKNOWN                 },
-#if SDL_MAJOR_VERSION == 1
-#define SDLK_PRINTSCREEN	SDLK_PRINT
-#endif
 { "PRSCR",  255,    SDLK_PRINTSCREEN   },
 { "RALT",   255,    SDLK_RALT          },
 { "",       255,    SDLK_UNKNOWN                 },
@@ -331,52 +307,7 @@ constexpr std::array<key_props, 256> key_properties = {{
 { "PGDN",   255,    SDLK_PAGEDOWN      },
 { "INS",    255,    SDLK_INSERT        }, // 210
 { "DEL",    255,    SDLK_DELETE        },
-#if SDL_MAJOR_VERSION == 1
-{ "W52",    255,    SDLK_WORLD_52      },
-{ "W53",    255,    SDLK_WORLD_53      },
-{ "W54",    255,    SDLK_WORLD_54      },
-{ "W55",    255,    SDLK_WORLD_55      },
-{ "W56",    255,    SDLK_WORLD_56      },
-{ "W57",    255,    SDLK_WORLD_57      },
-{ "W58",    255,    SDLK_WORLD_58      },
-{ "W59",    255,    SDLK_WORLD_59      },
-{ "W60",    255,    SDLK_WORLD_60      }, // 220
-{ "W61",    255,    SDLK_WORLD_61      },
-{ "W62",    255,    SDLK_WORLD_62      },
-{ "W63",    255,    SDLK_WORLD_63      },
-{ "W64",    255,    SDLK_WORLD_64      },
-{ "W65",    255,    SDLK_WORLD_65      },
-{ "W66",    255,    SDLK_WORLD_66      },
-{ "W67",    255,    SDLK_WORLD_67      },
-{ "W68",    255,    SDLK_WORLD_68      },
-{ "W69",    255,    SDLK_WORLD_69      },
-{ "W70",    255,    SDLK_WORLD_70      }, // 230
-{ "W71",    255,    SDLK_WORLD_71      },
-{ "W72",    255,    SDLK_WORLD_72      },
-{ "W73",    255,    SDLK_WORLD_73      },
-{ "W74",    255,    SDLK_WORLD_74      },
-{ "W75",    255,    SDLK_WORLD_75      },
-{ "W76",    255,    SDLK_WORLD_76      },
-{ "W77",    255,    SDLK_WORLD_77      },
-{ "W78",    255,    SDLK_WORLD_78      },
-{ "W79",    255,    SDLK_WORLD_79      },
-{ "W80",    255,    SDLK_WORLD_80      }, // 240
-{ "W81",    255,    SDLK_WORLD_81      },
-{ "W82",    255,    SDLK_WORLD_82      },
-{ "W83",    255,    SDLK_WORLD_83      },
-{ "W84",    255,    SDLK_WORLD_84      },
-{ "W85",    255,    SDLK_WORLD_85      },
-{ "W86",    255,    SDLK_WORLD_86      },
-{ "W87",    255,    SDLK_WORLD_87      },
-{ "W88",    255,    SDLK_WORLD_88      },
-{ "W89",    255,    SDLK_WORLD_89      },
-{ "W90",    255,    SDLK_WORLD_90      }, // 250
-{ "W91",    255,    SDLK_WORLD_91      },
-{ "W92",    255,    SDLK_WORLD_92      },
-{ "W93",    255,    SDLK_WORLD_93      },
-{ "W94",    255,    SDLK_WORLD_94      },
-{ "W95",    255,    SDLK_WORLD_95      }, // 255
-#endif
+
 }};
 
 namespace {
@@ -482,10 +413,8 @@ void pressed_keys::update(const std::size_t keycode, const uint8_t down)
 
 window_event_result key_handler(const SDL_KeyboardEvent *const kevent)
 {
-#if SDL_MAJOR_VERSION == 2
 	if (!keyd_repeat && kevent->repeat)
 		return window_event_result::ignored;
-#endif
 	// Read SDLK symbol and state
 	const auto event_keysym = kevent->keysym.sym;
 	if (event_keysym == SDLK_UNKNOWN)
@@ -495,11 +424,8 @@ window_event_result key_handler(const SDL_KeyboardEvent *const kevent)
 	// fill the unicode frame-related unicode buffer 
 	if (key_state)
 	{
-#if SDL_MAJOR_VERSION == 1
-		const auto sym = kevent->keysym.unicode;
-#elif SDL_MAJOR_VERSION == 2
 		const auto sym = kevent->keysym.sym;
-#endif
+
 		if (sym > 31 && sym < 255)
 		{
 			range_for (auto &i, unicode_frame_buffer)
@@ -552,9 +478,6 @@ window_event_result key_handler(const SDL_KeyboardEvent *const kevent)
 
 void key_init()
 {
-#if SDL_MAJOR_VERSION == 1
-	SDL_EnableUNICODE(1);
-#endif
 	key_toggle_repeat(1);
 
 	keyd_time_when_last_pressed = timer_query();
@@ -566,11 +489,7 @@ namespace {
 
 static void restore_sticky_key(const uint8_t *keystate, const unsigned i)
 {
-#if SDL_MAJOR_VERSION == 1
-	const auto ki = key_properties[i].sym;
-#elif SDL_MAJOR_VERSION == 2
 	const auto ki{i};
-#endif
 	const auto v = keystate[ki];	// do not flush status of sticky keys
 	keyd_pressed.update_pressed(i, v);
 }
@@ -584,13 +503,8 @@ void key_flush()
 	keyd_pressed = {};
 	if (unlikely(CGameArg.CtlNoStickyKeys))
 		return;
-#if SDL_MAJOR_VERSION == 1
-	const auto &keystate = SDL_GetKeyState(nullptr);
-#define DXX_SDL_STICKY_KEYS	{KEY_CAPSLOCK, KEY_NUMLOCK, KEY_SCROLLOCK}
-#elif SDL_MAJOR_VERSION == 2
 	const auto &keystate = SDL_GetKeyboardState(nullptr);
 #define DXX_SDL_STICKY_KEYS	{SDL_SCANCODE_CAPSLOCK, SDL_SCANCODE_SCROLLLOCK, SDL_SCANCODE_NUMLOCKCLEAR}
-#endif
 	range_for (const auto key, DXX_SDL_STICKY_KEYS)
 #undef DXX_SDL_STICKY_KEYS
 		restore_sticky_key(keystate, key);
@@ -615,18 +529,12 @@ int event_key_get_raw(const d_event &event)
 
 void key_toggle_repeat1()
 {
-#if SDL_MAJOR_VERSION == 1
-	if (SDL_EnableKeyRepeat(KEY_REPEAT_DELAY, KEY_REPEAT_INTERVAL) == 0)
-#endif
-		keyd_repeat = 1;
+	keyd_repeat = 1;
 	key_flush();
 }
 
 void key_toggle_repeat0()
 {
-#if SDL_MAJOR_VERSION == 1
-	SDL_EnableKeyRepeat(0, 0);
-#endif
 	keyd_repeat = 0;
 	key_flush();
 }

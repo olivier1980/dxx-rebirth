@@ -357,11 +357,8 @@ void joy_init()
 		auto &joystick = SDL_Joysticks[num_joysticks];
 		const auto handle = SDL_JoystickOpen(i);
 		joystick.handle().reset(handle);
-#if SDL_MAJOR_VERSION == 1
-		con_printf(CON_NORMAL, "sdl-joystick %d: %s", i, SDL_JoystickName(i));
-#else
 		con_printf(CON_NORMAL, "sdl-joystick %d: %s", i, SDL_JoystickName(handle));
-#endif
+
 		if (handle)
 		{
 #if DXX_MAX_AXES_PER_JOYSTICK

@@ -30,15 +30,10 @@
 #include "physfsrwops.h"
 #include "physfsx.h"
 
-#if SDL_MAJOR_VERSION == 1
-#define SDL_RWops_callback_seek_position	int
-#define SDL_RWops_callback_read_position	int
-#define SDL_RWops_callback_write_position	int
-#else
 #define SDL_RWops_callback_seek_position	Sint64
 #define SDL_RWops_callback_read_position	size_t
 #define SDL_RWops_callback_write_position	size_t
-#endif
+
 
 namespace {
 

@@ -26,21 +26,8 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 namespace dcx {
 
-#if SDL_MAJOR_VERSION == 1
-struct RBACHANNELCTL
-{
-	unsigned int out0in, out0vol;
-	unsigned int out1in, out1vol;
-	unsigned int out2in, out2vol;
-	unsigned int out3in, out3vol;
-};
-#endif
-
 extern void RBAInit(void);
 extern void RBAExit();
-#if SDL_MAJOR_VERSION == 1
-extern long RBAGetDeviceStatus(void);
-#endif
 extern int RBAPlayTrack(int track);
 extern int RBAPlayTracks(int first, int last, void (*hook_finished)(void));	//plays tracks first through last, inclusive
 extern int RBACheckMediaChange();
@@ -48,12 +35,6 @@ extern long	RBAGetHeadLoc(int *min, int *sec, int *frame);
 extern int	RBAPeekPlayStatus(void);
 extern void RBAStop(void);
 extern void RBAEjectDisk(void);
-#if SDL_MAJOR_VERSION == 1
-extern void RBASetStereoAudio(RBACHANNELCTL *channels);
-extern void RBASetQuadAudio(RBACHANNELCTL *channels);
-extern void RBAGetAudioInfo(RBACHANNELCTL *channels);
-extern void RBASetChannelVolume(int channel, int volume);
-#endif
 #if defined(__linux__) || SDL_MAJOR_VERSION != 1
 extern void RBASetVolume(int volume);
 #else

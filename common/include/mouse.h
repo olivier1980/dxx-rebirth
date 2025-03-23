@@ -79,11 +79,7 @@ public:
 class d_event_mouse_moved : public d_event
 {
 public:
-#if SDL_MAJOR_VERSION == 1
-#define SDL_MOUSE_MOVE_INT_TYPE	Sint16
-#elif SDL_MAJOR_VERSION == 2
 #define SDL_MOUSE_MOVE_INT_TYPE	Sint32
-#endif
 	const SDL_MOUSE_MOVE_INT_TYPE dx, dy;
 	const int16_t dz;
 	constexpr d_event_mouse_moved(const event_type t, const SDL_MOUSE_MOVE_INT_TYPE x, const SDL_MOUSE_MOVE_INT_TYPE y, const int16_t z) :

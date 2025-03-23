@@ -3,6 +3,8 @@ sudo apt-get install build-essential scons libsdl1.2-dev libsdl-image1.2-dev lib
 git clone repo
 
 sudo apt-get install build-essential scons libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libphysfs-dev
+sudo apt install libsdl2-image-dev libsdl2-mixer-dev
+
 sudo apt install gcc-12 g++-12
 scons d1x=gcc12,sdl2 gcc12_CXX=/usr/bin/g++-12
 

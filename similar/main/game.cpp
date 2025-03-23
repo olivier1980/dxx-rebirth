@@ -449,52 +449,7 @@ int set_screen_mode(int sm)
 
 	Screen_mode = sm;
 
-#if SDL_MAJOR_VERSION == 1
-	switch( Screen_mode )
-	{
-		case SCREEN_MENU:
-			if  (grd_curscreen->get_screen_mode() != Game_screen_mode)
-				if (gr_set_mode(Game_screen_mode))
-					Error("Cannot set screen mode.");
-			break;
 
-		case SCREEN_GAME:
-			if  (grd_curscreen->get_screen_mode() != Game_screen_mode)
-				if (gr_set_mode(Game_screen_mode))
-					Error("Cannot set screen mode.");
-			break;
-#if DXX_USE_EDITOR
-		case SCREEN_EDITOR:
-		{
-			const screen_mode editor_mode{800, 600};
-			if (grd_curscreen->get_screen_mode() != editor_mode)
-			{
-				int gr_error;
-				if ((gr_error = gr_set_mode(editor_mode)) != 0) { //force into game scrren
-					Warning("Cannot init editor screen (error=%d)",gr_error);
-					return 0;
-				}
-			}
-		}
-			break;
-#endif
-#if DXX_BUILD_DESCENT == 2
-		case SCREEN_MOVIE:
-		{
-			const screen_mode movie_mode{MOVIE_WIDTH, MOVIE_HEIGHT};
-			if (grd_curscreen->get_screen_mode() != movie_mode)
-			{
-				if (gr_set_mode(movie_mode))
-					Error("Cannot set screen mode for game!");
-				gr_palette_load( gr_palette );
-			}
-		}
-			break;
-#endif
-		default:
-			Error("Invalid screen mode %d",sm);
-	}
-#endif
 	return 1;
 }
 

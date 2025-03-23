@@ -26,12 +26,6 @@
 #include "fwd-gr.h"
 #include "timer.h"
 
-#if SDL_MAJOR_VERSION == 1
-// we don't want this on SDL1 because there we have common/arch/sdl/rbaudio.cpp
-// #pragma message("Skipping win32/rbaudio because of SDL1")
-
-#elif SDL_MAJOR_VERSION == 2
-
 namespace dcx {
 #define CD_FPS 75
 
@@ -502,4 +496,4 @@ void RBAList(void)
 
 }
 
-#endif
+

@@ -120,25 +120,6 @@ namespace dcx {
         }
     }
 
-    namespace {
-        // From Linear to Linear
-        static void gr_bm_ubitblt00(const unsigned w, const unsigned h, const unsigned dx, const unsigned dy,
-                                    const unsigned sx, const unsigned sy, const grs_bitmap &src, grs_bitmap &dest) {
-            //int	src_bm_rowsize_2, dest_bm_rowsize_2;
-            auto sbits = &src.get_bitmap_data()[(src.bm_rowsize * sy) + sx];
-            auto dbits = &dest.get_bitmap_data()[(dest.bm_rowsize * dy) + dx];
-            const auto dstep = dest.bm_rowsize;
-            // No interlacing, copy the whole buffer.
-            for (uint_fast32_t i = h; i--;) {
-                gr_linear_movsd(sbits, dbits, w);
-                //memcpy(dbits, sbits, w);
-                sbits += src.bm_rowsize;
-                dbits += dstep;
-            }
-        }
-
-    }
-
     // Clipped bitmap ...
     void gr_bitmap(grs_canvas &canvas, const unsigned x, const unsigned y, grs_bitmap &bm) {
         int dx1 = x, dx2 = x + bm.bm_w - 1;
@@ -152,7 +133,6 @@ namespace dcx {
         ogl_ubitmapm_cs(canvas, x, y, opengl_bitmap_use_src_bitmap, opengl_bitmap_use_src_bitmap, bm,
                         ogl_colors::white);
     }
-
 
     namespace {
         class bm_rle_window : bm_rle_src_stride {

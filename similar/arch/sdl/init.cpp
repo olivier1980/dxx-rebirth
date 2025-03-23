@@ -55,7 +55,7 @@ arch_atexit arch_init()
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		Error("SDL library initialisation failed: %s.",SDL_GetError());
 	IMG_Init(0);
-#if SDL_MAJOR_VERSION == 2
+
 	/* In SDL1, grabbing input grabbed both the keyboard and the mouse.
 	 * Many game management keys assume a keyboard grab.
 	 * Tell SDL2 to grab the keyboard.
@@ -74,7 +74,6 @@ arch_atexit arch_init()
 	/* Support the Alt+Shift+F4 hotkey for renaming the Guide-Bot
 	 */
 	SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1");
-#endif
 
 	key_init();
 

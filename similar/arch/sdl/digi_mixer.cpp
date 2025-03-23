@@ -122,12 +122,8 @@ int digi_mixer_init()
 	con_printf(CON_DEBUG, "digi_init %u (SDL_Mixer)", MAX_SOUNDS.value);
 #endif
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) Error("SDL audio initialisation failed: %s.", SDL_GetError());
-
-#if SDL_MAJOR_VERSION == 1
-	if (Mix_OpenAudio(digi_sample_rate, MIX_OUTPUT_FORMAT, MIX_OUTPUT_CHANNELS, SOUND_BUFFER_SIZE))
-#else
 	if (Mix_OpenAudioDevice(digi_sample_rate, MIX_OUTPUT_FORMAT, MIX_OUTPUT_CHANNELS, SOUND_BUFFER_SIZE, NULL, 0))
-#endif
+
 	{
 		//edited on 10/05/98 by Matt Mueller - should keep running, just with no sound.
 		con_printf(CON_URGENT,"\nError: Couldn't open audio: %s", SDL_GetError());

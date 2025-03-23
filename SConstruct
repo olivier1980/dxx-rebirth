@@ -811,14 +811,14 @@ struct %(N)s {
  * Fails: new clang + new libc++ + unique_ptr<T[]> (v3.6.0 confirmed broken).
 
 memory:2676:32: error: no type named 'type' in 'std::__1::enable_if<false, std::__1::unique_ptr<int [], std::__1::default_delete<int []> >::__nat>'; 'enable_if' cannot be used to disable this declaration
-            typename enable_if<__same_or_less_cv_qualified<_Pp, pointer>::value, __nat>::type = __nat()) _NOEXCEPT
-                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			typename enable_if<__same_or_less_cv_qualified<_Pp, pointer>::value, __nat>::type = __nat()) _NOEXCEPT
+							   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .sconf_temp/conftest_43.cpp:26:11: note: in instantiation of member function 'std::__1::unique_ptr<int [], std::__1::default_delete<int []> >::unique_ptr' requested here
-        using B::B;
-                 ^
+		using B::B;
+				 ^
 .sconf_temp/conftest_43.cpp:30:2: note: while substituting deduced template arguments into function template 'I' [with _Pp = I]
-        return nullptr;
-        ^
+		return nullptr;
+		^
  */
 #include <memory>
 class I%(N)s : std::unique_ptr<int[]>
@@ -4839,6 +4839,12 @@ class DXXArchive(DXXCommon):
 			clean=False,
 			help=False
 		)
+		with open('build/dxxsconf.h', "r") as file:
+			content = file.read()
+		updated_content = content.replace(" 600", " 700")
+		with open('build/dxxsconf.h', "w") as file:
+			file.write(updated_content)
+
 		self.configure_added_environment_flags = tests.successful_flags
 		self.configure_pch_flags = None
 		if not conf.env:

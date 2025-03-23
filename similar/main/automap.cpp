@@ -1136,12 +1136,6 @@ window_event_result automap::event_handler(const d_event &event)
 			key_toggle_repeat(1);
 			break;
 
-#if SDL_MAJOR_VERSION == 2
-		case event_type::window_resize:
-			init_automap_subcanvas(automap_view, grd_curscreen->sc_canvas);
-			break;
-#endif
-
 		case event_type::idle:
 #if DXX_MAX_BUTTONS_PER_JOYSTICK
 		case event_type::joystick_button_up:
