@@ -17,7 +17,3 @@ jobs:
   windows:
     name: Package Windows
     uses: ./.github/workflows/package-windows.yml
-
-  macos:
-   name: Package MacOS
-   uses: ./.github/workflows/package-macos.yml
