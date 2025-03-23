@@ -4839,11 +4839,12 @@ class DXXArchive(DXXCommon):
 			clean=False,
 			help=False
 		)
-		with open('build/dxxsconf.h', "r") as file:
-			content = file.read()
-		updated_content = content.replace(" 600", " 700")
-		with open('build/dxxsconf.h', "w") as file:
-			file.write(updated_content)
+		if os.path.exists('build/dxxsconf.h'):
+			with open('build/dxxsconf.h', "r") as file:
+				content = file.read()
+			updated_content = content.replace(" 600", " 700")
+			with open('build/dxxsconf.h', "w") as file:
+				file.write(updated_content)
 
 		self.configure_added_environment_flags = tests.successful_flags
 		self.configure_pch_flags = None

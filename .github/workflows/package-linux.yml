@@ -19,9 +19,7 @@ jobs:
           gcc-12 g++-12
           python3
           scons
-          libsdl1.2-dev
-          libsdl-image1.2-dev
-          libsdl-mixer1.2-dev
+          libsdl2-dev
           libsdl2-image-dev 
           libsdl2-mixer-dev
           libphysfs-dev
