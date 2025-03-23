@@ -22,6 +22,8 @@ jobs:
           libsdl1.2-dev
           libsdl-image1.2-dev
           libsdl-mixer1.2-dev
+          libsdl2-image-dev 
+          libsdl2-mixer-dev
           libphysfs-dev
           libpng-dev
 
@@ -31,7 +33,7 @@ jobs:
           printf 'uname_m=%s\n' "$(uname -m)" >> "$GITHUB_OUTPUT"
 
       - name: Configure and Build
-        run: scons -j`nproc`
+        run: scons -j`nproc` sdl2_sdl2=1
         env:
           CXX: g++-12
 
