@@ -31,7 +31,7 @@ jobs:
           printf 'uname_m=%s\n' "$(uname -m)" >> "$GITHUB_OUTPUT"
 
       - name: Configure and Build
-        run: scons -j`nproc` sdl2_sdl2=1
+        run: scons -j`nproc` d1x=sdl2 sdl2_sdl2=1
         env:
           CXX: g++-12
 
