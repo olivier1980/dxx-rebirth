@@ -24,14 +24,11 @@
 #include <windows.h>
 #endif
 
-#if !defined(_MSC_VER) && !defined(macintosh)
 #include <unistd.h>
-#endif
-#if !defined(macintosh)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#endif
+
 
 #include <algorithm>
 #include <errno.h>
@@ -100,39 +97,29 @@ namespace dsx {
     }
 }
 
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-static EGLDisplay eglDisplay=EGL_NO_DISPLAY;
-static EGLConfig eglConfig;
-static EGLSurface eglSurface=EGL_NO_SURFACE;
-static EGLContext eglContext=EGL_NO_CONTEXT;
-
-static bool TestEGLError(const char* pszLocation)
-{
-	/*
-	 * eglGetError returns the last error that has happened using egl,
-	 * not the status of the last called function. The user has to
-	 * check after every single egl call or at least once every frame.
-	*/
-	EGLint iErr = eglGetError();
-	if (iErr != EGL_SUCCESS)
-	{
-		con_printf(CON_URGENT, "%s failed (%d).", pszLocation, iErr);
-		return 0;
-	}
-
-	return 1;
-}
-#endif
-
 namespace dcx {
     void ogl_swap_buffers_internal(void) {
+
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
+
+		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+		ImGui::Begin("Hello, world!");
+		ImGui::Text("This is some useful text.");
+		ImGui::End();
+		ImGui::Render();
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         sync_helper.before_swap();
-#if DXX_USE_OGLES && SDL_MAJOR_VERSION == 1
-	eglSwapBuffers(eglDisplay, eglSurface);
-#else
         SDL_GL_SwapWindow(g_pRebirthSDLMainWindow);
-#endif
         sync_helper.after_swap();
+
+
     }
 }
 
@@ -277,45 +264,9 @@ static int rpi_setup_element(int x, int y, Uint32 video_flags, int update)
 #endif // RPI
 
     static int ogl_init_window(int w, int h) {
-#if SDL_MAJOR_VERSION == 1
-	if (gl_initialized)
-		ogl_smash_texture_list_internal();//if we are or were fullscreen, changing vid mode will invalidate current textures
-
-	SDL_WM_SetCaption(DESCENT_VERSION, DXX_SDL_WINDOW_CAPTION);
-	if (const auto window_icon = SDL_LoadBMP(DXX_SDL_WINDOW_ICON_BITMAP))
-		SDL_WM_SetIcon(window_icon, nullptr);
-
-	int use_x = w;
-	int use_y = h;
-	int use_bpp = CGameArg.DbgBpp;
-	int use_flags = sdl_video_flags;
-	if (sdl_no_modeswitch) {
-		const SDL_VideoInfo *vinfo=SDL_GetVideoInfo();
-		if (vinfo) {
-			use_x=vinfo->current_w;
-			use_y=vinfo->current_h;
-			use_bpp=vinfo->vfmt->BitsPerPixel;
-			use_flags=SDL_SWSURFACE | SDL_ANYFORMAT;
-		} else {
-			con_puts(CON_URGENT, "Could not query video info");
-		}
-	}
-
-	if (!SDL_SetVideoMode(use_x, use_y, use_bpp, use_flags))
-	{
-#ifdef RPI
-		con_printf(CON_URGENT, "Could not set %dx%dx%d opengl video mode: %s\n (Ignored for RPI)",
-			    w, h, CGameArg.DbgBpp, SDL_GetError());
-#else
-		Error("Could not set %dx%dx%d opengl video mode: %s\n", w, h, CGameArg.DbgBpp, SDL_GetError());
-#endif
-	}
-#elif SDL_MAJOR_VERSION == 2
 	const auto SDLWindow{g_pRebirthSDLMainWindow};
 	if (!(SDL_GetWindowFlags(SDLWindow) & SDL_WINDOW_FULLSCREEN))
 		SDL_SetWindowSize(SDLWindow, w, h);
-#endif
-
         const auto w640 = w / 640;
         const auto h480 = h / 480;
         const auto min_wh = std::min(w640, h480);

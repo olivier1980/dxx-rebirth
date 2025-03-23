@@ -27,7 +27,9 @@
 #include "joy.h"
 #include "args.h"
 #include "partial_range.h"
-
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_sdl2.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 namespace dcx {
 
 namespace {
@@ -115,6 +117,8 @@ void event_poll_state::process_event_batch(const std::ranges::subrange<const SDL
 {
 	for (auto &&event : events)
 	{
+		ImGui_ImplSDL2_ProcessEvent(&event);
+
 		window_event_result result;
 		switch(event.type) {
 			case SDL_WINDOWEVENT:

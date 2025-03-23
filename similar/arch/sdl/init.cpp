@@ -19,7 +19,10 @@
 #include "window.h"
 #include "dxxsconf.h"
 #include <SDL_image.h>
-
+#include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_sdl2.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 
 namespace dsx {
 
@@ -39,8 +42,16 @@ static void arch_close(void)
 	{
 		digi_close();
 	}
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
 	IMG_Quit();
 	SDL_Quit();
+
+	std::cout << "quitting arch" << std::endl;
 }
 
 arch_atexit::~arch_atexit()
