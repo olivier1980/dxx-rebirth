@@ -96,7 +96,6 @@ void d_strlwr( char *s1 )
 	}
 }
 
-#if DXX_USE_EDITOR
 void d_strupr(std::array<char, PATH_MAX> &out, const std::array<char, PATH_MAX> &in)
 {
 	for (auto &&[i, o] : zip(in, out))
@@ -106,7 +105,6 @@ void d_strupr(std::array<char, PATH_MAX> &out, const std::array<char, PATH_MAX> 
 			break;
 	}
 }
-#endif
 
 std::unique_ptr<char[]> (d_strdup)(const char *str)
 {

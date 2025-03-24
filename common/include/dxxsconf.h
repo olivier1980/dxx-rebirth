@@ -6,6 +6,9 @@
 // b'as' => 'GNU assembler (GNU Binutils for Ubuntu) 2.42'
 // '/usr/bin/g++-12 -g -O2 -ftabstop=4 -Wall -Wformat=2 -Wextra -Wmissing-braces -Wmissing-include-dirs -Wuninitialized -Wundef -Wpointer-arith -Wcast-qual -Wmissing-declarations -Wvla -pthread -funsigned-char -print-prog-name=ld' => b'ld'
 // b'ld' => 'GNU ld (GNU Binutils for Ubuntu) 2.42'
+
+#define DXX_BUILD_DESCENT 1
+
 #define DXX_WORDS_BIGENDIAN 0
 #define DXX_WORDS_NEED_ALIGNMENT 0
 #define DXX_USE_OGL 1
@@ -13,7 +16,7 @@
 #define DXX_USE_DEBUG_MEMORY_ALLOCATOR 0
 #define DXX_USE_EDITOR 0
 #define DXX_USE_IPv6 0
-#define DXX_USE_STEREOSCOPIC_RENDER 1
+#define DXX_USE_STEREOSCOPIC_RENDER 0
 #define DXX_USE_MULTIPLAYER 1
 #define DXX_USE_UDP 1
 #define DXX_USE_TRACKER 1

@@ -37,7 +37,8 @@ using std::min;
 
 namespace dcx {
 
-static int sdl_video_flags = SDL_SWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF;
+	// https://stackoverflow.com/questions/28341281/how-can-i-do-double-buffering-in-sdl-2-0
+static int sdl_video_flags = SDL_SWSURFACE ;//| SDL_DOUBLEBUF;
 static SDL_Surface *screen, *canvas;
 static int gr_installed;
 

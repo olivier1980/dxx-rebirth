@@ -104,7 +104,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <array>
 #include <utility>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #if defined(__GNUC__) && defined(WIN32)
 /* Mingw64 _mingw_print_pop.h changes PRIi64 to POSIX-style.  Change it

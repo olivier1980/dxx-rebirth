@@ -11,11 +11,13 @@ include_directories(common/2d)
 include_directories(common/3d)
 include_directories(common/arch/cocoa)
 include_directories(common/include)
+include_directories(common/include/imgui)
 include_directories(common/include/editor)
 include_directories(common/main)
 include_directories(common/misc)
 include_directories(common/texmap)
 include_directories(d1x-rebirth/main)
+include_directories(.)
 #include_directories(similar/arch/win32)
 #include_directories(similar/arch/win32/include)
 
@@ -65,24 +67,24 @@ add_executable(dxx_rebirth
 #    common/arch/win32/rbaudio.cpp
     common/editor/autosave.cpp
     common/editor/func.cpp
-    common/include/editor/centers.h
+#    common/include/editor/centers.h
     common/include/editor/editor.h
-    common/include/editor/ehostage.h
-    common/include/editor/eobject.h
-    common/include/editor/esegment.h
-    common/include/editor/eswitch.h
-    common/include/editor/info.h
-    common/include/editor/kdefs.h
-    common/include/editor/macro.h
-    common/include/editor/meddraw.h
-    common/include/editor/medlisp.h
-    common/include/editor/medmisc.h
-    common/include/editor/medrobot.h
-    common/include/editor/medsel.h
-    common/include/editor/medwall.h
-    common/include/editor/objpage.h
-    common/include/editor/seguvs.h
-    common/include/editor/texpage.h
+#    common/include/editor/ehostage.h
+#    common/include/editor/eobject.h
+#    common/include/editor/esegment.h
+#    common/include/editor/eswitch.h
+#    common/include/editor/info.h
+#    common/include/editor/kdefs.h
+#    common/include/editor/macro.h
+#    common/include/editor/meddraw.h
+#    common/include/editor/medlisp.h
+#    common/include/editor/medmisc.h
+#    common/include/editor/medrobot.h
+#    common/include/editor/medsel.h
+#    common/include/editor/medwall.h
+#    common/include/editor/objpage.h
+#    common/include/editor/seguvs.h
+#    common/include/editor/texpage.h
     common/include/3d.h
     common/include/adlmidi_dynamic.h
     common/include/args.h
@@ -275,7 +277,7 @@ add_executable(dxx_rebirth
     common/misc/vg-wrap-physfs.h
     common/misc/vgrphys.cpp
     common/misc/vgwphys.cpp
-    common/music/adlmidi_dynamic.cpp
+#    common/music/adlmidi_dynamic.cpp
 #    common/texmap/ntmap.cpp
 #    common/texmap/scanline.cpp
 #    common/texmap/scanline.h
@@ -323,37 +325,37 @@ add_executable(dxx_rebirth
     similar/arch/sdl/gr.cpp
     similar/arch/sdl/init.cpp
     similar/arch/win32/include/resource.h
-    similar/editor/centers.cpp
-    similar/editor/curves.cpp
-    similar/editor/eglobal.cpp
-    similar/editor/elight.cpp
-    similar/editor/eobject.cpp
-    similar/editor/eswitch.cpp
-    similar/editor/group.cpp
-    similar/editor/info.cpp
-    similar/editor/kbuild.cpp
-    similar/editor/kcurve.cpp
-    similar/editor/kfuncs.cpp
-    similar/editor/kgame.cpp
-    similar/editor/khelp.cpp
-    similar/editor/kmine.cpp
-    similar/editor/ksegmove.cpp
-    similar/editor/ksegsel.cpp
-    similar/editor/ksegsize.cpp
-    similar/editor/ktmap.cpp
-    similar/editor/kview.cpp
-    similar/editor/med.cpp
-    similar/editor/meddraw.cpp
-    similar/editor/medmisc.cpp
-    similar/editor/medrobot.cpp
-    similar/editor/medsel.cpp
-    similar/editor/medwall.cpp
-    similar/editor/mine.cpp
-    similar/editor/objpage.cpp
-    similar/editor/segment.cpp
-    similar/editor/seguvs.cpp
-    similar/editor/texpage.cpp
-    similar/editor/texture.cpp
+#    similar/editor/centers.cpp
+#    similar/editor/curves.cpp
+#    similar/editor/eglobal.cpp
+#    similar/editor/elight.cpp
+#    similar/editor/eobject.cpp
+#    similar/editor/eswitch.cpp
+#    similar/editor/group.cpp
+#    similar/editor/info.cpp
+#    similar/editor/kbuild.cpp
+#    similar/editor/kcurve.cpp
+#    similar/editor/kfuncs.cpp
+#    similar/editor/kgame.cpp
+#    similar/editor/khelp.cpp
+#    similar/editor/kmine.cpp
+#    similar/editor/ksegmove.cpp
+#    similar/editor/ksegsel.cpp
+#    similar/editor/ksegsize.cpp
+#    similar/editor/ktmap.cpp
+#    similar/editor/kview.cpp
+#    similar/editor/med.cpp
+#    similar/editor/meddraw.cpp
+#    similar/editor/medmisc.cpp
+#    similar/editor/medrobot.cpp
+#    similar/editor/medsel.cpp
+#    similar/editor/medwall.cpp
+#    similar/editor/mine.cpp
+#    similar/editor/objpage.cpp
+#    similar/editor/segment.cpp
+#    similar/editor/seguvs.cpp
+#    similar/editor/texpage.cpp
+#    similar/editor/texture.cpp
     similar/main/ai.cpp
     similar/main/aipath.cpp
     similar/main/automap.cpp

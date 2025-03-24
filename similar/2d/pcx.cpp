@@ -41,7 +41,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "partial_range.h"
 #include "console.h"
 #include "physfsrwops.h"
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 
 namespace dcx {

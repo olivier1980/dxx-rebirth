@@ -21,10 +21,6 @@
 
 namespace dcx {
 
-#if defined(macintosh)
-#define snprintf macintosh_snprintf
-extern void snprintf(char *out_string, int size, const char * format, ... );
-#endif
 
 #ifdef DXX_HAVE_STRCASECMP
 #define d_stricmp strcasecmp
@@ -41,9 +37,9 @@ int d_strnicmp(const char *s1, const char *s2, uint_fast32_t n);
 extern void d_strlwr( char *s1 );
 std::unique_ptr<char[]> d_strdup(const char *str);
 
-#if DXX_USE_EDITOR
+
 void d_strupr(std::array<char, PATH_MAX> &out, const std::array<char, PATH_MAX> &in);
-#endif
+
 
 template <std::size_t N>
 static inline int d_strnicmp(const char *s1, const char (&s2)[N])

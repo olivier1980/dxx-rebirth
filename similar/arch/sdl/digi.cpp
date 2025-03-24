@@ -24,7 +24,7 @@
 #include <digi.h>
 #include <digi_audio.h>
 #include <digi_mixer.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 
 #ifdef _WIN32
 #include "hmp.h"

@@ -6,7 +6,7 @@
  */
 // Holds the main init and de-init functions for arch-related program parts
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "songs.h"
 #include "key.h"
 #include "digi.h"
@@ -18,7 +18,7 @@
 #include "args.h"
 #include "window.h"
 #include "dxxsconf.h"
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_sdl2.h"
