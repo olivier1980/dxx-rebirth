@@ -10,7 +10,7 @@
  */
 
 #include <string.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "ogl_extensions.h"
 #include "console.h"

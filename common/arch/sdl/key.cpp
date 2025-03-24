@@ -17,9 +17,9 @@
 #include <stdlib.h>
 #include <ranges>
 
-#include <SDL.h>
-#include <SDL_version.h>
-#include <SDL_keycode.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_version.h>
+#include <SDL2/SDL_keycode.h>
 #include "event.h"
 #include "dxxerror.h"
 #include "key.h"

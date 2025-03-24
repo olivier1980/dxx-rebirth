@@ -22,7 +22,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #define RBA_MEDIA_CHANGED	-1
 
 #ifdef __cplusplus
-#include <SDL_version.h>
+#include <SDL2/SDL_version.h>
 
 namespace dcx {
 

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <digi_audio.h>
 #include "dxxerror.h"
 #include "fmtcheck.h"

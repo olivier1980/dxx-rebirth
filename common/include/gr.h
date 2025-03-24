@@ -36,7 +36,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <array>
 #include <iostream>
 #include <memory>
-#include <SDL_video.h>
+#include <SDL2/SDL_video.h>
 
 
 namespace dcx {

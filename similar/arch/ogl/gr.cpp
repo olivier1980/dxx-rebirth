@@ -32,7 +32,7 @@
 
 #include <algorithm>
 #include <errno.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "game.h"
 #include "gr.h"
 #include "gamefont.h"

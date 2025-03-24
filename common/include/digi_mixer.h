@@ -8,7 +8,7 @@
 
 #ifdef DXX_BUILD_DESCENT
 #include "maths.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "digi_audio.h"
 
 #ifndef DXX_FEATURE_EXTERNAL_RESAMPLER_SDL_NATIVE

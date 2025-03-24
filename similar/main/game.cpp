@@ -29,7 +29,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <string.h>
 #include <stdarg.h>
 #include <ranges>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <ctime>
 #if DXX_USE_SCREENSHOT_FORMAT_PNG
 #include <png.h>

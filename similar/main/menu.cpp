@@ -27,7 +27,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <stdio.h>
 #include <string.h>
 #include <ranges>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "menu.h"
 #include "inferno.h"

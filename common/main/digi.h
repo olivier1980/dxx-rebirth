@@ -25,7 +25,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 
 #pragma once
 
-#include <SDL_version.h>
+#include <SDL2/SDL_version.h>
 #include <type_traits>
 #include "pstypes.h"
 

@@ -18,7 +18,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <ranges>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "window.h"
 #include "event.h"
 #include "console.h"

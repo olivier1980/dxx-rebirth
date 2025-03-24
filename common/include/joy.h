@@ -19,7 +19,7 @@
 #if DXX_MAX_JOYSTICKS
 #include "pstypes.h"
 #include "maths.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 namespace dcx {
 

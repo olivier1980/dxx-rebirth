@@ -9,7 +9,7 @@
  *
  */
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "window.h"
 #include "event.h"
 #include "messagebox.h"

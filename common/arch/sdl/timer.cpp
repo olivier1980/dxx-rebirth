@@ -10,7 +10,7 @@
  *
  */
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "fwd-game.h"
 #include "maths.h"

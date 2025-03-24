@@ -16,7 +16,7 @@
 #include <tuple>
 #include "pstypes.h"
 #include "maths.h"
-#include <SDL_version.h>
+#include <SDL2/SDL_version.h>
 #include <cassert>
 #include "event.h"
 

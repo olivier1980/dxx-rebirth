@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <ranges>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #ifdef __linux__
 #include <sys/ioctl.h>

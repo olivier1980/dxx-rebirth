@@ -6,6 +6,7 @@
 from collections import (defaultdict, Counter as collections_counter)
 import collections.abc
 from dataclasses import dataclass
+import scons_compiledb
 import base64
 import binascii
 import errno
@@ -18,9 +19,6 @@ import os
 import SCons.Util
 import SCons.Script
 from functools import cached_property
-
-# Disable injecting tools into default namespace
-SCons.Defaults.DefaultEnvironment(tools = [])
 
 def message(program, msg: str):
 	print(f'{program.program_message_prefix}: {msg}')
@@ -2756,7 +2754,7 @@ unsigned g(unsigned i)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 ''',
 		_mangle_compiler_option_name=__mangle_compiler_option_name,
 		_mangle_linker_option_name=__mangle_linker_option_name

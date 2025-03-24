@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include <SDL_version.h>
+#include <SDL2/SDL_version.h>
 #include "fwd-event.h"
 #include "maths.h"
-#include <SDL_video.h>
+#include <SDL2/SDL_video.h>
 
 
 #ifdef __cplusplus

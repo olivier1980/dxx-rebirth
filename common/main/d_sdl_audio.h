@@ -5,7 +5,7 @@
  */
 
 #pragma once
-#include <SDL_audio.h>
+#include <SDL2/SDL_audio.h>
 
 namespace dcx {
 

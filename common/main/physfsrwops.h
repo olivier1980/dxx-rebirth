@@ -33,7 +33,7 @@
 #else
 #include <physfs/physfs.h>
 #endif
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #ifdef __cplusplus
 #include <memory>
