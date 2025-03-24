@@ -580,7 +580,7 @@ static void render_object_search(grs_canvas &canvas, const d_level_unique_light_
 	{
 	const uint8_t color = 0;
 	//set our search pixel to color zero
-#if DXX_USE_OGL
+
 	ogl_end_frame();
 
 	// For OpenGL we use gr_rect instead of gr_pixel,
@@ -592,9 +592,7 @@ static void render_object_search(grs_canvas &canvas, const d_level_unique_light_
 	gr_rect(canvas, _search_x - 1, _search_y - 1, _search_x + 1, _search_y + 1, color);
 
 	ogl_start_frame(canvas);
-#else
-	gr_pixel(canvas.cv_bitmap, _search_x, _search_y, color);
-#endif
+
 	}
 	render_object(canvas, LevelUniqueLightState, obj);
 	if (gr_ugpixel(canvas.cv_bitmap,_search_x,_search_y) != 0)
@@ -602,13 +600,11 @@ static void render_object_search(grs_canvas &canvas, const d_level_unique_light_
 
 	{
 		const uint8_t color = 1;
-#if DXX_USE_OGL
+
 	ogl_end_frame();
 	gr_rect(canvas, _search_x - 1, _search_y - 1, _search_x + 1, _search_y + 1, color);
 	ogl_start_frame(canvas);
-#else
-	gr_pixel(canvas.cv_bitmap, _search_x, _search_y, color);
-#endif
+
 	}
 	render_object(canvas, LevelUniqueLightState, obj);
 	if (gr_ugpixel(canvas.cv_bitmap,_search_x,_search_y) != 1)

@@ -361,7 +361,9 @@ void wall_damage(const vmsegptridx_t seg, const sidenum_t side, fix damage)
 	auto &w0 = *vmwallptr(wall_num);
 	if (w0.type != WALL_BLASTABLE)
 		return;
-	
+
+	//blast_blastable_wall(seg, side, w0);
+
 	if (!(w0.flags & wall_flag::blasted) && w0.hps >= 0)
 		{
 		const auto &&csegp = seg.absolute_sibling(seg->shared_segment::children[side]);

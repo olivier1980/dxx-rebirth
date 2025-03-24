@@ -559,19 +559,19 @@ static void draw_polygon_object(grs_canvas &canvas, const d_level_unique_light_s
 
 			if (is_weapon_with_inner_model)
 			{
-				if constexpr (!DXX_USE_OGL) // in software rendering must draw inner model last
-				{
-				gr_settransblend(canvas, GR_FADE_OFF, gr_blend::additive_a);
-				if (draw_simple_model)
-					draw_polygon_model(Polygon_models, canvas, draw_tmap, obj->pos,
-							   obj->orient,
-							   obj->rtype.pobj_info.anim_angles,
-							   Weapon_info[obj->id].model_num_inner,
-							   obj->rtype.pobj_info.subobj_flags,
-							   light,
-							   &engine_glow_value,
-							   alt_textures);
-				}
+				// if constexpr (!DXX_USE_OGL) // in software rendering must draw inner model last
+				// {
+				// gr_settransblend(canvas, GR_FADE_OFF, gr_blend::additive_a);
+				// if (draw_simple_model)
+				// 	draw_polygon_model(Polygon_models, canvas, draw_tmap, obj->pos,
+				// 			   obj->orient,
+				// 			   obj->rtype.pobj_info.anim_angles,
+				// 			   Weapon_info[obj->id].model_num_inner,
+				// 			   obj->rtype.pobj_info.subobj_flags,
+				// 			   light,
+				// 			   &engine_glow_value,
+				// 			   alt_textures);
+				// }
 				gr_settransblend(canvas, GR_FADE_OFF, gr_blend::normal);
 			}
 			return;
@@ -769,6 +769,7 @@ void render_object(grs_canvas &canvas, const d_level_unique_light_state &LevelUn
 				gr_settransblend(canvas, gr_fade_level{10}, gr_blend::additive_a);
 			}
 #endif
+			// dont render robots, will render fireball
 			draw_polygon_object(canvas, LevelUniqueLightState, obj);
 
 			if (obj->type == OBJ_ROBOT) //"warn" robot if being shot at

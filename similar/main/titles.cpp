@@ -342,6 +342,7 @@ struct briefing_screen {
 static grs_subcanvas_ptr create_spinning_robot_sub_canvas(grs_canvas &canvas)
 {
 	return gr_create_sub_canvas(canvas, rescale_x(canvas.cv_bitmap, 138), rescale_y(canvas.cv_bitmap, 55), rescale_x(canvas.cv_bitmap, 166), rescale_y(canvas.cv_bitmap, 138));
+	//return gr_create_sub_canvas(canvas, rescale_x(canvas.cv_bitmap, 0), rescale_y(canvas.cv_bitmap, 0), rescale_x(canvas.cv_bitmap, 166*2), rescale_y(canvas.cv_bitmap, 138*2));
 }
 
 static std::array<char, 32> get_message_name(const char *&message, const char *const trailer)
@@ -742,6 +743,7 @@ static int briefing_process_char(grs_canvas &canvas, briefing *const br)
 			}
 #endif
 
+			// Disable rotating bots
 			if (EMULATING_D1) {
 				init_spinning_robot(canvas, *br);
 				br->robot_num = get_message_num(br->message);
@@ -1244,7 +1246,11 @@ static void init_spinning_robot(grs_canvas &canvas, briefing &br) //(int x,int y
 static void show_spinning_robot_frame(const enumerated_array<polymodel, MAX_POLYGON_MODELS, polygon_model_index> &Polygon_models, const d_robot_info_array &Robot_info, briefing &br, const robot_id robot_num)
 {
 	br.robot_angles.p = br.robot_angles.b = 0;
-	br.robot_angles.h += 150;
+
+	//br.robot_angles.p = 0; // front to down (along side axis)
+	//br.robot_angles.b += 100; //rotate along length axis
+
+	br.robot_angles.h += 150; //rotate speed, left to right along center vertical axis
 
 	const auto model_num = Robot_info[robot_num].model_num;
 	assert(model_num != polygon_model_index::None);
@@ -1674,6 +1680,7 @@ window_event_result briefing::event_handler(const d_event &event)
 			if (this->robot_num != -1)
 			{
 				auto &Robot_info = LevelSharedRobotInfoState.Robot_info;
+				std::cout << "Showing " + std::to_string(this->robot_num)  << std::endl;
 				show_spinning_robot_frame(LevelSharedPolygonModelState.Polygon_models, Robot_info, *this, static_cast<robot_id>(this->robot_num));
 			}
 

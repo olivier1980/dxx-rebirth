@@ -18,6 +18,9 @@
 #include "dxxerror.h"
 
 #include "interp.h"
+
+#include <iostream>
+
 #include "console.h"
 #include "common/3d/globvars.h"
 #include "polyobj.h"
@@ -28,6 +31,7 @@
 #include "d_range.h"
 #include "d_zip.h"
 #include "partial_range.h"
+#include <iostream>
 
 namespace dcx {
 
@@ -239,8 +243,10 @@ protected:
 		std::array<cg3s_point *, N> prepare_point_list(const uint_fast32_t nv, const uint8_t *const p)
 		{
 			std::array<cg3s_point *, N> point_list;
-			for (uint_fast32_t i = 0; i < nv; ++i)
+			for (uint_fast32_t i = 0; i < nv; ++i) {
 				point_list[i] = &Interp_point_list[wp(p + 30)[i]];
+				//std::cout << point_list[i] << std::endl;
+			}
 			return point_list;
 		}
 	g3s_lrgb get_noglow_light(const uint8_t *const p) const
@@ -339,7 +345,7 @@ public:
 					: gr_find_closest_color_15bpp(packed_color_r5g5b5{w(p + 28)});
 #endif
 				const auto point_list = prepare_point_list<MAX_POINTS_PER_POLY>(nv, p);
-				g3_draw_poly(canvas, nv, point_list, color);
+				g3_draw_poly(canvas, nv, point_list, color); // draws laser
 		}
 	}
 	static g3s_lrgb get_glow_light(const fix c)

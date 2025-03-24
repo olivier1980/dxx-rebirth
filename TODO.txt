@@ -18,3 +18,5 @@
 - Add minimap
 - Add DEARGUI
 - Add rearview mini
+- Preview resize
+- Instant kill hostage door

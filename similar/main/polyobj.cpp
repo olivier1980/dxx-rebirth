@@ -464,7 +464,7 @@ void draw_polygon_model(grs_canvas &canvas, const tmap_drawer_type tmap_drawer_p
 				auto &&subctx = g3_start_instance_matrix();
 				g3_draw_polygon_model(texture_list.data(), robot_points, canvas, tmap_drawer_ptr, anim_angles, light, glow_values, &po->model_data[po->submodel_ptrs[i]]);
 				g3_done_instance(subctx);
-			}	
+			}
 	}
 	g3_done_instance(ctx);
 }
@@ -587,7 +587,8 @@ polygon_model_index load_polygon_model(const char *filename, int n_textures, int
 }
 
 //compare against this size when figuring how far to place eye for picture
-#define BASE_MODEL_SIZE 0x28000
+#define BASE_MODEL_SIZE 0x8000 // increase for bigger model
+//#define BASE_MODEL_SIZE 0x38000 // increase for bigger model
 
 #define DEFAULT_VIEW_DIST 0x60000
 

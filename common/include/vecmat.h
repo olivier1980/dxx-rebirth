@@ -165,6 +165,7 @@ constexpr bool operator<(const vm_magnitude_squared a, const fix &b)
 //Angle vector.  Used to store orientations
 struct vms_angvec
 {
+	// h = horizontal
 	fixang p, b, h;
 };
 
