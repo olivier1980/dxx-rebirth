@@ -6,7 +6,6 @@
 from collections import (defaultdict, Counter as collections_counter)
 import collections.abc
 from dataclasses import dataclass
-import scons_compiledb
 import base64
 import binascii
 import errno
