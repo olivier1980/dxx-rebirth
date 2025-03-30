@@ -887,8 +887,8 @@ void songs_play_level_song(int levelnum, int offset)
 				{
 					static level_song_number last_songnum{level_song_number::None};
 
-					if (Song_playing >= song_number::first_level_song)
-						return;
+					//if (Song_playing >= song_number::first_level_song)
+///						return;
 
 					// As soon as we start a new level, go to next track
 					if (last_songnum != level_song_number::None && level_songnum != last_songnum)
