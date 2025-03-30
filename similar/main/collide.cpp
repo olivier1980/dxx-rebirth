@@ -1455,6 +1455,9 @@ int apply_damage_to_robot(const d_robot_info_array &Robot_info, const vmobjptrid
 	robot->shields -= damage;
 
 #if DXX_BUILD_DESCENT == 2
+    if (robot_is_thief(robptr))
+      	robot->shields = -1;
+
 	//	Do unspeakable hacks to make sure player doesn't die after killing boss.  Or before, sort of.
 	if (robptr.boss_flag != boss_robot_id::None)
 		if (PLAYING_BUILTIN_MISSION && Current_level_num == Current_mission->last_level)

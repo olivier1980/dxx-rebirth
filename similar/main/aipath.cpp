@@ -1002,7 +1002,7 @@ void ai_follow_path(const d_robot_info_array &Robot_info, const vmobjptridx_t ob
 #if DXX_BUILD_DESCENT == 2
 			if (aip->behavior == ai_behavior::AIB_SNIPE) {
 				if (robot_is_thief(robptr))
-					ailp->mode = ai_mode::AIM_THIEF_ATTACK;	//	It gets bashed in create_n_segment_path
+					ailp->mode = ai_mode::AIM_THIEF_RETREAT;	//	It gets bashed in create_n_segment_path
 				else
 					ailp->mode = ai_mode::AIM_SNIPE_FIRE;	//	It gets bashed in create_n_segment_path
 			} else
