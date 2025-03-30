@@ -152,17 +152,17 @@ int toggle_outline_mode(void)
 {
 	return Outline_mode = !Outline_mode;
 }
-#endif
 
-#ifndef NDEBUG
 namespace {
-static void draw_outline(const g3_draw_line_context &context, const unsigned nverts, cg3s_point *const *const pointlist)
+
+static void draw_outline(const g3_draw_line_context &context, const std::span<g3_draw_line_point *> pointlist)
 {
-	const unsigned e = nverts - 1;
+	const auto e{pointlist.size() - 1u};
 	range_for (const unsigned i, xrange(e))
 		g3_draw_line(context, *pointlist[i], *pointlist[i + 1]);
 	g3_draw_line(context, *pointlist[e], *pointlist[0]);
 }
+
 }
 #endif
 
@@ -236,7 +236,7 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 	auto &TmapInfo = LevelUniqueTmapInfoState.TmapInfo;
 	grs_bitmap  *bm;
 
-	std::array<cg3s_point *, 4> pointlist;
+	std::array<g3_draw_tmap_point *, 4> pointlist;
 
 	Assert(nv <= pointlist.size());
 
@@ -373,7 +373,7 @@ static void render_face(grs_canvas &canvas, const shared_segment &segp, const si
 	{
 		const uint8_t color = BM_XRGB(63, 63, 63);
 		g3_draw_line_context context{canvas, color};
-		draw_outline(context, nv, pointlist.data());
+		draw_outline(context, std::span(pointlist).first(nv));
 	}
 #endif
 }
@@ -389,7 +389,7 @@ static void check_face(grs_canvas &canvas, const vmsegidx_t segnum, const sidenu
 #if DXX_USE_EDITOR
 	if (_search_mode) {
 		std::array<g3s_lrgb, 4> dyn_light{};
-		std::array<cg3s_point *, 4> pointlist;
+		std::array<g3_draw_tmap_point *, 4> pointlist;
 #if DXX_USE_OGL
 		(void)tmap1;
 		(void)tmap2;
@@ -1421,7 +1421,7 @@ static void build_segment_list(render_state_t &rstate, const vms_vector &Viewer_
 						auto codes_and_2d = codes_and_3d;
 						range_for (const auto i, Side_to_verts[siden])
 						{
-							g3s_point *pnt = &Segment_points[seg->verts[i]];
+							const g3_projected_point *const pnt{&Segment_points[seg->verts[i]]};
 
 							if (! (pnt->p3_flags&projection_flag::projected)) {no_proj_flag=1; break;}
 

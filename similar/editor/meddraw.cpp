@@ -32,6 +32,7 @@ COPYRIGHT 1993-1998 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "segment.h"
 #include "segpoint.h"
 #include "gameseg.h"
+#include "common/3d/globvars.h"
 #include "gr.h"
 #include "ui.h"
 #include "editor/editor.h"
@@ -92,6 +93,7 @@ static void draw_seg_objects(grs_canvas &canvas, const unique_segment &seg)
 {
 	auto &Objects = LevelUniqueObjectState.Objects;
 	auto &vcobjptridx = Objects.vcptridx;
+	const g3_instance_context viewer_context{View_matrix, View_position};
 	range_for (const auto obj, objects_in(seg, vcobjptridx, vcsegptr))
 	{
 		const uint8_t color = (obj->type == OBJ_PLAYER && static_cast<icobjptridx_t::index_type>(obj) > 0)
@@ -100,7 +102,7 @@ static void draw_seg_objects(grs_canvas &canvas, const unique_segment &seg)
 				? PLAYER_COLOR
 				: ROBOT_COLOR
 			);
-		g3_draw_sphere(canvas, /* sphere_point = */ g3_rotate_point(obj->pos), obj->size, color);
+		g3_draw_sphere(canvas, /* sphere_point = */ g3_draw_sphere_point{viewer_context, obj->pos}, obj->size, color);
 	}
 }
 
@@ -160,13 +162,14 @@ static void check_segment(const vmsegptridx_t seg)
 
 		range_for (auto &fn, Side_to_verts)
 		{
-			std::array<cg3s_point *, 3> vert_list;
-			vert_list[0] = &Segment_points[seg->verts[fn[side_relative_vertnum::_0]]];
-			vert_list[1] = &Segment_points[seg->verts[fn[side_relative_vertnum::_1]]];
-			vert_list[2] = &Segment_points[seg->verts[fn[side_relative_vertnum::_2]]];
+			std::array<g3_draw_tmap_point *, 3> vert_list{{
+				&Segment_points[seg->verts[fn[side_relative_vertnum::_0]]],
+				&Segment_points[seg->verts[fn[side_relative_vertnum::_1]]],
+				&Segment_points[seg->verts[fn[side_relative_vertnum::_2]]],
+			}};
 			g3_check_and_draw_poly(*grd_curcanv, vert_list, color);
 
-			vert_list[1] = &Segment_points[seg->verts[fn[side_relative_vertnum::_2]]];
+			vert_list[1] = vert_list[2];
 			vert_list[2] = &Segment_points[seg->verts[fn[side_relative_vertnum::_3]]];
 			g3_check_and_draw_poly(*grd_curcanv, vert_list, color);
 		}
