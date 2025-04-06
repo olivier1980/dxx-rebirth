@@ -763,6 +763,8 @@ void render_object(grs_canvas &canvas, const d_level_unique_light_state &LevelUn
 				gr_settransblend(canvas, gr_fade_level{10}, gr_blend::additive_a);
 			}
 #endif
+
+
 			draw_polygon_object(canvas, LevelUniqueLightState, obj);
 
 			if (obj->type == OBJ_ROBOT) //"warn" robot if being shot at

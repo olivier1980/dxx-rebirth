@@ -78,7 +78,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "partial_range.h"
 #include <utility>
-
+#include "letsplay.h"
 using std::min;
 
 #if DXX_BUILD_DESCENT == 1
@@ -1079,7 +1079,9 @@ static void collide_robot_and_player(const d_robot_info_array &Robot_info, const
 			if (ailp->mode == ai_mode::AIM_THIEF_ATTACK)
 			{
 				Last_thief_hit_time = {GameTime64};
+#if LP_THIEF_NO_STEAL == 0
 				attempt_to_steal_item(robot, robptr, playerobj);
+#endif
 				steal_attempt = 1;
 			} else if (GameTime64 - Last_thief_hit_time < F1_0*2)
 				return;		//	ZOUNDS!  BRILLIANT!  Thief not collide with player if not stealing!

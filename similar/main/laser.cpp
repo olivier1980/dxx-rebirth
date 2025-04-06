@@ -58,7 +58,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "d_underlying_value.h"
 #include "partial_range.h"
-
+#include "letsplay.h"
 namespace {
 #ifdef NEWHOMER
 #define HOMING_TRACKABLE_DOT_FRAME_TIME	HOMING_TURN_TIME
@@ -345,8 +345,13 @@ static imobjptridx_t create_weapon_object(int weapon_type,const vmsegptridx_t se
 	obj->mtype.phys_info.drag = Weapon_info[weapon_type].drag;
 	obj->mtype.phys_info.thrust = {};
 
+	bool alwaysBounce = false;
+#if LP_ALWAYS_BOUNCE == 1
+	alwaysBounce = true;
+#endif
+
 	const auto bounce{Weapon_info[weapon_type].bounce};
-	if (bounce == weapon_info::bounce_type::always)
+	if (alwaysBounce || (bounce == weapon_info::bounce_type::always))
 		obj->mtype.phys_info.flags |= PF_BOUNCE;
 
 #if DXX_BUILD_DESCENT == 2
