@@ -1,3 +1,5 @@
 #pragma once
 
-#define LP_NO_LAVA_DAMAGE 1
+#define LP_NO_LAVA_DAMAGE 0
+#define LP_TRIPLE_LAVA_DAMAGE 1
+#define LP_SKIP_ROBOT_POWERUP 1
