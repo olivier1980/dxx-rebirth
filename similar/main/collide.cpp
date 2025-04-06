@@ -451,8 +451,13 @@ volatile_wall_result check_volatile_wall(const vmobjptridx_t obj, const unique_s
 	Assert(obj->type==OBJ_PLAYER);
 
 	auto &TmapInfo = LevelUniqueTmapInfoState.TmapInfo;
+
+	// Get texture info
 	const auto &tmi1 = TmapInfo[get_texture_index(side.tmap_num)];
+
+	// Get damage amount from texture info
 	const fix d = tmi1.damage;
+
 	if (d > 0
 #if DXX_BUILD_DESCENT == 2
 		|| (tmi1.flags & tmapinfo_flag::water)
@@ -474,14 +479,18 @@ volatile_wall_result check_volatile_wall(const vmobjptridx_t obj, const unique_s
 				fix damage = fixmul(d,((FrameTime>DESIGNATED_GAME_FRAMETIME)?FrameTime:DESIGNATED_GAME_FRAMETIME));
 
 #if DXX_BUILD_DESCENT == 2
+				// Half damage on easy
 				if (GameUniqueState.Difficulty_level == Difficulty_level_type::_0)
 					damage /= 2;
 #endif
 
+#if LP_NO_LAVA_DAMAGE == 0
 				apply_damage_to_player(obj, obj, damage, apply_damage_player::always);
+#endif
 				PALETTE_FLASH_ADD(f2i(damage*4), 0, 0);	//flash red
 			}
 
+			// Move player around
 			obj->mtype.phys_info.rotvel.x = (d_rand() - 16384)/2;
 			obj->mtype.phys_info.rotvel.z = (d_rand() - 16384)/2;
 		}
@@ -1455,6 +1464,9 @@ int apply_damage_to_robot(const d_robot_info_array &Robot_info, const vmobjptrid
 	robot->shields -= damage;
 
 #if DXX_BUILD_DESCENT == 2
+    // if (robot_is_thief(robptr))
+    //   	robot->shields = -1;
+
 	//	Do unspeakable hacks to make sure player doesn't die after killing boss.  Or before, sort of.
 	if (robptr.boss_flag != boss_robot_id::None)
 		if (PLAYING_BUILTIN_MISSION && Current_level_num == Current_mission->last_level)
@@ -1633,7 +1645,7 @@ static boss_weapon_collision_result do_boss_weapon_collision(const d_robot_info_
 	return boss_weapon_collision_result::normal;
 }
 #endif
-//	------------------------------------------------------------------------------------------------------
+	//	------------------------------------------------------------------------------------------------------
 static void collide_robot_and_weapon(const d_robot_info_array &Robot_info, const vmobjptridx_t robot, const vmobjptridx_t weapon, vms_vector &collision_point)
 {
 	auto &BossUniqueState = LevelUniqueObjectState.BossState;
