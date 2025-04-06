@@ -485,7 +485,11 @@ volatile_wall_result check_volatile_wall(const vmobjptridx_t obj, const unique_s
 #endif
 
 #if LP_NO_LAVA_DAMAGE == 0
+#if LP_TRIPLE_LAVA_DAMAGE == 1
+				apply_damage_to_player(obj, obj, damage*3, apply_damage_player::always);
+#else
 				apply_damage_to_player(obj, obj, damage, apply_damage_player::always);
+#endif
 #endif
 				PALETTE_FLASH_ADD(f2i(damage*4), 0, 0);	//flash red
 			}

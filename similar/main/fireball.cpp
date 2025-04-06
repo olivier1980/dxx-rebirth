@@ -1304,6 +1304,9 @@ bool object_create_robot_egg(const d_robot_info_array &Robot_info, const contain
 	{
 		if (type == contained_object_type::powerup)
 		{
+#if LP_SKIP_ROBOT_POWERUP == 1
+			return false;
+#endif
 			if (skip_create_egg_powerup(get_local_plrobj(), id.powerup))
 				return false;
 		}
