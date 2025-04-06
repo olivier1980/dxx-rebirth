@@ -71,9 +71,9 @@ public:
 	}
 
 	window_event_result send_event(const d_event &event
-#if DXX_HAVE_CXX_BUILTIN_FILE_LINE
-								, const char *file = __builtin_FILE(), unsigned line = __builtin_LINE()
-#endif
+// #if DXX_HAVE_CXX_BUILTIN_FILE_LINE
+// 								, const char *file = __builtin_FILE(), unsigned line = __builtin_LINE()
+// #endif
 								);
 	friend window *window_get_next(window &wind)
 	{

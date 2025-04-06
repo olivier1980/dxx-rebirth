@@ -41,11 +41,15 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "gameseg.h"
 #include "wall.h"
 #include "laser.h"
+#include <iostream>
+
 #if DXX_BUILD_DESCENT == 2
 #include "bm.h"
 #include "player.h"
 #define MAX_OBJECT_VEL	i2f(100)
 #endif
+
+#include <iostream>
 
 #include "d_levelstate.h"
 #include "compiler-range_for.h"
@@ -392,6 +396,17 @@ window_event_result do_physics_sim(const d_robot_info_array &Robot_info, const v
 	bool obj_stopped{};
 	do {
 		try_again = 0;
+
+		// if (obj->type == OBJ_WEAPON) {
+		// 	//obj->mtype.phys_info.velocity.x *= 2;
+		// 	//obj->mtype.phys_info.velocity.y *= 2;
+		// 	//obj->mtype.phys_info.velocity.z *= 2;
+		// 	std::cout << obj->mtype.phys_info.velocity.x << std::endl;
+		// 	std::cout << obj->mtype.phys_info.velocity.y << std::endl;
+		// 	std::cout << obj->mtype.phys_info.velocity.z << std::endl;
+		// 	std::cout << static_cast<int>(obj->rtype.pobj_info.model_num) << std::endl;
+		// 	//std::cout << obj->id << std::endl;
+		// }
 
 		//Move the object
 		const auto frame_vec{vm_vec_copy_scale(obj->mtype.phys_info.velocity, sim_time)};
