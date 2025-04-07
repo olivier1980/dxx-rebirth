@@ -1,7 +1,8 @@
 #pragma once
 
 #define LP_NO_LAVA_DAMAGE 0
-#define LP_TRIPLE_LAVA_DAMAGE 1
+#define LP_TRIPLE_LAVA_DAMAGE 0
 #define LP_SKIP_ROBOT_POWERUP 0
-#define LP_ALWAYS_BOUNCE 1
-#define LP_THIEF_NO_STEAL 1
+#define LP_ALWAYS_BOUNCE 0
+#define LP_THIEF_NO_STEAL 0
+#define LP_LOBOTOMY 1

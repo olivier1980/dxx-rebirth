@@ -82,7 +82,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_enumerate.h"
 #include "d_levelstate.h"
 #include <utility>
-
+#include "letsplay.h"
 using std::min;
 
 namespace dsx {
@@ -3298,6 +3298,12 @@ void do_ai_frame(const d_level_shared_robot_info_state &LevelSharedRobotInfoStat
 
 	if (do_any_robot_dying_frame(Robot_info, obj))
 		return;
+
+#if LP_LOBOTOMY == 1
+	if (!robot_is_companion(robptr))
+		return;
+#endif
+
 
 	// Kind of a hack.  If a robot is flinching, but it is time for it to fire, unflinch it.
 	// Else, you can turn a big nasty robot into a wimp by firing flares at it.
