@@ -81,7 +81,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_underlying_value.h"
 #include "partial_range.h"
 #include <utility>
-
+#include "letsplay.h"
 using std::min;
 using std::max;
 
@@ -1860,7 +1860,7 @@ static window_event_result object_move_one(const d_level_shared_robot_info_state
 
 		auto &player_info = obj->ctype.player_info;
 		auto &energy = player_info.energy;
-		const fix fuel = fuelcen_give_fuel(segp, INITIAL_ENERGY - energy);
+		const fix fuel = fuelcen_give_fuel(segp, LP_MAX_ENERGY_RESTORE - energy);
 		if (fuel > 0 )	{
 			energy += fuel;
 		}

@@ -58,7 +58,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "partial_range.h"
 #include "segiter.h"
-
+#include <iostream>;
 // The max number of fuel stations per mine.
 
 namespace dcx {
@@ -611,7 +611,12 @@ fix repaircen_give_shields(const shared_segment &segp, const fix MaxAmountCanTak
 {
 	static fix64 last_play_time{};
 
+
+#if LP_RESTORE_FUEL_SHIELD == 1
+	if (segp.special == segment_special::fuelcen || segp.special == segment_special::repaircen)
+#else
 	if (segp.special == segment_special::repaircen)
+#endif
 	{
 		fix amount;
 		if (MaxAmountCanTake <= 0 ) {

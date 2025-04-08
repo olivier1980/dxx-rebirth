@@ -70,7 +70,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_zip.h"
 #include "partial_range.h"
 #include "segiter.h"
-
+#include "letsplay.h"
 using std::min;
 
 #define EXPLOSION_SCALE (F1_0*5/2)		//explosion is the obj size times this 
@@ -1512,11 +1512,19 @@ void do_explosion_sequence(const d_robot_info_array &Robot_info, object &obj)
 			auto &robptr{Robot_info[get_robot_id(del_obj)]};
 			if (const auto contains_count{robptr.contains.count})
 			{
+#if LP_ALWAYS_DROP == 1
+				if (0 < robptr.contains_prob) {
+#else
 				if (((d_rand() * 16) >> 15) < robptr.contains_prob) {
+#endif
 					del_obj->contains = robptr.contains;
 					del_obj->contains.count = ((d_rand() * contains_count) >> 15) + 1;
 					maybe_replace_powerup_with_energy(del_obj);
 					object_create_robot_egg(Robot_info, del_obj);
+#if LP_MULTIPLE_DROP == 1
+					object_create_robot_egg(Robot_info, del_obj);
+					object_create_robot_egg(Robot_info, del_obj);
+#endif
 				}
 			}
 #if DXX_BUILD_DESCENT == 2
