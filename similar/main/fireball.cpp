@@ -37,7 +37,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "vecmat.h"
 #include "gr.h"
 #include "3d.h"
-
+#include <random>
 #include "inferno.h"
 #include "object.h"
 #include "vclip.h"
@@ -51,6 +51,9 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "ai.h"
 #include "weapon.h"
 #include "fireball.h"
+
+#include <iostream>
+
 #include "collide.h"
 #include "physics.h"
 #include "laser.h"
@@ -1200,11 +1203,23 @@ static bool drop_robot_egg(const d_robot_info_array &Robot_info, const contained
 			con_printf(CON_URGENT, DXX_STRINGIZE_FL(__FILE__, __LINE__, "ignoring invalid object type; expected OBJ_POWERUP or OBJ_ROBOT, got type=%i, id=%i"), underlying_value(type), underlying_value(id.powerup));
 			return false;
 	}
+
+	std::random_device rd;  // Obtain a random number from hardware
+	std::mt19937 gen(rd()); // Seed the generator
+	std::uniform_int_distribution<> distr(37, 40); // Define the range
+
+
 	auto &Polygon_models{LevelSharedPolygonModelState.Polygon_models};
 	bool created{false};
 	const auto [normalized_init_magnitude, normalized_init_vel]{vm_vec_normalize_quick_with_magnitude(init_vel)};
 	const fix scale_magnitude{(F1_0 * 32 + normalized_init_magnitude) * 2};
+
+	std::cout << "Creating " + std::to_string(num) + " robots" << std::endl;
+#if LP_CRAZY_SPAWN == 1
+	for (const auto count : xrange(num+2))
+#else
 	for (const auto count : xrange(num))
+#endif
 	{
 		(void)count;
 				auto new_pos{pos};
@@ -1213,7 +1228,13 @@ static bool drop_robot_egg(const d_robot_info_array &Robot_info, const contained
 //				new_pos.y += (d_rand()-16384)*7;
 //				new_pos.z += (d_rand()-16384)*6;
 
+#if LP_CRAZY_SPAWN == 1
+				int randomNumber = distr(gen); // Generate the random number
+				robot_id a{randomNumber};
+				const auto rid{a};
+#else
 				const auto rid{id.robot};
+#endif
 				auto &robptr{Robot_info[rid]};
 				const auto &&objp{robot_create(Robot_info, rid, segnum, new_pos, &vmd_identity_matrix, Polygon_models[robptr.model_num].rad, ai_behavior::AIB_NORMAL)};
 				if (objp == object_none)
@@ -1227,6 +1248,8 @@ static bool drop_robot_egg(const d_robot_info_array &Robot_info, const contained
 					Net_create_objnums[Net_create_loc++] = objp;
 				}
 				//Set polygon-object-specific data
+
+				std::cout << "Creating model number " + std::to_string(static_cast<uint8_t>(robptr.model_num)) << std::endl;
 
 				obj.rtype.pobj_info.model_num = robptr.model_num;
 				obj.rtype.pobj_info.subobj_flags = 0;

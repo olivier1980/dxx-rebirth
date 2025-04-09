@@ -1860,7 +1860,7 @@ static window_event_result object_move_one(const d_level_shared_robot_info_state
 
 		auto &player_info = obj->ctype.player_info;
 		auto &energy = player_info.energy;
-		const fix fuel = fuelcen_give_fuel(segp, LP_MAX_ENERGY_RESTORE - energy);
+		const fix fuel = fuelcen_give_fuel(segp, i2f(LP_MAX_ENERGY_RESTORE) - energy);
 		if (fuel > 0 )	{
 			energy += fuel;
 		}
