@@ -1171,7 +1171,7 @@ static void ai_fire_laser_at_player(const d_robot_info_array &Robot_info, const 
 
     auto robot_id = static_cast<uint8_t> (get_robot_id(obj));
 
-    std::cout << unsigned(robot_id) << std::endl;
+    std::cout << "Robot firing: " + std::to_string(robot_id) << std::endl;
 
     if (cheats.vulcansuspended && robot_id == 19)
         return;
