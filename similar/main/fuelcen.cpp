@@ -58,7 +58,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "partial_range.h"
 #include "segiter.h"
-#include <iostream>;
+#include <iostream>
 // The max number of fuel stations per mine.
 
 namespace dcx {
@@ -513,9 +513,13 @@ static void robotmaker_proc(const d_robot_info_array &Robot_info, const d_vclip_
 					}
 				}
 
+#if LP_ROBOT_GENERATOR_OVERRIDE
+				const robot_id type{LP_ROBOT_GENERATOR_OVERRIDE};
+#else
 				const robot_id type = (num_types == 1)
 					? legal_types[0]
 					: legal_types[(d_rand() * num_types) / 32768];
+#endif
 
 				const auto &&obj = create_morph_robot(Robot_info, vmsegptridx(robotcen->segnum), cur_object_loc, type );
 				if (obj != object_none) {
