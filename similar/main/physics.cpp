@@ -397,16 +397,11 @@ window_event_result do_physics_sim(const d_robot_info_array &Robot_info, const v
 	do {
 		try_again = 0;
 
-		// if (obj->type == OBJ_WEAPON) {
-		// 	//obj->mtype.phys_info.velocity.x *= 2;
-		// 	//obj->mtype.phys_info.velocity.y *= 2;
-		// 	//obj->mtype.phys_info.velocity.z *= 2;
-		// 	std::cout << obj->mtype.phys_info.velocity.x << std::endl;
-		// 	std::cout << obj->mtype.phys_info.velocity.y << std::endl;
-		// 	std::cout << obj->mtype.phys_info.velocity.z << std::endl;
-		// 	std::cout << static_cast<int>(obj->rtype.pobj_info.model_num) << std::endl;
-		// 	//std::cout << obj->id << std::endl;
-		// }
+#if LP_SLOWMOTION == 1
+		if (obj->type != OBJ_PLAYER) {
+			sim_time /= 3;
+		}
+#endif
 
 		//Move the object
 		const auto frame_vec{vm_vec_copy_scale(obj->mtype.phys_info.velocity, sim_time)};
