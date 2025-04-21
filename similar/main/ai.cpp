@@ -648,7 +648,7 @@ void init_ai_object(const d_robot_info_array &Robot_info, const vmobjptridx_t ob
 	else
 		aip->CLOAKED = 0;
 
-#if LP_CLOAKED_ALL == 1
+#if LP_CLOAKED_ALL == 1 && DXX_BUILD_DESCENT == 2
 	if (!robptr.companion) {
 		aip->CLOAKED = 1;
 	}
