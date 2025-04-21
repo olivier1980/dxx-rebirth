@@ -68,6 +68,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "state.h"
 #include "multi.h"
 #include "gr.h"
+#include "letsplay.h"
 #if DXX_USE_OGL
 #include "ogl_init.h"
 #endif
@@ -644,6 +645,11 @@ static void state_object_rw_to_object(const object_rw *const obj_rw, object &obj
 #endif
 			obj.ctype.ai_info.GOALSIDE = build_sidenum_from_untrusted(obj_rw->ctype.ai_info.flags[5]).value();
 			obj.ctype.ai_info.CLOAKED = obj_rw->ctype.ai_info.flags[6];
+
+#if LP_CLOAKED_ALL == 1 && DXX_BUILD_DESCENT == 2
+			obj.ctype.ai_info.CLOAKED = 1;
+#endif
+
 			obj.ctype.ai_info.SKIP_AI_COUNT = obj_rw->ctype.ai_info.flags[7];
 			obj.ctype.ai_info.REMOTE_OWNER = obj_rw->ctype.ai_info.flags[8];
 			obj.ctype.ai_info.REMOTE_SLOT_NUM = obj_rw->ctype.ai_info.flags[9];
