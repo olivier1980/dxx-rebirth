@@ -41,7 +41,7 @@ build_app() {
 }
 
 # Build each app
-build_app "d1x-rebirth" "D1X-Rebirth"
+#build_app "d1x-rebirth" "D1X-Rebirth"
 build_app "d2x-rebirth" "D2X-Rebirth"
 
 if ! [[ -v zip_filename ]]; then
@@ -51,5 +51,6 @@ fi
 if [[ -n "$zip_filename" ]]; then
 	# Consolidate both apps into a single zip file
 	cd "${outdir}"
-	zip -r -X "$zip_filename" "D1X-Rebirth" "D2X-Rebirth"
+	#zip -r -X "$zip_filename" "D1X-Rebirth" "D2X-Rebirth"
+	zip -r -X "$zip_filename" "D2X-Rebirth"
 fi
