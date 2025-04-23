@@ -1327,7 +1327,6 @@ player_led: ;
 #endif
 
 	const auto weapon_type = get_robot_weapon(robptr, gun_num);
-
 	Laser_create_new_easy(Robot_info, fire_vec, fire_point, obj, weapon_type, weapon_sound_flag::audible);
 
 #if DXX_USE_MULTIPLAYER
@@ -1821,14 +1820,28 @@ static void compute_vis_and_vec(const d_robot_info_array &Robot_info, const vmob
 				{
 					if (ailp.time_player_seen + F1_0/2 < GameTime64)
 					{
+#if LP_RAMBO_BOT == 1
+						if (robptr.companion)
+							digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+						else
+							digi_link_sound_to_object(robptr.see_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#else
 						digi_link_sound_to_object(robptr.see_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#endif
 						ailp.time_player_sound_attacked = {GameTime64};
 						ailp.next_misc_sound_time = GameTime64 + F1_0 + d_rand()*4;
 					}
 				}
 				else if (ailp.time_player_sound_attacked + F1_0/4 < GameTime64)
 				{
+#if LP_RAMBO_BOT == 1
+					if (robptr.companion)
+						digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+					else
+						digi_link_sound_to_object(robptr.attack_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#else
 					digi_link_sound_to_object(robptr.attack_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#endif
 					ailp.time_player_sound_attacked = {GameTime64};
 				}
 			} 
@@ -1836,7 +1849,16 @@ static void compute_vis_and_vec(const d_robot_info_array &Robot_info, const vmob
 			if (player_visibility.visibility == player_visibility_state::visible_and_in_field_of_view && ailp.next_misc_sound_time < GameTime64)
 			{
 				ailp.next_misc_sound_time = GameTime64 + (d_rand() + F1_0) * (7 - underlying_value(Difficulty_level)) / 2;
+
+#if LP_RAMBO_BOT == 1
+				if (robptr.companion)
+					digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+				else
+					digi_link_sound_to_object(robptr.attack_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#else
 				digi_link_sound_to_object(robptr.attack_sound, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
+#endif
+
 			}
 			ailp.previous_visibility = player_visibility.visibility;
 		}
@@ -3831,10 +3853,14 @@ _exit_cheat:
 
 		if (guidebot_should_fire_flare(vcobjptr, vcsegptr, vcwallptr, BuddyState, robptr, *obj))
 		{
+#if LP_RAMBO_BOT == 1
+    		Laser_create_new_easy(Robot_info, obj->orient.fvec, obj->pos, obj, weapon_id_type::MEGA_ID, weapon_sound_flag::audible);
+#else
 			Laser_create_new_easy(Robot_info, obj->orient.fvec, obj->pos, obj, weapon_id_type::FLARE_ID, weapon_sound_flag::audible);
-				ailp.next_fire = F1_0/2;
-				if (!BuddyState.Buddy_allowed_to_talk) // If buddy not talking, make him fire flares less often.
-					ailp.next_fire += d_rand()*4;
+#endif
+			ailp.next_fire = F1_0/2;
+			if (!BuddyState.Buddy_allowed_to_talk) // If buddy not talking, make him fire flares less often.
+				ailp.next_fire += d_rand()*4;
 		}
 	}
 

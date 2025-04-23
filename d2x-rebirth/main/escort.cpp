@@ -74,7 +74,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include "d_range.h"
 #include "d_zip.h"
-
+#include "letsplay.h"
 #if DXX_USE_EDITOR
 #include "editor/editor.h"
 #endif
@@ -1140,7 +1140,12 @@ static int maybe_buddy_fire_mega(const vmobjptridx_t objp, const vcobjptridx_t B
 	buddy_message_str("GAHOOGA!");
 
 	auto &buddy = *Buddy_objp;
-	const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy.orient.fvec, buddy.pos, objp, weapon_id_type::MEGA_ID, weapon_sound_flag::audible);
+
+	#if LP_RAMBO_BOT == 1
+	    const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy.orient.fvec, buddy.pos, objp, weapon_id_type::EARTHSHAKER_ID, weapon_sound_flag::audible);
+	#else
+	    const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy.orient.fvec, buddy.pos, objp, weapon_id_type::MEGA_ID, weapon_sound_flag::audible);
+	#endif
 
 	if (weapon_objnum != object_none)
 		bash_buddy_weapon_info(BuddyState, Objects.vmptridx, weapon_objnum);
@@ -1165,8 +1170,11 @@ static int maybe_buddy_fire_smart(const vmobjptridx_t objp, const vcobjptridx_t 
 
 	buddy_message_str("WHAMMO!");
 
-	const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy_objp->orient.fvec, buddy_objp->pos, objp, weapon_id_type::SMART_ID, weapon_sound_flag::audible);
-
+#if LP_RAMBO_BOT == 1
+	const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy_objp->orient.fvec, buddy_objp->pos, objp, weapon_id_type::MEGA_ID, weapon_sound_flag::audible);
+#else
+    const imobjptridx_t weapon_objnum = Laser_create_new_easy(LevelSharedRobotInfoState.Robot_info, buddy_objp->orient.fvec, buddy_objp->pos, objp, weapon_id_type::SMART_ID, weapon_sound_flag::audible);
+#endif
 	if (weapon_objnum != object_none)
 		bash_buddy_weapon_info(BuddyState, Objects.vmptridx, weapon_objnum);
 
@@ -1252,6 +1260,10 @@ void do_escort_frame(const vmobjptridx_t objp, const robot_info &robptr, const o
 
 	if (cheats.buddyangry)
 		do_buddy_dude_stuff(objp);
+
+#if LP_RAMBO_BOT == 1
+	do_buddy_dude_stuff(objp);
+#endif
 
 	{
 		const auto buddy_sorry_time = BuddyState.Buddy_sorry_time;
