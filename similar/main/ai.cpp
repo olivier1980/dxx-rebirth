@@ -1820,7 +1820,7 @@ static void compute_vis_and_vec(const d_robot_info_array &Robot_info, const vmob
 				{
 					if (ailp.time_player_seen + F1_0/2 < GameTime64)
 					{
-#if LP_RAMBO_BOT == 1
+#if LP_RAMBO_BOT == 1 && DXX_BUILD_DESCENT == 2
 						if (robptr.companion)
 							digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
 						else
@@ -1834,7 +1834,7 @@ static void compute_vis_and_vec(const d_robot_info_array &Robot_info, const vmob
 				}
 				else if (ailp.time_player_sound_attacked + F1_0/4 < GameTime64)
 				{
-#if LP_RAMBO_BOT == 1
+#if LP_RAMBO_BOT == 1 && DXX_BUILD_DESCENT == 2
 					if (robptr.companion)
 						digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
 					else
@@ -1850,7 +1850,7 @@ static void compute_vis_and_vec(const d_robot_info_array &Robot_info, const vmob
 			{
 				ailp.next_misc_sound_time = GameTime64 + (d_rand() + F1_0) * (7 - underlying_value(Difficulty_level)) / 2;
 
-#if LP_RAMBO_BOT == 1
+#if LP_RAMBO_BOT == 1 && DXX_BUILD_DESCENT == 2
 				if (robptr.companion)
 					digi_link_sound_to_object(sound_effect::ROBOT_CLAW_SOUND_DEFAULT, objp, 0, Robot_sound_volume, sound_stack::allow_stacking);
 				else
