@@ -516,6 +516,11 @@ static imobjptridx_t object_create_explosion_with_damage(const d_robot_info_arra
 									if (const auto boss_index{build_boss_robot_index_from_boss_robot_id(robot_info.boss_flag)}; Boss_invulnerable_matter.valid_index(boss_index) && Boss_invulnerable_matter[boss_index])
 											damage /= 4;
 #endif
+
+#if LP_RAMBO_BOT == 1
+                                    if (Robot_info[get_robot_id(obj_iter)].companion)
+                                        damage = 0;
+#endif
 									if (apply_damage_to_robot(Robot_info, obj_iter, damage, parent))
 										if (obj_explosion_origin != object_none && parent == get_local_player().objnum)
 											add_points_to_score(ConsoleObject->ctype.player_info, Robot_info[get_robot_id(obj_iter)].score_value, Game_mode);
@@ -578,8 +583,13 @@ static imobjptridx_t object_create_explosion_with_damage(const d_robot_info_arra
 								{
 #if DXX_BUILD_DESCENT == 2
 									if (GameUniqueState.Difficulty_level == Difficulty_level_type::_0)
-									damage /= 4;
+									    damage /= 4;
 #endif
+
+#if LP_RAMBO_BOT == 1
+                                    damage /= 4;
+#endif
+
 									apply_damage_to_player(obj_iter, killer, damage, apply_damage_player::check_for_friendly);
 								}
 							}
