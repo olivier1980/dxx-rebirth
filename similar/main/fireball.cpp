@@ -517,7 +517,7 @@ static imobjptridx_t object_create_explosion_with_damage(const d_robot_info_arra
 											damage /= 4;
 #endif
 
-#if LP_RAMBO_BOT == 1
+#if LP_RAMBO_BOT == 1 && DXX_BUILD_DESCENT == 2
                                     if (Robot_info[get_robot_id(obj_iter)].companion)
                                         damage = 0;
 #endif
