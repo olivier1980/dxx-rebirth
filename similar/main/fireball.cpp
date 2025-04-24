@@ -587,7 +587,7 @@ static imobjptridx_t object_create_explosion_with_damage(const d_robot_info_arra
 #endif
 
 #if LP_RAMBO_BOT == 1
-                                    damage /= 4;
+                                    damage = 0;
 #endif
 
 									apply_damage_to_player(obj_iter, killer, damage, apply_damage_player::check_for_friendly);
