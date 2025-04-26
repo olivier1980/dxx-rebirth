@@ -1469,6 +1469,10 @@ int apply_damage_to_robot(const d_robot_info_array &Robot_info, const vmobjptrid
 
 	robot->shields -= damage;
 
+#if LP_ONE_HIT_KILL == 1
+	robot->shields = -1;
+#endif
+
 #if DXX_BUILD_DESCENT == 2
     // if (robot_is_thief(robptr))
     //   	robot->shields = -1;
