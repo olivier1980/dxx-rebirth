@@ -14,5 +14,6 @@
 #define LP_ROBOT_GENERATOR_OVERRIDE 0
 #define LP_SLOWMOTION 0
 #define LP_CLOAKED_ALL 0
-#define LP_RAMBO_BOT 1
+#define LP_RAMBO_BOT 0
 #define LP_ITEM_INF 1
+#define LP_ONE_HIT_KILL 1
