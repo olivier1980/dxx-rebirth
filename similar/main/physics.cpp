@@ -403,6 +403,12 @@ window_event_result do_physics_sim(const d_robot_info_array &Robot_info, const v
 		}
 #endif
 
+#if LP_FAST_WEAPONS == 1
+		if (obj->type == OBJ_WEAPON) {
+			sim_time *= 1.5;
+		}
+#endif
+
 		//Move the object
 		const auto frame_vec{vm_vec_copy_scale(obj->mtype.phys_info.velocity, sim_time)};
 
