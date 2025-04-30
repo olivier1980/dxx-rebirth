@@ -305,6 +305,7 @@ struct game_cheats : prohibit_void_ptr<game_cheats>
 	int8_t rapidfire;
 	int8_t turbo;
 	int8_t robotfiringsuspended;
+	int8_t vulcansuspended;
 	int8_t acid;
 #if DXX_BUILD_DESCENT == 1
 	int8_t wowie2;

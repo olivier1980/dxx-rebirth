@@ -26,6 +26,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include <algorithm>
 #include <cstdlib>
 #include <stdio.h>
+#include <iostream>
 #include <time.h>
 #include <optional>
 
@@ -81,6 +82,8 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_enumerate.h"
 #include "d_levelstate.h"
 #include <utility>
+
+#include <iostream>
 
 using std::min;
 
@@ -572,6 +575,7 @@ static void boss_init_all_segments(const segment_array &Segments, const object &
 //	initial_mode == -1 means leave mode unchanged.
 void init_ai_object(const d_robot_info_array &Robot_info, const vmobjptridx_t objp, ai_behavior behavior, const imsegidx_t hide_segment)
 {
+
 	auto &BossUniqueState = LevelUniqueObjectState.BossState;
 	auto &obj = *objp;
 	ai_static *const aip = &obj.ctype.ai_info;
@@ -642,6 +646,8 @@ void init_ai_object(const d_robot_info_array &Robot_info, const vmobjptridx_t ob
 
 	aip->SKIP_AI_COUNT = 0;
 
+	std::cout << "Determine cloaked" << std::endl;
+
 	if (robptr.cloak_type == RI_CLOAKED_ALWAYS)
 		aip->CLOAKED = 1;
 	else
@@ -694,6 +700,9 @@ void init_ai_objects(const d_robot_info_array &Robot_info)
 #define D1_Boss_gate_interval	F1_0*5 - Difficulty_level*F1_0/2
 #if DXX_BUILD_DESCENT == 1
 	GameUniqueState.Boss_gate_interval = D1_Boss_gate_interval;
+
+	//init_buddy_for_level();
+
 #elif DXX_BUILD_DESCENT == 2
 	ai_do_cloak_stuff();
 
@@ -1167,6 +1176,13 @@ static void ai_fire_laser_at_player(const d_robot_info_array &Robot_info, const 
 	vms_vector	fire_vec;
 
 	Assert(robptr.attack_type == 0);	//	We should never be coming here for the green guy, as he has no laser!
+
+    auto robot_id = static_cast<uint8_t> (get_robot_id(obj));
+
+    std::cout << "Robot id: " + std::to_string(robot_id) << std::endl;
+
+    if (cheats.vulcansuspended && robot_id == 19)
+        return;
 
 	if (cheats.robotfiringsuspended)
 		return;
@@ -1651,6 +1667,12 @@ static void do_firing_stuff(object &obj, const player_flags powerup_flags, const
 	if (Dist_to_last_fired_upon_player_pos < FIRE_AT_NEARBY_PLAYER_THRESHOLD || player_is_visible(player_visibility.visibility))
 #endif
 	{
+        //auto robot_id = static_cast<uint8_t> (get_robot_id(obj));
+        //std::cout << unsigned(robot_id) << std::endl;
+        //std::cout << GameTime64 / 1000 << std::endl;  //43 6666
+
+       // static fix64 last_lock_time=0;
+
 		//	Now, if in robot's field of view, lock onto player
 		const fix dot = vm_vec_dot(obj.orient.fvec, player_visibility.vec_to_player);
 		if ((dot >= 7*F1_0/8) || (powerup_flags & PLAYER_FLAGS_CLOAKED)) {
@@ -1665,7 +1687,7 @@ static void do_firing_stuff(object &obj, const player_flags powerup_flags, const
 					aip->GOAL_STATE = AIS_FIRE;
 					if (ailp->player_awareness_type <= player_awareness_type_t::PA_NEARBY_ROBOT_FIRED) {
 						ailp->player_awareness_type = player_awareness_type_t::PA_NEARBY_ROBOT_FIRED;
-						ailp->player_awareness_time = PLAYER_AWARENESS_INITIAL_TIME;
+						ailp->player_awareness_time = PLAYER_AWARENESS_INITIAL_TIME; //make robots deaf
 					}
 					break;
 				case ai_static_state::AIS_FLIN:
@@ -2460,10 +2482,10 @@ static void do_boss_dying_frame(const d_robot_info_array &Robot_info, const vmob
 		{
 			BossUniqueState.Boss_dying_sound_playing = 1;
 			digi_link_sound_to_object2(sound_effect::SOUND_BOSS_SHARE_DIE, objp, 0, F1_0*4, sound_stack::allow_stacking, vm_distance{F1_0*1024});	//	F1_0*512 means play twice as loud
-                } else if (d_rand() < FrameTime*16)
-                        create_small_fireball_on_object(objp, (F1_0 + d_rand()) * 8, 0);
+        } else if (d_rand() < FrameTime*16)
+            create_small_fireball_on_object(objp, (F1_0 + d_rand()) * 8, 0);
         } else if (d_rand() < FrameTime*8)
-                create_small_fireball_on_object(objp, (F1_0/2 + d_rand()) * 8, 1);
+            create_small_fireball_on_object(objp, (F1_0/2 + d_rand()) * 8, 1);
 
 	if (BossUniqueState.Boss_dying_start_time + BOSS_DEATH_DURATION < GameTime64 || GameTime64+(F1_0*2) < BossUniqueState.Boss_dying_start_time)
 	{

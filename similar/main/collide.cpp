@@ -79,6 +79,11 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "partial_range.h"
 #include <utility>
 
+#include <iostream>
+#include <chrono>
+#include <ctime>
+
+
 using std::min;
 
 #if DXX_BUILD_DESCENT == 1
@@ -110,6 +115,9 @@ constexpr std::array<uint8_t, MAX_WEAPON_TYPES> Weapon_is_energy{{
 #define FORCE_DAMAGE_THRESHOLD (F1_0/3)
 #define STANDARD_EXPL_DELAY (F1_0/4)
 
+
+
+
 namespace dcx {
 void bump_one_object(object_base &obj0, const vms_vector &hit_dir, const fix damage)
 {
@@ -121,12 +129,38 @@ namespace {
 static int check_collision_delayfunc_exec()
 {
 	static fix64 last_play_time=0;
-	if (last_play_time + (F1_0/3) < GameTime64 || last_play_time > GameTime64)
+	static auto start = std::chrono::system_clock::now();
+    static auto end = std::chrono::system_clock::now();
+
+	std::cout << F1_0/3 << std::endl;
+	std::cout << last_play_time + (F1_0/3) << std::endl;
+	std::cout << GameTime64 << std::endl;
+
+    // Aprox half a second delay, with multiplier 0.9
+	if (last_play_time + ((F1_0/3)*2.7) < GameTime64 || last_play_time > GameTime64)
 	{
+	    if (last_play_time > 0) {
+	        end = std::chrono::system_clock::now();
+
+            std::chrono::duration<double> elapsed_seconds = end-start;
+            std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+            // 0.37885s
+            std::cout << "finished computation at " << std::ctime(&end_time)
+              << "elapsed time: " << elapsed_seconds.count() << "s"
+              << std::endl;
+	    }
+
+	    std::cout << "Setting collision" << std::endl;
+	    start = std::chrono::system_clock::now();
+
 		last_play_time = {GameTime64};
-		last_play_time -= (d_rand()/2); // add some randomness
+		//last_play_time -= (d_rand()/2); // add some randomness
 		return 1;
 	}
+
+	std::cout << GameTime64 - (last_play_time + (F1_0/3)) << std::endl;
+
 	return 0;
 }
 

@@ -1,0 +1,13 @@
+inferno.cpp -> main()
+    text.cpp -> load_text()
+    titles.cpp -> show_titles()
+        - songs_play_song()
+        - show_title_screen()
+
+menu.cpp
+    -> load_existing_singleplayer_game
+        -> dispatch_menu_option()
+            state.cpp -> state_restore_all()
+                           -> state_restore_all_sub()
+                                -> StartNewLevelSub()
+                                ai.cpp -> ai_restore_state()

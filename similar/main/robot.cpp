@@ -38,6 +38,8 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "compiler-range_for.h"
 #include "partial_range.h"
 
+#include <iostream>
+
 #if 0
 static inline void PHYSFSX_writeAngleVec(PHYSFS_File *fp, const vms_angvec &v)
 {
@@ -282,7 +284,13 @@ void robot_info_read(const NamedPHYSFS_File fp, robot_info &ri)
 	range_for (auto &j, ri.evade_speed)
 		j = PHYSFSX_readByte(fp);
 
-	ri.cloak_type = PHYSFSX_readByte(fp);
+	sbyte cloakType = PHYSFSX_readByte(fp);
+
+	std::cout << "Cloak type: "+std::to_string(cloakType) << std::endl;
+
+    // OLI: set all enemies cloaked
+	//ri.cloak_type = RI_CLOAKED_ALWAYS;
+	ri.cloak_type = cloakType;
 	ri.attack_type = PHYSFSX_readByte(fp);
 #if DXX_BUILD_DESCENT == 1
 	const uint8_t boss_flag = PHYSFSX_readByte(fp);
