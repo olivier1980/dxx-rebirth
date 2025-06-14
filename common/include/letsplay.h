@@ -19,4 +19,4 @@
 #define LP_ONE_HIT_KILL 0				// One hit kill
 #define LP_FAST_WEAPONS 0				// Add multiplier to weapon speed
 #define LP_SKIP_ROBOTS 1				// Remove all robots on load game (generators still work)
-#define LP_DISABLE_GENERATOR 0			// Disable generator
+#define LP_DISABLE_GENERATOR 1			// Disable generator
