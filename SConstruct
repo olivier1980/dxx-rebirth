@@ -2152,7 +2152,7 @@ help:assume compiler supports __attribute__((unused))
 		self._check_macro(context,macro_name=macro_name,macro_value=macro_value,test="""
 dxx_compiler_attribute_unused
 static void a(){}
-""", msg='for function __attribute__((unused))', successflags={'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ('-Wunused',))})
+""", msg='for function __attribute__((unused))', successflags={'CXXFLAGS' : get_Werror_sequence(context.env['CXXFLAGS'], ('',))})
 
 	@_custom_test
 	def check_cxx11_static_assert(self,context,_f='''

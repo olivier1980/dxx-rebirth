@@ -367,6 +367,10 @@ static void robotmaker_proc(const d_robot_info_array &Robot_info, const d_vclip_
 	auto &RobotCenters = LevelSharedRobotcenterState.RobotCenters;
 	fix		top_time;
 
+#if LP_DISABLE_GENERATOR == 1
+	return;
+#endif
+
 	if (robotcen->Enabled == 0)
 		return;
 

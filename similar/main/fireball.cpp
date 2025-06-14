@@ -465,7 +465,7 @@ static imobjptridx_t object_create_explosion_with_damage(const d_robot_info_arra
 								phys_apply_force(obj_iter, vforce);
 
 								if (is_proximity_bomb_or_player_smart_mine(get_weapon_id(obj_iter)))
-								{		//prox bombs have chance of blowing up
+								{		//prox bombs have chance of blowing up when explosion happens nearby
 									if (fixmul(dist,force) > i2f(8000)) {
 										obj_iter->flags |= OF_SHOULD_BE_DEAD;
 										explode_badass_weapon(Robot_info, obj_iter, obj_iter->pos);

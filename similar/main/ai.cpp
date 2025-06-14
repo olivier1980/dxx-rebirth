@@ -83,6 +83,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "d_levelstate.h"
 #include <utility>
 #include "letsplay.h"
+#include "collide.h"
 using std::min;
 
 namespace dsx {
@@ -2631,12 +2632,14 @@ static int do_any_robot_dying_frame(const d_robot_info_array &Robot_info, const 
 			objp->ctype.ai_info.dying_start_time = {GameTime64}; // make sure following only happens one time!
 			explode_object(LevelUniqueObjectState, Robot_info, LevelSharedSegmentState, LevelUniqueSegmentState, objp, F1_0/4);
 			digi_link_sound_to_object2(sound_effect::SOUND_BADASS_EXPLOSION, objp, 0, F2_0, sound_stack::allow_stacking, vm_distance{F1_0*512});
+#if LP_SKIP_ROBOTS == 0
 			if (Current_level_num < 0)
 			{
 				const auto id = get_robot_id(objp);
 				if (Robot_info[id].thief)
 					recreate_thief(Robot_info, id);
 			}
+#endif
 		}
 
 		return 1;
@@ -3865,7 +3868,10 @@ _exit_cheat:
 	}
 
 	if (robot_is_thief(robptr)) {
-
+#if LP_SKIP_ROBOTS == 1
+		obj->shields = 0;
+		return;
+#endif
 		compute_vis_and_vec(Robot_info, obj, player_info, vis_vec_pos, ailp, player_visibility, robptr);
 		do_thief_frame(obj, robptr, dist_to_player, player_visibility.visibility, vec_to_player);
 

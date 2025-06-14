@@ -68,6 +68,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "state.h"
 #include "multi.h"
 #include "gr.h"
+#include "collide.h"
 #include "letsplay.h"
 #if DXX_USE_OGL
 #include "ogl_init.h"
@@ -76,6 +77,8 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #if DXX_USE_EDITOR
 #include "editor/editor.h"
 #endif
+
+#include <iostream>
 
 #include "compiler-range_for.h"
 #include "d_levelstate.h"
@@ -547,6 +550,15 @@ static void state_object_rw_to_object(const object_rw *const obj_rw, object &obj
 	obj.pos.x         = obj_rw->pos.x;
 	obj.pos.y         = obj_rw->pos.y;
 	obj.pos.z         = obj_rw->pos.z;
+#if LP_SKIP_ROBOTS == 1
+	if (obj.type == OBJ_ROBOT) {
+		obj.pos.x         =-10000;
+		obj.pos.y         = -10000;
+		obj.pos.z = -10000;
+		obj.shields = 0;
+	}
+#endif
+
 	obj.orient.rvec.x = obj_rw->orient.rvec.x;
 	obj.orient.rvec.y = obj_rw->orient.rvec.y;
 	obj.orient.rvec.z = obj_rw->orient.rvec.z;
@@ -2104,7 +2116,7 @@ int state_restore_all_sub(const d_level_shared_destructible_light_state &LevelSh
 	//Read objects, and pop 'em into their respective segments.
 	{
 		const auto i{PHYSFSX_readSXE32(fp, swap)};
-	Objects.set_count(i);
+		Objects.set_count(i);
 	}
 	for (auto &obj : vmobjptr)
 	{

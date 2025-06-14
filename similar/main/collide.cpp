@@ -2217,6 +2217,12 @@ static void collide_player_and_weapon(const d_robot_info_array &Robot_info, cons
 	fix		damage = weapon->shields;
 
 #if DXX_BUILD_DESCENT == 2
+
+//#if LP_DISABLE_MINES == 1
+	//if ((get_weapon_id(weapon) == weapon_id_type::PROXIMITY_ID) || (get_weapon_id(weapon) == weapon_id_type::SUPERPROX_ID))
+//		return;
+//#endif
+
 	if (get_weapon_id(weapon) == weapon_id_type::OMEGA_ID)
 		if (!ok_to_do_omega_damage(weapon)) // see comment in laser.c
 			return;
