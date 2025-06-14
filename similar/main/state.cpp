@@ -552,8 +552,8 @@ static void state_object_rw_to_object(const object_rw *const obj_rw, object &obj
 	obj.pos.z         = obj_rw->pos.z;
 #if LP_SKIP_ROBOTS == 1
 	if (obj.type == OBJ_ROBOT) {
-		obj.pos.x         =-10000;
-		obj.pos.y         = -10000;
+		obj.pos.x = -10000;
+		obj.pos.y = -10000;
 		obj.pos.z = -10000;
 		obj.shields = 0;
 	}

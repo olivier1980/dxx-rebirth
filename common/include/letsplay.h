@@ -4,7 +4,7 @@
 #define LP_TRIPLE_LAVA_DAMAGE 0         // triple lava damage
 #define LP_SKIP_ROBOT_POWERUP 0         // robots dont drop powerups
 #define LP_ALWAYS_BOUNCE 0              // all weapons bounce
-#define LP_THIEF_NO_STEAL 1             // disable thief stealing
+#define LP_THIEF_NO_STEAL 0             // disable thief stealing
 #define LP_LOBOTOMY 0                   // robots dont respond or fire
 #define LP_RESTORE_FUEL_SHIELD 1        // fuel center restores shields
 #define LP_MAX_ENERGY_RESTORE 200       // amount of energy restored
@@ -18,5 +18,6 @@
 #define LP_ITEM_INF 1					// Headlight doesnt consume enrgy
 #define LP_ONE_HIT_KILL 0				// One hit kill
 #define LP_FAST_WEAPONS 0				// Add multiplier to weapon speed
-#define LP_SKIP_ROBOTS 1				// Remove all robots on load game (generators still work)
-#define LP_DISABLE_GENERATOR 1			// Disable generator
+#define LP_SKIP_ROBOTS 0				// Remove all robots on load game (generators still work)
+#define LP_DISABLE_GENERATOR 0			// Disable generator
+#define LP_THIEF_MAYHEM 1               // Every robot is a thief (except buddy)

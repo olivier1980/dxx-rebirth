@@ -36,7 +36,7 @@ COPYRIGHT 1993-1999 PARALLAX SOFTWARE CORPORATION.  ALL RIGHTS RESERVED.
 #include "fwd-partial_range.h"
 #include "d_array.h"
 #include "digi.h"
-
+#include "letsplay.h"
 namespace dcx {
 
 enum class robot_animation_state : uint8_t
@@ -183,6 +183,12 @@ static inline int robot_is_companion(const robot_info &robptr)
 
 static inline int robot_is_thief(const robot_info &robptr)
 {
+#if LP_THIEF_MAYHEM == 1
+	if (robptr.companion)
+		return false;
+
+	return true;
+#endif
 	return robptr.thief;
 }
 #endif
