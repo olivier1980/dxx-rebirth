@@ -1991,7 +1991,7 @@ window_event_result GameProcessFrame(const d_level_shared_robot_info_state &Leve
 		auto &energy = player_info.energy;
 #if LP_ITEM_INF == 0
 		energy -= (FrameTime*3/8);
-#endif
+
 		if (energy < i2f(10)) {
 			if (!turned_off) {
 				pl_flags &= ~PLAYER_FLAGS_HEADLIGHT_ON;
@@ -2010,6 +2010,7 @@ window_event_result GameProcessFrame(const d_level_shared_robot_info_state &Leve
 			if (Game_mode & GM_MULTI)
 				multi_send_flags(Player_num);
 		}
+#endif
 	}
 #endif
 

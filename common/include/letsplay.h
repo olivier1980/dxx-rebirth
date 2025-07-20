@@ -20,4 +20,5 @@
 #define LP_FAST_WEAPONS 0				// Add multiplier to weapon speed
 #define LP_SKIP_ROBOTS 0				// Remove all robots on load game (generators still work)
 #define LP_DISABLE_GENERATOR 0			// Disable generator
-#define LP_THIEF_MAYHEM 1               // Every robot is a thief (except buddy)
+#define LP_THIEF_MAYHEM 0               // Every robot is a thief (except buddy)
+#define LP_BUDDY_MAYHEM 0               // Every robot is a thief (except buddy)
